@@ -53,6 +53,7 @@
     pen: '<path d="M3 21l3.5-1 12-12-2.5-2.5-12 12zM14.5 6.5l2.5 2.5"/><path d="M15 21h6"/>',
     marker: '<path d="M9 14l-4 4v3h6l2-2M8 13l7-9 5 4-7 9z"/>',
     textT: '<path d="M5 6V4h14v2M12 4v16M9 20h6"/>',
+    lockline: '<path d="M4 12h16M4 8v8M20 8v8"/>',
     eraser: '<path d="M9 20h11M4.5 14.5l9-9 6 6-8.5 8.5H9z"/>',
     undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/>',
     docedit: '<path d="M13 3H5v18h14V9z"/><path d="M13 3v6h6"/><path d="M9 17l.6-2.6 4.8-4.8 2 2-4.8 4.8z"/>',
@@ -107,6 +108,12 @@
       help: 'Write a chord in brackets right before the syllable it lands on: <code>A[G]mazing [C]grace</code>. Text with chords on the line above is converted when you paste it. A section name goes in brackets on its own line: <code>[Chorus]</code>.',
       saved: 'Saved', saving: 'Saving…', notSaved: 'Not saved yet', stageView: 'Stage view',
       settings: 'Settings', language: 'Language', theme: 'Appearance', auto: 'Auto', dark: 'Dark', light: 'Light',
+      black: 'Black', blackHint: 'Black: pure black for OLED screens and dark rooms.',
+      songText: 'Song text', sheetFont: 'Font', fontBody: 'Standard', fontMono: 'Mono', fontSystem: 'System',
+      boldLyrics: 'Bold lyrics', boldChords: 'Bold chords', chordColor: 'Chord colour', chordSameAsAccent: 'Same as accent',
+      chordHi: 'Highlight chords', textPreview: 'Preview', textPreviewSong: '{title: Preview}\n[G]Here is a [C]line with [D]chords\nAnd the [Em]next one [D/F#]goes [G]home',
+      textSettingsHint: 'Applies to all songs on stage and in the editor preview. Printing stays black on white.',
+      lockLine: 'Straight lines', lockLineHint: 'Highlighter draws straight lines, across or down',
       defaultSpeed: 'Default scroll speed', defaultSpeedHint: 'Used for songs that have no saved speed yet.',
       speed: 'Speed', slower: 'Slower', faster: 'Faster', play: 'Start scrolling', pause: 'Pause scrolling',
       prev: 'Previous song', next: 'Next song', nextUp: 'Next', endOfSet: 'End of setlist',
@@ -144,7 +151,7 @@
       notesClear: 'Clear all', notesDone: 'Done', notesShow: 'Show notes', notesHide: 'Hide notes', notesSaved: 'Notes saved',
       notesTitle: 'Save your notes?', notesUnsaved: 'You have notes on this song that are not saved.',
       notesHintTouch: 'Draw with a finger or a pen. Scroll with two fingers.', notesHintPen: 'The pen draws and a finger scrolls.',
-      notesTextPh: 'Type a note, then Enter', c_nred: 'Red', c_nblue: 'Blue', c_nink: 'Black', c_ngreen: 'Green',
+      notesTextPh: 'Type a note, then Enter', notesTextHint: 'Tap the page to add a note. Tap a note to change it, drag it to move it.', c_nred: 'Red', c_nblue: 'Blue', c_nink: 'Black', c_ngreen: 'Green',
       c_hyellow: 'Yellow', c_hgreen: 'Green', c_hpink: 'Pink',
       save: 'Save', saved: 'Saved', unsaved: 'Unsaved changes', unsavedTitle: 'Save this song?',
       unsavedNew: 'This new song has not been saved yet.', unsavedText: 'This song has changes that are not saved.', discard: 'Discard',
@@ -182,6 +189,12 @@
       help: 'Skrifaðu hljóm í hornklofa beint fyrir framan atkvæðið sem hann á við: <code>A[G]mazing [C]grace</code>. Texta með hljómum í línunni fyrir ofan er umbreytt þegar þú límir hann inn. Kaflaheiti fer í hornklofa í sér línu: <code>[Viðlag]</code>.',
       saved: 'Vistað', saving: 'Vista…', notSaved: 'Ekki vistað enn', stageView: 'Sviðssýn',
       settings: 'Stillingar', language: 'Tungumál', theme: 'Útlit', auto: 'Sjálfvirkt', dark: 'Dökkt', light: 'Ljóst',
+      black: 'Svart', blackHint: 'Svart: kolsvart fyrir OLED skjái og litla birtu.',
+      songText: 'Texti í lögum', sheetFont: 'Letur', fontBody: 'Venjulegt', fontMono: 'Jafnbreitt', fontSystem: 'Kerfisletur',
+      boldLyrics: 'Feitur texti', boldChords: 'Feitir hljómar', chordColor: 'Litur á hljómum', chordSameAsAccent: 'Sami og áherslulitur',
+      chordHi: 'Highlight á hljómum', textPreview: 'Forskoðun', textPreviewSong: '{title: Forskoðun}\n[G]Hér er [C]lína með [D]hljómum\nOg [Em]næsta lína [D/F#]fer [G]heim',
+      textSettingsHint: 'Gildir um öll lög á sviðinu og í forskoðun ritilsins. Prentun helst svart á hvítu.',
+      lockLine: 'Beinar línur', lockLineHint: 'Yfirstrikun dregur beinar línur, lárétt eða lóðrétt',
       defaultSpeed: 'Sjálfgefinn skrunhraði', defaultSpeedHint: 'Notaður fyrir lög sem eiga ekki vistaðan hraða.',
       speed: 'Hraði', slower: 'Hægar', faster: 'Hraðar', play: 'Byrja að skruna', pause: 'Stöðva skrun',
       prev: 'Fyrra lag', next: 'Næsta lag', nextUp: 'Næst', endOfSet: 'Lagalistinn er búinn',
@@ -219,7 +232,7 @@
       notesClear: 'Hreinsa allt', notesDone: 'Lokið', notesShow: 'Sýna glósur', notesHide: 'Fela glósur', notesSaved: 'Glósur vistaðar',
       notesTitle: 'Vista glósurnar?', notesUnsaved: 'Þú ert með óvistaðar glósur á þessu lagi.',
       notesHintTouch: 'Teiknaðu með fingri eða penna. Skrunaðu með tveimur fingrum.', notesHintPen: 'Penninn teiknar og fingur skrunar.',
-      notesTextPh: 'Skrifaðu glósu og ýttu á Enter', c_nred: 'Rauður', c_nblue: 'Blár', c_nink: 'Svartur', c_ngreen: 'Grænn',
+      notesTextPh: 'Skrifaðu glósu og ýttu á Enter', notesTextHint: 'Pikkaðu á blaðið til að bæta við glósu. Pikkaðu á glósu til að breyta, dragðu hana til að færa.', c_nred: 'Rauður', c_nblue: 'Blár', c_nink: 'Svartur', c_ngreen: 'Grænn',
       c_hyellow: 'Gulur', c_hgreen: 'Grænn', c_hpink: 'Bleikur',
       save: 'Vista', saved: 'Vistað', unsaved: 'Óvistaðar breytingar', unsavedTitle: 'Vista lagið?',
       unsavedNew: 'Nýja lagið hefur ekki verið vistað.', unsavedText: 'Lagið hefur breyst síðan það var vistað.', discard: 'Henda',
@@ -246,14 +259,21 @@
   function lsGet(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
   function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage may be unavailable */ } }
   var prefs = Object.assign(
-    { lang: /^is/i.test(navigator.language || '') ? 'is' : 'en', theme: 'auto', fontSize: 20, defaultSpeed: 10, accent: 'orange', poolSort: 'title', setlistSort: 'created', penSize: 1, markerSize: 1, inkSmooth: 2 },
+    { lang: /^is/i.test(navigator.language || '') ? 'is' : 'en', theme: 'auto', fontSize: 20, defaultSpeed: 10, accent: 'orange', poolSort: 'title', setlistSort: 'created', penSize: 1, markerSize: 1, inkSmooth: 2,
+      sheetFont: 'body', boldLyrics: false, boldChords: true, chordColor: 'accent', chordHi: false, lockLine: false },
     lsGet(LS_PREFS) || {}
   );
   function savePrefs() { lsSet(LS_PREFS, prefs); }
   function applyPrefs() {
     var root = document.documentElement;
-    if (prefs.theme === 'dark' || prefs.theme === 'light') root.setAttribute('data-mode', prefs.theme);
+    if (prefs.theme === 'dark' || prefs.theme === 'light' || prefs.theme === 'black') root.setAttribute('data-mode', prefs.theme);
     else root.removeAttribute('data-mode');
+    // The phone's status bar follows the black theme too.
+    document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
+      if (!m.hasAttribute('data-orig')) m.setAttribute('data-orig', m.getAttribute('content') || '');
+      m.setAttribute('content', prefs.theme === 'black' ? '#000000' : m.getAttribute('data-orig'));
+    });
+    applyText();
     root.lang = prefs.lang;
     $('#tab-songs').textContent = t('songs');
     $('#tab-setlists').textContent = t('setlists');
@@ -304,6 +324,17 @@
     var c = accentFor(prefs.accent, dark);
     root.style.setProperty('--accent', rgbHex(c));
     root.style.setProperty('--accent-ink', contrast(c, [255, 255, 255]) >= contrast(c, [20, 16, 10]) ? '#ffffff' : '#14100a');
+    var cc = !prefs.chordColor || prefs.chordColor === 'accent' ? c : accentFor(prefs.chordColor, dark);
+    root.style.setProperty('--chord', rgbHex(cc));
+  }
+  // Song text settings: font, weights and chord highlight. Only the song sheet on screen uses them.
+  var SHEET_FONTS = { body: 'var(--font-body)', mono: 'var(--font-mono)', system: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif' };
+  function applyText() {
+    var root = document.documentElement;
+    root.style.setProperty('--sheet-font', SHEET_FONTS[prefs.sheetFont] || SHEET_FONTS.body);
+    root.style.setProperty('--lyric-w', prefs.boldLyrics ? '700' : '400');
+    root.style.setProperty('--chord-w', prefs.boldChords === false ? '400' : '700');
+    root.classList.toggle('chord-hi', !!prefs.chordHi);
   }
   try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyAccent); } catch (e) { /* old browser */ }
   try { new MutationObserver(applyAccent).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-mode'] }); } catch (e) { /* old browser */ }
@@ -1146,7 +1177,8 @@
     if (ed && ed.dirty) { guardEditor(function () { openEditor(songId, ret, draft); }); return; }
     if (ed) leaveEditor();
     var rec = draft || (songId ? clone(data.songs[songId]) : { id: uid('s'), title: '', artist: '', key: '', bpm: '', body: '', tags: [], createdAt: Date.now(), updatedAt: 0 });
-    ed = { rec: rec, isNew: !songId, dirty: !!draft, ret: ret || null };
+    ed = { rec: rec, isNew: !songId, dirty: !!draft, ret: ret || null,
+      from: { view: ui.view === 'edit' ? 'songs' : ui.view, setlistId: ui.setlistId } };
     ui.view = 'edit';
     render();
     main.scrollTop = 0;
@@ -1171,6 +1203,14 @@
     ed.isNew = false; ed.dirty = false;
     edStatus();
     toast(t('saved'));
+  }
+  // The Save button: save, then go back to where the editor was opened from. Ctrl+S only saves.
+  function edSaveAndBack() {
+    if (!ed) return;
+    if (ed.dirty || ed.isNew) edSave();
+    if (ed.ret) { backToStage(); return; }
+    var from = ed.from || { view: 'songs' };
+    go(from.view, { setlistId: from.setlistId });
   }
   function edStatus() {
     var s = $('#ed-status'), b = $('#ed-save');
@@ -1356,9 +1396,8 @@
         h('button', { class: 'btn ghost', type: 'button', onclick: function () { go('songs'); } }, ico('left'), t('songPool')),
         h('span', { class: 'hint', id: 'ed-status' }),
         h('span', { class: 'spacer' }),
-        h('button', { class: 'btn primary', id: 'ed-save', type: 'button', onclick: edSave }, t('save')),
+        h('button', { class: 'btn primary', id: 'ed-save', type: 'button', onclick: edSaveAndBack }, t('save')),
         iconBtn('export', t('exportSong'), function () { exportSong(ed.rec); }),
-        iconBtn('printer', t('print'), function () { openPrint({ song: clone(ed.rec) }); }),
         ed.ret
           ? h('button', { class: 'btn', type: 'button', onclick: backToStage }, ico('play'), t('backToStage'))
           : h('button', { class: 'btn', type: 'button', onclick: function () {
@@ -1477,6 +1516,11 @@
           e.diagBtn = iconBtn('grid', t('diagramsShow'), function () { prefs.showDiagrams = !prefs.showDiagrams; savePrefs(); drawStage(true); }),
           e.notesBtn = h('button', { class: 'btn small notesbtn', type: 'button', 'aria-label': t('notes'), title: t('notes'), onclick: notesStart }, ico('pen'), h('span', { text: t('notes') })),
           e.eyeBtn = iconBtn('eye', t('notesHide'), function () { prefs.hideNotes = !prefs.hideNotes; savePrefs(); drawNotes(); }),
+          e.printBtn = iconBtn('printer', t('print'), function () {
+            var info = stageInfo(); if (!info) return;
+            setPlaying(false);
+            openPrint({ song: info.song, tr: st.tr, acc: st.acc, capo: st.capo, noChords: st.noChords });
+          }),
           h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('textSmaller'), title: t('textSmaller'), text: 'A−', onclick: function () { setFont(-2); } }),
           h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('textLarger'), title: t('textLarger'), text: 'A+', onclick: function () { setFont(2); } }),
           iconBtn('expand', t('fullscreen'), function () {
@@ -1532,8 +1576,8 @@
     e.capo.textContent = st.capo ? t('capo') + ' ' + st.capo : t('capo');
     e.capo.setAttribute('aria-label', st.capo ? t('capo') + ' ' + st.capo : t('capoNone'));
     e.capo.classList.toggle('on', !!st.capo);
-    e.chordsBtn.textContent = st.noChords ? t('lyricsOnly') : t('chordsOn');
-    e.chordsBtn.setAttribute('aria-pressed', String(!st.noChords));
+    // The button says what it does: hide the chords, or show them again.
+    e.chordsBtn.textContent = st.noChords ? t('showChords') : t('lyricsOnly');
     e.chordsBtn.title = st.noChords ? t('showChords') : t('hideChords');
     e.diagBtn.setAttribute('aria-pressed', String(!!prefs.showDiagrams));
     e.diagBtn.setAttribute('aria-label', prefs.showDiagrams ? t('diagramsHide') : t('diagramsShow'));
@@ -1841,9 +1885,11 @@
       e.eyeBtn.title = e.eyeBtn.getAttribute('aria-label');
     }
     if (e.notesBtn) e.notesBtn.hidden = an.on || st.noChords;
+    if (e.printBtn) e.printBtn.hidden = an.on;
     if (!an.body || !an.layer || !an.layer.isConnected) return;
     an.layer.classList.toggle('drawing', an.on);
     an.layer.classList.toggle('erase', an.on && an.tool === 'eraser');
+    an.layer.classList.toggle('text', an.on && an.tool === 'text');
     while (an.svg.firstChild) an.svg.removeChild(an.svg.firstChild);
     Array.prototype.slice.call(an.layer.querySelectorAll('.note-text')).forEach(function (x) { x.remove(); });
     an.svg.setAttribute('width', an.body.scrollWidth);
@@ -1941,13 +1987,15 @@
         an.tool === 'pen' ? sizes('penSize', [3, 6, 10]) : null),
       h('span', { class: 'ngroup' }, tool('marker', 'marker', t('notesMarker')),
         an.tool === 'marker' ? swatch(MARKERS, an.marker, function (v) { an.marker = v; }) : null,
-        an.tool === 'marker' ? sizes('markerSize', [8, 12, 17]) : null),
+        an.tool === 'marker' ? sizes('markerSize', [8, 12, 17]) : null,
+        an.tool === 'marker' ? h('button', { class: 'iconbtn lockbtn', type: 'button', 'aria-pressed': String(!!prefs.lockLine), 'aria-label': t('lockLineHint'), title: t('lockLineHint'),
+          onclick: function () { prefs.lockLine = !prefs.lockLine; savePrefs(); drawNotesBar(); } }, ico('lockline'), h('span', { text: t('lockLine') })) : null),
       tool('text', 'textT', t('notesText')),
       tool('eraser', 'eraser', t('notesEraser')),
       h('span', { class: 'nsep' }),
       h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('notesUndo'), title: t('notesUndo'), disabled: !an.undo.length, onclick: notesUndo }, ico('undo')),
       h('button', { class: 'btn small ghost', type: 'button', disabled: !an.notes.length, onclick: function () { notesPush(); an.notes = []; drawNotes(); drawNotesBar(); } }, t('notesClear')),
-      h('span', { class: 'nhint hint', text: an.penSeen ? t('notesHintPen') : t('notesHintTouch') }),
+      h('span', { class: 'nhint hint', text: an.tool === 'text' ? t('notesTextHint') : an.penSeen ? t('notesHintPen') : t('notesHintTouch') }),
       h('button', { class: 'btn small primary', type: 'button', onclick: function () { notesEnd(true); } }, t('notesDone')));
   }
 
@@ -1986,23 +2034,47 @@
         }
       }
     }
-    function addText(p) {
-      var a = anchorFor(p[0], p[1]);
-      if (!a) return;
+    // A text note under the pointer, if any.
+    function textNoteAt(ev) {
+      var hits = document.elementsFromPoint ? document.elementsFromPoint(ev.clientX, ev.clientY) : [];
+      for (var i = 0; i < hits.length; i++) if (hits[i].classList && hits[i].classList.contains('note-text') && layer.contains(hits[i])) return hits[i];
+      return null;
+    }
+    // Where a text note's top left corner sits, as a note position anchored to the line under it.
+    function textPos(left, top) {
+      var em = emSize(), a = anchorFor(left, top + em * 0.6);
+      if (!a) return null;
+      return { a: { i: +a.el.getAttribute('data-bi'), k: a.el.getAttribute('data-k') }, x: +((left - a.ox) / em).toFixed(3), y: +((top - a.oy) / em).toFixed(3) };
+    }
+    // New note at p, or edit the note `old` (its element el). An empty text removes the note.
+    function addText(p, old, el) {
       var em = emSize();
+      var left = old ? el.offsetLeft : p[0], top = old ? el.offsetTop : p[1] - em * 0.6;
+      if (!old && !anchorFor(p[0], p[1])) return;
       var input = h('input', { class: 'note-input', type: 'text', placeholder: t('notesTextPh'), 'aria-label': t('notesText') });
-      input.style.left = p[0] + 'px'; input.style.top = (p[1] - em * 0.6) + 'px'; input.style.color = inkColor(an.pen);
+      if (old) { input.value = old.text; el.style.visibility = 'hidden'; }
+      input.style.left = left + 'px'; input.style.top = top + 'px'; input.style.color = inkColor(old ? old.color : an.pen);
       layer.appendChild(input);
       var done = false;
       function commit(keep) {
         if (done) return; done = true;
         var v = input.value.trim(); input.remove();
+        if (old) {
+          if (!keep || v === old.text) { el.style.visibility = ''; return; }
+          notesPush();
+          if (!v) an.notes = an.notes.filter(function (n) { return n.id !== old.id; });
+          else an.notes.forEach(function (n) { if (n.id === old.id) n.text = v.slice(0, 200); });
+          drawNotes(); drawNotesBar();
+          return;
+        }
         if (!keep || !v) return;
+        var pos = textPos(left, top);
+        if (!pos) return;
         notesPush();
-        an.notes.push({ id: uid('n'), type: 'text', color: an.pen, a: { i: +a.el.getAttribute('data-bi'), k: a.el.getAttribute('data-k') },
-          x: +((p[0] - a.ox) / em).toFixed(3), y: +((p[1] - em * 0.6 - a.oy) / em).toFixed(3), text: v.slice(0, 200) });
+        an.notes.push({ id: uid('n'), type: 'text', color: an.pen, a: pos.a, x: pos.x, y: pos.y, text: v.slice(0, 200) });
         drawNotes(); drawNotesBar();
       }
+      if (old) input.select();
       input.addEventListener('keydown', function (ev) {
         ev.stopPropagation();
         if (ev.key === 'Enter') { ev.preventDefault(); commit(true); }
@@ -2030,7 +2102,16 @@
         an.scrolling = true;
         return;
       }
-      if (an.tool === 'text') { addText(local(ev)); return; }
+      if (an.tool === 'text') {
+        var tEl = textNoteAt(ev);
+        if (tEl) {
+          var tid = tEl.getAttribute('data-id');
+          an.live = { id: ev.pointerId, textMove: true, el: tEl, note: an.notes.filter(function (n) { return n.id === tid; })[0],
+            sx: ev.clientX, sy: ev.clientY, l0: tEl.offsetLeft, t0: tEl.offsetTop, moved: false };
+          return;
+        }
+        addText(local(ev)); return;
+      }
       if (an.tool === 'eraser') { an.erasing = false; eraseAt(ev); an.live = { erase: true, id: ev.pointerId }; return; }
       var hl = an.tool === 'marker', color = hl ? an.marker : an.pen, em = emSize(), w = penWidth(hl);
       // Pressure only from a real pen; fingers and mice report a fixed value.
@@ -2039,7 +2120,7 @@
       if (pr) p0.push(ev.pressure);
       var path = inkPathEl([p0], pr ? [pressW(w * em, ev.pressure)] : null, inkColor(color), w * em, hl);
       an.svg.appendChild(path);
-      an.live = { id: ev.pointerId, pts: [p0], raw: p0, path: path, hl: hl, color: color, w: w, pr: pr, f: SMOOTH[clamp(prefs.inkSmooth | 0, 0, 3)] };
+      an.live = { id: ev.pointerId, pts: [p0], raw: p0, path: path, hl: hl, color: color, w: w, pr: pr, f: SMOOTH[clamp(prefs.inkSmooth | 0, 0, 3)], lock: hl && !!prefs.lockLine };
     });
     layer.addEventListener('pointermove', function (ev) {
       var pinfo = an.ptrs[ev.pointerId];
@@ -2052,6 +2133,21 @@
       if (!an.live || an.live.id !== ev.pointerId) return;
       if (an.live.erase) { eraseAt(ev); return; }
       var lv = an.live, em = emSize();
+      if (lv.textMove) {
+        var mx = ev.clientX - lv.sx, my = ev.clientY - lv.sy;
+        if (!lv.moved && Math.abs(mx) + Math.abs(my) < 6) return;
+        lv.moved = true; lv.el.classList.add('moving');
+        lv.el.style.left = Math.max(0, lv.l0 + mx) + 'px'; lv.el.style.top = Math.max(0, lv.t0 + my) + 'px';
+        return;
+      }
+      if (lv.lock) {
+        // Straight line: across or down, whichever way the stroke started.
+        var rp = local(ev), s0 = lv.pts[0];
+        if (!lv.dir && Math.abs(rp[0] - s0[0]) + Math.abs(rp[1] - s0[1]) > 8) lv.dir = Math.abs(rp[1] - s0[1]) > Math.abs(rp[0] - s0[0]) ? 'v' : 'h';
+        lv.raw = lv.dir === 'v' ? [s0[0], rp[1]] : [rp[0], s0[1]];
+        lv.path.setAttribute('d', pathD([s0, lv.raw]));
+        return;
+      }
       var evs = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev];
       (evs.length ? evs : [ev]).forEach(function (ce) {
         var raw = local(ce), last = lv.pts[lv.pts.length - 1];
@@ -2074,6 +2170,17 @@
       if (!lv || lv.id !== ev.pointerId) return;
       an.live = null;
       if (lv.erase) { an.erasing = false; return; }
+      if (lv.textMove) {
+        if (!lv.note) return;
+        if (!lv.moved) { addText(null, lv.note, lv.el); return; }
+        lv.el.classList.remove('moving');
+        var pos = textPos(lv.el.offsetLeft, lv.el.offsetTop);
+        if (!pos) { drawNotes(); return; }
+        notesPush();
+        an.notes.forEach(function (n) { if (n.id === lv.note.id) { n.a = pos.a; n.x = pos.x; n.y = pos.y; } });
+        drawNotes(); drawNotesBar();
+        return;
+      }
       var em = emSize(), xs = lv.pts.map(function (p) { return p[0]; }), ys = lv.pts.map(function (p) { return p[1]; });
       var a = anchorFor((Math.min.apply(null, xs) + Math.max.apply(null, xs)) / 2, (Math.min.apply(null, ys) + Math.max.apply(null, ys)) / 2);
       lv.path.remove();
@@ -2108,7 +2215,7 @@
         return { song: song, tr: it.tr || 0, acc: it.acc || 'auto', capo: itemCapo(song, it) };
       });
     }
-    return [{ song: target.song, tr: 0, acc: 'auto', capo: (target.song.capo | 0) }];
+    return [{ song: target.song, tr: target.tr || 0, acc: target.acc || 'auto', capo: target.capo != null ? target.capo | 0 : (target.song.capo | 0) }];
   }
   function entryMeta(en, noChords) {
     var s = en.song, bits = [];
@@ -2120,7 +2227,7 @@
   function openPrint(target) {
     var sl = target.setlistId ? data.setlists[target.setlistId] : null;
     var po = Object.assign({ what: 'songs', diagrams: false, newPage: true, size: 'm' }, prefs.print || {});
-    po.chords = sl ? !sl.hideChords : (prefs.print && prefs.print.chords != null ? prefs.print.chords : true);
+    po.chords = sl ? !sl.hideChords : target.noChords != null ? !target.noChords : (prefs.print && prefs.print.chords != null ? prefs.print.chords : true);
     function seg(options, cur, set) {
       return h('div', { class: 'seg' }, options.map(function (o) {
         return h('button', { type: 'button', 'aria-pressed': String(o[0] === cur), text: o[1], onclick: function () { set(o[0]); draw(); } });
@@ -2131,7 +2238,7 @@
       cb.addEventListener('change', function () { set(cb.checked); draw(); });
       return h('label', { class: 'check' }, cb, h('span', { text: label }));
     }
-    function keep() { prefs.print = { what: po.what, diagrams: po.diagrams, newPage: po.newPage, size: po.size, chords: sl ? (prefs.print || {}).chords : po.chords }; savePrefs(); }
+    function keep() { prefs.print = { what: po.what, diagrams: po.diagrams, newPage: po.newPage, size: po.size, chords: sl || target.noChords != null ? (prefs.print || {}).chords : po.chords }; savePrefs(); }
     function draw() {
       var listOnly = sl && po.what === 'list';
       openDialog(h('div', { class: 'dlg' },
@@ -2408,6 +2515,35 @@
 
   // ---------- settings ----------
   function openSettings() {
+    function check(label, on, set) {
+      var cb = h('input', { type: 'checkbox', checked: on });
+      cb.addEventListener('change', function () { set(cb.checked); savePrefs(); applyText(); draw(); });
+      return h('label', { class: 'check' }, cb, h('span', { text: label }));
+    }
+    // Font, bold, chord colour and highlight, with a small live preview.
+    function textSection() {
+      var dark = isDarkNow(), cur = prefs.chordColor || 'accent';
+      var acc = rgbHex(accentFor(prefs.accent, dark));
+      var chordSw = h('div', { class: 'swatches' },
+        h('button', { class: 'swatch same', type: 'button', 'aria-pressed': String(cur === 'accent'), 'aria-label': t('chordSameAsAccent'), title: t('chordSameAsAccent'),
+          style: 'background:' + acc, onclick: function () { prefs.chordColor = 'accent'; savePrefs(); applyAccent(); draw(); } }, h('span', { text: 'A' })),
+        ACCENTS.map(function (a) {
+          return h('button', { class: 'swatch', type: 'button', 'aria-pressed': String(cur === a.id), 'aria-label': t('c_' + a.id), title: t('c_' + a.id),
+            style: 'background:' + rgbHex(accentFor(a.id, dark)), onclick: function () { prefs.chordColor = a.id; savePrefs(); applyAccent(); draw(); } });
+        }));
+      var prev = h('div', { class: 'txtprev', 'aria-label': t('textPreview') },
+        renderSheet({ body: t('textPreviewSong'), key: 'G' }, 0, 'auto'));
+      return h('div', { class: 'field textset' }, h('span', { text: t('songText') }),
+        h('div', { class: 'sub' }, h('small', { text: t('sheetFont') }),
+          seg([['body', t('fontBody')], ['mono', t('fontMono')], ['system', t('fontSystem')]], prefs.sheetFont || 'body', function (v) { prefs.sheetFont = v; savePrefs(); applyText(); draw(); })),
+        h('div', { class: 'checks' },
+          check(t('boldLyrics'), !!prefs.boldLyrics, function (v) { prefs.boldLyrics = v; }),
+          check(t('boldChords'), prefs.boldChords !== false, function (v) { prefs.boldChords = v; }),
+          check(t('chordHi'), !!prefs.chordHi, function (v) { prefs.chordHi = v; })),
+        h('div', { class: 'sub' }, h('small', { text: t('chordColor') }), chordSw),
+        prev,
+        h('span', { class: 'hint', text: t('textSettingsHint') }));
+    }
     function seg(options, current, onpick) {
       return h('div', { class: 'seg' }, options.map(function (o) {
         return h('button', { type: 'button', 'aria-pressed': String(o[0] === current), text: o[1], onclick: function () { onpick(o[0]); } });
@@ -2452,8 +2588,10 @@
         h('div', { class: 'field' }, h('span', { text: t('language') }),
           seg([['en', 'English'], ['is', 'Íslenska']], prefs.lang, function (v) { prefs.lang = v; savePrefs(); applyPrefs(); if (ui.view !== 'edit') render(); draw(); })),
         h('div', { class: 'field' }, h('span', { text: t('theme') }),
-          seg([['auto', t('auto')], ['dark', t('dark')], ['light', t('light')]], prefs.theme, function (v) { prefs.theme = v; savePrefs(); applyPrefs(); draw(); })),
+          seg([['auto', t('auto')], ['dark', t('dark')], ['black', t('black')], ['light', t('light')]], prefs.theme, function (v) { prefs.theme = v; savePrefs(); applyPrefs(); draw(); }),
+          h('span', { class: 'hint', text: t('blackHint') })),
         h('div', { class: 'field' }, h('span', { text: t('color') }), swatches),
+        textSection(),
         h('div', { class: 'field' }, h('span', { text: t('inkSmooth') }),
           seg([[0, t('smooth0')], [1, t('smooth1')], [2, t('smooth2')], [3, t('smooth3')]], prefs.inkSmooth | 0, function (v) { prefs.inkSmooth = v; savePrefs(); draw(); }),
           h('span', { class: 'hint', text: t('inkSmoothHint') })),

@@ -65,7 +65,7 @@ async def main():
         await page.get_by_label('Breyta lagi').click()
         body = await page.input_value('#ed-body')
         await page.fill('#ed-body', 'Ný lína efst\nÖnnur ný lína\n' + body)
-        await page.click('#ed-save'); await page.get_by_role('button', name='Aftur á svið').click()
+        await page.click('#ed-save')  # Save goes back to the stage (3.4)
         await page.wait_for_selector('#stage .notes-svg g')
         x, y, w, h = await line_box(page, L); moved = await page.evaluate(STROKE_BOX)
         print('after adding lines above: stroke still on its line:', y <= moved[1] <= y + h)

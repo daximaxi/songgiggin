@@ -90,7 +90,7 @@ async def main():
         await page.wait_for_selector('#ed-body')
         print('editing:', await page.input_value('#ed-title'))
         await page.fill('#ed-artist', 'John Newton')
-        await page.click('#ed-save'); await page.get_by_role('button', name='Aftur á svið').click()
+        await page.click('#ed-save')  # Save goes back to the stage (3.4)
         await page.wait_for_selector('#stage .sheet-body')
         print('back on stage:', await page.locator('.sttitle b').inner_text(), '|', await page.locator('.sttitle small').inner_text(),
               '| scroll', await page.evaluate("document.getElementById('stage-sheet').scrollTop"))
@@ -99,7 +99,7 @@ async def main():
 
         # colour
         await page.click('#btn-settings')
-        await page.get_by_role('button', name='Blár', exact=True).click()
+        await page.get_by_role('button', name='Blár', exact=True).first.click()  # first row: accent; the second row is chord colour
         acc = await page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent')")
         print('accent blue (dark):', acc)
         await page.get_by_role('button', name='Ljóst').click()

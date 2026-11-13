@@ -21,6 +21,8 @@
 }
 :root[data-theme="dark"]:not([data-mode="light"]) { /*@DARK@*/ }
 :root[data-mode="dark"] { /*@DARK@*/ }
+/* Black: pure black for OLED screens and dark rooms. Text a little dimmer so it does not glare. */
+:root[data-mode="black"] { /*@DARK@*/ --bg: #000000; --surface: #050506; --ink: #d4d8de; --muted: #8a919c; --line: #23272d; }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
@@ -445,3 +447,25 @@ a.brand:hover { filter: brightness(1.08); }
   #print .p-list.big { font-size: 26px; }
   #print .p-list.big h1 { font-size: 1.6em; }
 }
+
+/* ---------- v3.4: black theme, song text settings, note selection, straight highlighter ---------- */
+:root { --chord: var(--accent); --sheet-font: var(--font-body); --lyric-w: 400; --chord-w: 700; }
+.stsheet .sheet-body, .preview .sheet-body, .txtprev .sheet-body { font-family: var(--sheet-font); font-weight: var(--lyric-w); }
+.stsheet .ch, .preview .ch, .txtprev .ch { color: var(--chord); font-weight: var(--chord-w); }
+.stsheet .ch.an, .preview .ch.an, .txtprev .ch.an { color: var(--muted); font-weight: 400; }
+/* Highlight: a soft marker behind the chord name, not behind the gap after it. */
+:root.chord-hi .stsheet .ch:not(.an):not(:empty),
+:root.chord-hi .preview .ch:not(.an):not(:empty),
+:root.chord-hi .txtprev .ch:not(.an):not(:empty) {
+  background-color: color-mix(in srgb, var(--chord) 24%, transparent); background-clip: content-box; border-radius: .2em;
+}
+.textset .sub { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.textset .sub small { color: var(--muted); }
+.textset .checks { display: flex; flex-wrap: wrap; gap: 0 18px; }
+.swatch.same { display: inline-flex; align-items: center; justify-content: center; font-weight: 700; color: var(--accent-ink); font-size: 13px; }
+.txtprev { border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin-top: 8px; background: var(--bg); font-size: 20px; line-height: 1.35; overflow-x: auto; }
+.txtprev .sheet-body > *:first-child { margin-top: 0; }
+.notes-layer.drawing.text .note-text { pointer-events: auto; cursor: grab; outline: 1px dashed color-mix(in srgb, var(--muted) 70%, transparent); outline-offset: 2px; border-radius: 2px; }
+.notes-layer.drawing.text .note-text.moving { cursor: grabbing; opacity: .85; outline-style: solid; }
+.lockbtn { width: auto; gap: 6px; padding: 0 10px; font-size: 13px; font-weight: 700; }
+.lockbtn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
