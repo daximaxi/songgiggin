@@ -338,6 +338,45 @@ a.brand:hover { filter: brightness(1.08); }
 .dlg .foot { flex-wrap: wrap; }
 .dlg .foot .btn { white-space: nowrap; }
 
+/* ---------- v3: notes on top of a song ---------- */
+.sheet-body { position: relative; }
+.notes-layer { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.notes-layer.drawing { pointer-events: auto; touch-action: none; cursor: crosshair; -webkit-user-select: none; user-select: none; }
+.notes-layer.drawing.erase { cursor: cell; }
+.notes-svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+.notes-layer.erase .notes-svg .hit { pointer-events: stroke; }
+.notes-layer.erase .note-text { pointer-events: auto; outline: 1px dashed var(--muted); }
+.note-text {
+  position: absolute; font-size: .72em; font-weight: 700; line-height: 1.2; white-space: pre-wrap; max-width: 18em;
+  padding: 1px 4px; border-radius: 3px; background: color-mix(in srgb, var(--bg) 70%, transparent); pointer-events: none;
+}
+.note-input {
+  position: absolute; z-index: 3; font-size: .72em; font-weight: 700; min-width: 14em; padding: 4px 6px;
+  border: 2px solid var(--accent); border-radius: 4px; background: var(--surface); pointer-events: auto;
+}
+.notesbar {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 6px 10px;
+  border-bottom: 1px solid var(--line); background: var(--surface);
+}
+.notesbar .tool[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.notesbar .ngroup { display: inline-flex; align-items: center; gap: 4px; }
+.nswatches { display: inline-flex; gap: 4px; padding: 0 4px; }
+.nswatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--line); padding: 0; }
+.nswatch[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 1px; }
+.nsep { width: 1px; align-self: stretch; background: var(--line); margin: 0 4px; }
+.nhint { flex: 1 1 160px; text-align: right; }
+.notesbtn { margin-right: 4px; }
+@media (max-width: 760px) {
+  .nhint { display: none; }
+  .notesbtn span { display: none; }
+}
+@media (max-width: 760px) {
+  .notesbar { flex-wrap: nowrap; overflow-x: auto; gap: 2px; padding: 4px 6px; scrollbar-width: none; }
+  .notesbar > * { flex: none; }
+  .notesbar .btn.primary { margin-left: auto; position: sticky; right: 0; }
+}
+.note-text { width: max-content; max-width: min(18em, 92vw); }
+
 </style>
 </head>
 <body>
@@ -977,7 +1016,14 @@ a.brand:hover { filter: brightness(1.08); }
     import: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
     export: '<path d="M12 15V4M7 9l5-5 5 5M5 20h14"/>',
     file: '<path d="M6 3h8l4 4v14H6zM14 3v4h4"/>',
-    copy: '<rect x="8" y="8" width="12" height="12" rx="1"/><path d="M16 8V4H4v12h4"/>'
+    copy: '<rect x="8" y="8" width="12" height="12" rx="1"/><path d="M16 8V4H4v12h4"/>',
+    pen: '<path d="M3 21l3.5-1 12-12-2.5-2.5-12 12zM14.5 6.5l2.5 2.5"/><path d="M15 21h6"/>',
+    marker: '<path d="M9 14l-4 4v3h6l2-2M8 13l7-9 5 4-7 9z"/>',
+    textT: '<path d="M5 6V4h14v2M12 4v16M9 20h6"/>',
+    eraser: '<path d="M9 20h11M4.5 14.5l9-9 6 6-8.5 8.5H9z"/>',
+    undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/>',
+    eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    eyeoff: '<path d="M2 12s3.6-7 10-7c2 0 3.7.7 5.1 1.6M22 12s-3.6 7-10 7c-2 0-3.7-.7-5.1-1.6M4 20L20 4"/>'
   };
   function ico(name) {
     var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -1055,6 +1101,12 @@ a.brand:hover { filter: brightness(1.08); }
       mNewTags: 'New tags', mNothing: 'Everything in the file is already here. Nothing to import.', mDone: 'Import finished',
       mBad: 'This file could not be read as a song or a Songgiggin file.',
       nLists: function (n) { return n === 1 ? '1 setlist' : n + ' setlists'; },
+      notes: 'Notes', notesPen: 'Pen', notesMarker: 'Highlighter', notesText: 'Text', notesEraser: 'Eraser', notesUndo: 'Undo',
+      notesClear: 'Clear all', notesDone: 'Done', notesShow: 'Show notes', notesHide: 'Hide notes', notesSaved: 'Notes saved',
+      notesTitle: 'Save your notes?', notesUnsaved: 'You have notes on this song that are not saved.',
+      notesHintTouch: 'Draw with a finger or a pen. Scroll with two fingers.', notesHintPen: 'The pen draws and a finger scrolls.',
+      notesTextPh: 'Type a note, then Enter', c_nred: 'Red', c_nblue: 'Blue', c_nink: 'Black', c_ngreen: 'Green',
+      c_hyellow: 'Yellow', c_hgreen: 'Green', c_hpink: 'Pink',
       save: 'Save', saved: 'Saved', unsaved: 'Unsaved changes', unsavedTitle: 'Save this song?',
       unsavedNew: 'This new song has not been saved yet.', unsavedText: 'This song has changes that are not saved.', discard: 'Discard',
       imported: 'Imported. Check the title, artist and key, then save.', importedGuess: 'Imported. The key was guessed from the chords, so check it, then save.', cancel: 'Cancel',
@@ -1111,6 +1163,12 @@ a.brand:hover { filter: brightness(1.08); }
       mNewTags: 'Ný tags', mNothing: 'Allt í skránni er þegar hér. Ekkert að flytja inn.', mDone: 'Innflutningi lokið',
       mBad: 'Ekki tókst að lesa þessa skrá sem lag eða Songgiggin skrá.',
       nLists: function (n) { return (n % 10 === 1 && n % 100 !== 11) ? n + ' lagalisti' : n + ' lagalistar'; },
+      notes: 'Glósur', notesPen: 'Penni', notesMarker: 'Yfirstrikun', notesText: 'Texti', notesEraser: 'Strokleður', notesUndo: 'Afturkalla',
+      notesClear: 'Hreinsa allt', notesDone: 'Lokið', notesShow: 'Sýna glósur', notesHide: 'Fela glósur', notesSaved: 'Glósur vistaðar',
+      notesTitle: 'Vista glósurnar?', notesUnsaved: 'Þú ert með óvistaðar glósur á þessu lagi.',
+      notesHintTouch: 'Teiknaðu með fingri eða penna. Skrunaðu með tveimur fingrum.', notesHintPen: 'Penninn teiknar og fingur skrunar.',
+      notesTextPh: 'Skrifaðu glósu og ýttu á Enter', c_nred: 'Rauður', c_nblue: 'Blár', c_nink: 'Svartur', c_ngreen: 'Grænn',
+      c_hyellow: 'Gulur', c_hgreen: 'Grænn', c_hpink: 'Bleikur',
       save: 'Vista', saved: 'Vistað', unsaved: 'Óvistaðar breytingar', unsavedTitle: 'Vista lagið?',
       unsavedNew: 'Nýja lagið hefur ekki verið vistað.', unsavedText: 'Lagið hefur breyst síðan það var vistað.', discard: 'Henda',
       imported: 'Flutt inn. Athugaðu titil, flytjanda og tóntegund og vistaðu svo.', importedGuess: 'Flutt inn. Tóntegundin var giskuð út frá hljómunum. Athugaðu hana og vistaðu svo.', cancel: 'Hætta við',
@@ -1451,11 +1509,17 @@ a.brand:hover { filter: brightness(1.08); }
   function closeDialog() { try { dlg.close(); } catch (e) { dlg.removeAttribute('open'); var f = dlgOnClose; dlgOnClose = null; if (f) f(); } }
 
   // ---------- song sheet rendering ----------
+  function blockKey(b) {
+    if (b.type === 'line') return 'l:' + b.segs.map(function (x) { return x.text; }).join('').replace(/\s+/g, ' ').trim().toLowerCase();
+    if (b.type === 'tab') return 't:' + (b.lines[0] || '');
+    if (b.type === 'empty') return 'e';
+    return b.type.charAt(0) + ':' + String(b.text || '').toLowerCase();
+  }
   function renderSheet(song, tr, accPref) {
     var parsed = C.parseSong(song.body);
     var sp = C.resolveSpelling(song.key, song.body, tr, accPref || 'auto');
     var root = h('div', { class: 'sheet-body' }), chorusEl = null, hasTab = false;
-    parsed.blocks.forEach(function (b) {
+    parsed.blocks.forEach(function (b, bi) {
       var el;
       if (b.type === 'empty') el = h('div', { class: 'ln gap' });
       else if (b.type === 'section') el = h('div', { class: 'sec', text: b.text });
@@ -1480,6 +1544,8 @@ a.brand:hover { filter: brightness(1.08); }
           }));
         }));
       }
+      el.setAttribute('data-bi', String(bi));
+      el.setAttribute('data-k', blockKey(b));
       if (b.chorus) {
         if (!chorusEl) { chorusEl = h('div', { class: 'chorus' }); root.appendChild(chorusEl); }
         chorusEl.appendChild(el);
@@ -2197,11 +2263,13 @@ a.brand:hover { filter: brightness(1.08); }
     ctx.scroll = st.el.sheet.scrollTop;
     var back = { view: ui.view, setlistId: ui.setlistId };
     setPlaying(false); flushSpeed();
+    notesReset();
     st.open = false; stageEl.hidden = true; stageEl.replaceChildren(); st.el = null;
     wake(false);
     openEditor(songId, { ctx: ctx, back: back });
   }
   function closeStage() {
+    notesReset();
     setPlaying(false);
     flushSpeed();
     st.open = false; stageEl.hidden = true; stageEl.replaceChildren(); st.el = null;
@@ -2240,11 +2308,13 @@ a.brand:hover { filter: brightness(1.08); }
     st.el = e;
     stageEl.replaceChildren(
       h('div', { class: 'sttop' },
-        iconBtn('x', t('close'), closeStage),
+        iconBtn('x', t('close'), function () { notesGuard(closeStage); }),
         h('div', { class: 'sttitle' }, e.title, e.sub),
         h('div', { class: 'stctl' }, textBtn('−', t('keyDown'), function () { shiftKey(-1); }), e.keys, textBtn('+', t('keyUp'), function () { shiftKey(1); }), e.acc),
         h('div', { class: 'stctl' },
-          iconBtn('edit', t('editSong'), stageToEditor),
+          e.notesBtn = h('button', { class: 'btn small notesbtn', type: 'button', 'aria-label': t('notes'), title: t('notes'), onclick: notesStart }, ico('pen'), h('span', { text: t('notes') })),
+          e.eyeBtn = iconBtn('eye', t('notesHide'), function () { prefs.hideNotes = !prefs.hideNotes; savePrefs(); drawNotes(); }),
+          iconBtn('edit', t('editSong'), function () { notesGuard(stageToEditor); }),
           h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('textSmaller'), title: t('textSmaller'), text: 'A−', onclick: function () { setFont(-2); } }),
           h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('textLarger'), title: t('textLarger'), text: 'A+', onclick: function () { setFont(2); } }),
           iconBtn('expand', t('fullscreen'), function () {
@@ -2253,6 +2323,7 @@ a.brand:hover { filter: brightness(1.08); }
               else document.documentElement.requestFullscreen().catch(function () {});
             } catch (err) { /* not allowed here */ }
           }))),
+      e.notesBar = buildNotesBar(),
       e.sheet,
       h('div', { class: 'transport' },
         e.prev,
@@ -2264,6 +2335,7 @@ a.brand:hover { filter: brightness(1.08); }
     var sx = 0, sy = 0, stime = 0;
     e.sheet.addEventListener('touchstart', function (ev) { var p = ev.changedTouches[0]; sx = p.clientX; sy = p.clientY; stime = Date.now(); }, { passive: true });
     e.sheet.addEventListener('touchend', function (ev) {
+      if (an.on) return;
       var p = ev.changedTouches[0], dx = p.clientX - sx, dy = p.clientY - sy;
       if (Math.abs(dx) > 90 && Math.abs(dy) < 50 && Date.now() - stime < 600) stageStep(dx < 0 ? 1 : -1);
     }, { passive: true });
@@ -2300,7 +2372,9 @@ a.brand:hover { filter: brightness(1.08); }
       }
       e.sheet.replaceChildren(renderSheet(song, st.tr, st.acc), end);
       st.stamp = song.id + '\n' + (song.body || '') + '\n' + (song.key || '');
+      mountNotes();
     }
+    drawNotes();
     var prev = info.items && info.items[st.ctx.index - 1], next = info.items && info.items[st.ctx.index + 1];
     e.prev.disabled = !prev; e.next.disabled = !next;
     e.prevLabel.textContent = prev ? songTitle(data.songs[prev.songId]) : '';
@@ -2317,11 +2391,13 @@ a.brand:hover { filter: brightness(1.08); }
     var info = stageInfo();
     if (!info) { closeStage(); return; }
     var bodyChanged = (info.song.id + '\n' + (info.song.body || '') + '\n' + (info.song.key || '')) !== st.stamp;
+    if (an.on && bodyChanged) return; // never pull the page from under a pen
     var top = st.el.sheet.scrollTop;
     drawStage(bodyChanged);
     if (bodyChanged) st.el.sheet.scrollTop = top;
   }
   function stageStep(d) {
+    if (an.on) { notesGuard(function () { stageStep(d); }); return; }
     var info = stageInfo();
     if (!info || !info.items) return;
     var n = st.ctx.index + d;
@@ -2340,7 +2416,7 @@ a.brand:hover { filter: brightness(1.08); }
       saveRec('setlists', c);
     } else { st.ctx.tr = st.tr; st.ctx.acc = st.acc; }
   }
-  function setFont(d) { prefs.fontSize = clamp(prefs.fontSize + d, FS_MIN, FS_MAX); savePrefs(); st.el.sheet.style.fontSize = prefs.fontSize + 'px'; st.pos = st.el.sheet.scrollTop; }
+  function setFont(d) { prefs.fontSize = clamp(prefs.fontSize + d, FS_MIN, FS_MAX); savePrefs(); st.el.sheet.style.fontSize = prefs.fontSize + 'px'; st.pos = st.el.sheet.scrollTop; drawNotes(); }
   // The speed is stored on the song, so it comes back the next time the song is opened.
   var speedSongId = null;
   function setSpeed(n) {
@@ -2365,6 +2441,7 @@ a.brand:hover { filter: brightness(1.08); }
     if (on === st.playing) return;
     st.playing = on;
     cancelAnimationFrame(st.raf);
+    if (on && an.on) { st.playing = false; return; }
     if (on) { st.pos = st.el.sheet.scrollTop; st.last = performance.now(); st.raf = requestAnimationFrame(tick); wake(true); }
     drawPlay();
   }
@@ -2381,17 +2458,302 @@ a.brand:hover { filter: brightness(1.08); }
   }
   document.addEventListener('keydown', function (e) {
     if (!st.open || dlg.open) return;
+    if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if (an.on && (e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); notesUndo(); return; }
     if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); setPlaying(!st.playing); }
     else if (e.key === '+' || e.key === '=') { e.preventDefault(); setSpeed(st.speed + 1); }
     else if (e.key === '-' || e.key === '_') { e.preventDefault(); setSpeed(st.speed - 1); }
     else if (e.key === 'ArrowRight') { e.preventDefault(); stageStep(1); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); stageStep(-1); }
-    else if (e.key === 'Escape') { e.preventDefault(); closeStage(); }
+    else if (e.key === 'Escape') { e.preventDefault(); notesGuard(closeStage); }
   });
   // A focused button would also fire on space keyup and undo the toggle above.
   document.addEventListener('keyup', function (e) {
     if (st.open && !dlg.open && (e.key === ' ' || e.code === 'Space')) e.preventDefault();
   });
+
+  // ---------- notes: pen, highlighter and text on top of a song ----------
+  // A note is stored on the song and anchored to one line of it: { a: { i: block index, k: block text },
+  // pts: [[x, y], ...] in em from that line's top left corner }. Ems follow the text size, and the line
+  // key lets a note find its line again after lines are added above it or the chords are transposed.
+  var PENS = [['nred', '#e03131'], ['nblue', '#1c6fd6'], ['nink', 'ink'], ['ngreen', '#2f9e44']];
+  var MARKERS = [['hyellow', '#ffd43b'], ['hgreen', '#8ce99a'], ['hpink', '#faa2c1']];
+  var an = { on: false, tool: 'pen', pen: PENS[0][1], marker: MARKERS[0][1], notes: [], dirty: false, undo: [], penSeen: false,
+    layer: null, svg: null, body: null, ro: null, live: null, ptrs: {}, scrolling: false, erasing: false };
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function svgEl(tag, attrs) { var el = document.createElementNS(SVGNS, tag); for (var k in attrs) el.setAttribute(k, attrs[k]); return el; }
+  function stageSong() { var info = st.el && stageInfo(); return info ? info.song : null; }
+  function shownNotes() { var sg = stageSong(); return an.on ? an.notes : ((sg && sg.notes) || []); }
+  function inkColor(c) { return c === 'ink' ? getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#14171c' : c; }
+
+  function mountNotes() {
+    var body = st.el && st.el.sheet.querySelector('.sheet-body');
+    if (!body) return;
+    an.body = body;
+    an.svg = svgEl('svg', { class: 'notes-svg', 'aria-hidden': 'true' });
+    an.layer = h('div', { class: 'notes-layer' });
+    an.layer.appendChild(an.svg);
+    body.appendChild(an.layer);
+    bindDrawing(an.layer);
+    try { if (an.ro) an.ro.disconnect(); an.ro = new ResizeObserver(function () { drawNotes(); }); an.ro.observe(body); } catch (e) { an.ro = null; }
+  }
+  function blockEls() { return an.body ? Array.prototype.slice.call(an.body.querySelectorAll('[data-bi]')) : []; }
+  function findBlock(els, a) {
+    if (!els.length || !a) return null;
+    var i = Math.min(Math.max(a.i | 0, 0), els.length - 1);
+    if (els[i].getAttribute('data-k') === a.k) return els[i];
+    for (var d = 1; d < 60; d++) {
+      if (els[i - d] && els[i - d].getAttribute('data-k') === a.k) return els[i - d];
+      if (els[i + d] && els[i + d].getAttribute('data-k') === a.k) return els[i + d];
+    }
+    return els[i];
+  }
+  function emSize() { return an.body ? parseFloat(getComputedStyle(an.body).fontSize) || 20 : 20; }
+  function pathD(pts) {
+    if (pts.length === 1) return 'M' + pts[0][0] + ' ' + pts[0][1] + 'l0.01 0';
+    var d = 'M' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(1);
+    for (var i = 1; i < pts.length - 1; i++) {
+      var mx = (pts[i][0] + pts[i + 1][0]) / 2, my = (pts[i][1] + pts[i + 1][1]) / 2;
+      d += 'Q' + pts[i][0].toFixed(1) + ' ' + pts[i][1].toFixed(1) + ' ' + mx.toFixed(1) + ' ' + my.toFixed(1);
+    }
+    var l = pts[pts.length - 1];
+    return d + 'L' + l[0].toFixed(1) + ' ' + l[1].toFixed(1);
+  }
+  function drawNotes() {
+    var e = st.el;
+    if (!e) return;
+    var sg = stageSong(), all = shownNotes();
+    var hidden = !an.on && prefs.hideNotes;
+    if (e.eyeBtn) {
+      var has = !!(sg && sg.notes && sg.notes.length);
+      e.eyeBtn.hidden = an.on || !has;
+      e.eyeBtn.replaceChildren(ico(prefs.hideNotes ? 'eyeoff' : 'eye'));
+      e.eyeBtn.setAttribute('aria-label', prefs.hideNotes ? t('notesShow') : t('notesHide'));
+      e.eyeBtn.title = e.eyeBtn.getAttribute('aria-label');
+    }
+    if (e.notesBtn) e.notesBtn.hidden = an.on;
+    if (!an.body || !an.layer || !an.layer.isConnected) return;
+    an.layer.classList.toggle('drawing', an.on);
+    an.layer.classList.toggle('erase', an.on && an.tool === 'eraser');
+    while (an.svg.firstChild) an.svg.removeChild(an.svg.firstChild);
+    Array.prototype.slice.call(an.layer.querySelectorAll('.note-text')).forEach(function (x) { x.remove(); });
+    an.svg.setAttribute('width', an.body.scrollWidth);
+    an.svg.setAttribute('height', an.body.scrollHeight);
+    if (hidden) return;
+    var em = emSize(), els = blockEls(), base = an.body.getBoundingClientRect();
+    all.forEach(function (n) {
+      var el = findBlock(els, n.a);
+      if (!el) return;
+      var r = el.getBoundingClientRect(), ox = r.left - base.left, oy = r.top - base.top;
+      if (n.type === 'text') {
+        var tx = h('div', { class: 'note-text', 'data-id': n.id, text: n.text });
+        tx.style.left = (ox + n.x * em) + 'px'; tx.style.top = (oy + n.y * em) + 'px'; tx.style.color = inkColor(n.color);
+        an.layer.appendChild(tx);
+        // On a narrow screen the line wraps: keep the note inside the page.
+        var maxL = an.body.clientWidth - tx.offsetWidth;
+        if (ox + n.x * em > maxL) tx.style.left = Math.max(0, maxL) + 'px';
+        return;
+      }
+      var pts = n.pts.map(function (p) { return [ox + p[0] * em, oy + p[1] * em]; });
+      var g = svgEl('g', { 'data-id': n.id });
+      var d = pathD(pts);
+      g.appendChild(svgEl('path', { d: d, fill: 'none', stroke: inkColor(n.color), 'stroke-width': Math.max(1.5, n.w * em),
+        'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: n.type === 'hl' ? 0.4 : 1, class: n.type === 'hl' ? 'hl' : 'ink' }));
+      if (an.on) g.appendChild(svgEl('path', { d: d, fill: 'none', stroke: 'transparent', 'stroke-width': Math.max(18, n.w * em), class: 'hit' }));
+      an.svg.appendChild(g);
+    });
+  }
+
+  function notesStart() {
+    var sg = stageSong();
+    if (!sg) return;
+    setPlaying(false);
+    an.on = true; an.dirty = false; an.undo = [];
+    an.notes = clone(sg.notes || []);
+    st.el.notesBar.hidden = false;
+    drawNotesBar();
+    st.el.sheet.scrollTop += st.el.notesBar.offsetHeight;
+    drawNotes();
+  }
+  function notesReset() { an.on = false; an.dirty = false; an.undo = []; an.notes = []; an.live = null; an.ptrs = {}; an.layer = null; an.body = null; if (an.ro) { try { an.ro.disconnect(); } catch (e) { /* ignore */ } an.ro = null; } }
+  function notesEnd(save) {
+    var sg = stageSong();
+    if (save && an.dirty && sg) {
+      var c = clone(sg); c.notes = an.notes; if (c.example) delete c.example;
+      saveRec('songs', c);
+      toast(t('notesSaved'));
+    }
+    an.on = false; an.dirty = false; an.undo = []; an.notes = [];
+    if (st.el) { var bh = st.el.notesBar.offsetHeight; st.el.notesBar.hidden = true; st.el.sheet.scrollTop -= bh; }
+    drawNotes();
+  }
+  // Unsaved notes: ask before leaving the song. next() runs after Save or Discard.
+  function notesGuard(next) {
+    if (!an.on) { next(); return; }
+    if (!an.dirty) { notesEnd(false); next(); return; }
+    openDialog(h('div', { class: 'dlg' },
+      h('h2', { text: t('notesTitle') }),
+      h('p', { text: t('notesUnsaved') }),
+      h('div', { class: 'foot' },
+        h('button', { class: 'btn ghost', type: 'button', text: t('cancel'), onclick: closeDialog }),
+        h('button', { class: 'btn danger', type: 'button', onclick: function () { closeDialog(); notesEnd(false); next(); } }, ico('trash'), t('discard')),
+        h('button', { class: 'btn primary', type: 'button', onclick: function () { closeDialog(); notesEnd(true); next(); } }, t('save')))));
+  }
+  function notesPush() { an.undo.push(JSON.stringify(an.notes)); if (an.undo.length > 60) an.undo.shift(); an.dirty = true; }
+  function notesUndo() { if (!an.undo.length) return; an.notes = JSON.parse(an.undo.pop()); an.dirty = true; drawNotes(); drawNotesBar(); }
+
+  function buildNotesBar() {
+    var bar = h('div', { class: 'notesbar', hidden: true, role: 'toolbar', 'aria-label': t('notes') });
+    return bar;
+  }
+  function drawNotesBar() {
+    var bar = st.el && st.el.notesBar;
+    if (!bar) return;
+    function tool(id, icon, label, extra) {
+      return h('button', { class: 'iconbtn tool', type: 'button', 'aria-pressed': String(an.tool === id), 'aria-label': label, title: label,
+        onclick: function () { an.tool = id; drawNotesBar(); drawNotes(); } }, ico(icon), extra || null);
+    }
+    function swatch(list, cur, set) {
+      return h('span', { class: 'nswatches' }, list.map(function (c) {
+        return h('button', { class: 'nswatch', type: 'button', 'aria-pressed': String(cur === c[1]), 'aria-label': t('c_' + c[0]), title: t('c_' + c[0]),
+          style: 'background:' + inkColor(c[1]), onclick: function () { set(c[1]); drawNotesBar(); } });
+      }));
+    }
+    setKids(bar,
+      h('span', { class: 'ngroup' }, tool('pen', 'pen', t('notesPen')),
+        an.tool === 'pen' ? swatch(PENS, an.pen, function (v) { an.pen = v; }) : null),
+      h('span', { class: 'ngroup' }, tool('marker', 'marker', t('notesMarker')),
+        an.tool === 'marker' ? swatch(MARKERS, an.marker, function (v) { an.marker = v; }) : null),
+      tool('text', 'textT', t('notesText')),
+      tool('eraser', 'eraser', t('notesEraser')),
+      h('span', { class: 'nsep' }),
+      h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('notesUndo'), title: t('notesUndo'), disabled: !an.undo.length, onclick: notesUndo }, ico('undo')),
+      h('button', { class: 'btn small ghost', type: 'button', disabled: !an.notes.length, onclick: function () { notesPush(); an.notes = []; drawNotes(); drawNotesBar(); } }, t('notesClear')),
+      h('span', { class: 'nhint hint', text: an.penSeen ? t('notesHintPen') : t('notesHintTouch') }),
+      h('button', { class: 'btn small primary', type: 'button', onclick: function () { notesEnd(true); } }, t('notesDone')));
+  }
+
+  // Anchor a set of points (px, relative to the sheet) to the line they sit on.
+  function anchorFor(cx, cy) {
+    var els = blockEls(), base = an.body.getBoundingClientRect(), best = null, bestD = 1e9;
+    els.forEach(function (el) {
+      var r = el.getBoundingClientRect(), top = r.top - base.top, bot = r.bottom - base.top;
+      var d = cy < top ? top - cy : cy > bot ? cy - bot : 0;
+      if (d < bestD) { bestD = d; best = { el: el, ox: r.left - base.left, oy: top }; }
+    });
+    return best;
+  }
+  function bindDrawing(layer) {
+    function local(ev) { var b = an.body.getBoundingClientRect(); return [ev.clientX - b.left, ev.clientY - b.top]; }
+    function touches() { return Object.keys(an.ptrs).filter(function (k) { return an.ptrs[k].touch; }); }
+    function eraseAt(ev) {
+      var hits = (document.elementsFromPoint ? document.elementsFromPoint(ev.clientX, ev.clientY) : []);
+      for (var i = 0; i < hits.length; i++) {
+        var g = hits[i].closest && hits[i].closest('[data-id]');
+        if (g && layer.contains(g)) {
+          var id = g.getAttribute('data-id');
+          if (!an.erasing) { notesPush(); an.erasing = true; }
+          an.notes = an.notes.filter(function (n) { return n.id !== id; });
+          drawNotes(); drawNotesBar();
+          return;
+        }
+      }
+    }
+    function addText(p) {
+      var a = anchorFor(p[0], p[1]);
+      if (!a) return;
+      var em = emSize();
+      var input = h('input', { class: 'note-input', type: 'text', placeholder: t('notesTextPh'), 'aria-label': t('notesText') });
+      input.style.left = p[0] + 'px'; input.style.top = (p[1] - em * 0.6) + 'px'; input.style.color = inkColor(an.pen);
+      layer.appendChild(input);
+      var done = false;
+      function commit(keep) {
+        if (done) return; done = true;
+        var v = input.value.trim(); input.remove();
+        if (!keep || !v) return;
+        notesPush();
+        an.notes.push({ id: uid('n'), type: 'text', color: an.pen, a: { i: +a.el.getAttribute('data-bi'), k: a.el.getAttribute('data-k') },
+          x: +((p[0] - a.ox) / em).toFixed(3), y: +((p[1] - em * 0.6 - a.oy) / em).toFixed(3), text: v.slice(0, 200) });
+        drawNotes(); drawNotesBar();
+      }
+      input.addEventListener('keydown', function (ev) {
+        ev.stopPropagation();
+        if (ev.key === 'Enter') { ev.preventDefault(); commit(true); }
+        else if (ev.key === 'Escape') { ev.preventDefault(); commit(false); }
+      });
+      input.addEventListener('blur', function () { commit(true); });
+      // Focus inside the touch itself, or tablets will not open their keyboard.
+      input.focus();
+      an.pendingInput = input;
+    }
+    layer.addEventListener('pointerdown', function (ev) {
+      if (!an.on || ev.target.classList.contains('note-input')) return;
+      if (ev.pointerType === 'pen' && !an.penSeen) { an.penSeen = true; drawNotesBar(); }
+      an.ptrs[ev.pointerId] = { touch: ev.pointerType === 'touch', y: ev.clientY };
+      try { layer.setPointerCapture(ev.pointerId); } catch (e) { /* ignore */ }
+      ev.preventDefault();
+      // Scrolling: two fingers, or one finger once a pen has been used (palm and finger rejection).
+      if (ev.pointerType === 'touch' && (an.penSeen || touches().length >= 2)) {
+        if (an.live) {
+          if (an.live.path) an.live.path.remove();
+          // The first finger of a two-finger scroll may have started erasing: put that back.
+          if (an.live.erase && an.erasing && an.undo.length) { an.notes = JSON.parse(an.undo.pop()); an.erasing = false; drawNotes(); drawNotesBar(); }
+          an.live = null;
+        }
+        an.scrolling = true;
+        return;
+      }
+      if (an.tool === 'text') { addText(local(ev)); return; }
+      if (an.tool === 'eraser') { an.erasing = false; eraseAt(ev); an.live = { erase: true, id: ev.pointerId }; return; }
+      var hl = an.tool === 'marker', color = hl ? an.marker : an.pen, em = emSize();
+      var path = svgEl('path', { fill: 'none', stroke: inkColor(color), 'stroke-width': (hl ? 0.9 : 0.12) * em, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: hl ? 0.4 : 1 });
+      an.svg.appendChild(path);
+      an.live = { id: ev.pointerId, pts: [local(ev)], path: path, hl: hl, color: color };
+    });
+    layer.addEventListener('pointermove', function (ev) {
+      var pinfo = an.ptrs[ev.pointerId];
+      if (!an.on || !pinfo) return;
+      if (an.scrolling) {
+        var ids = touches(); var dy = ev.clientY - pinfo.y; pinfo.y = ev.clientY;
+        st.el.sheet.scrollTop -= dy / Math.max(1, ids.length);
+        return;
+      }
+      if (!an.live || an.live.id !== ev.pointerId) return;
+      if (an.live.erase) { eraseAt(ev); return; }
+      var evs = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev];
+      (evs.length ? evs : [ev]).forEach(function (ce) {
+        var p = local(ce), last = an.live.pts[an.live.pts.length - 1];
+        if (Math.abs(p[0] - last[0]) + Math.abs(p[1] - last[1]) >= 1.5) an.live.pts.push(p);
+      });
+      an.live.path.setAttribute('d', pathD(an.live.pts));
+    });
+    function up(ev) {
+      delete an.ptrs[ev.pointerId];
+      if (an.pendingInput) { var pi = an.pendingInput; an.pendingInput = null; if (pi.isConnected && document.activeElement !== pi) pi.focus(); }
+      if (an.scrolling) { if (!touches().length) an.scrolling = false; return; }
+      var lv = an.live;
+      if (!lv || lv.id !== ev.pointerId) return;
+      an.live = null;
+      if (lv.erase) { an.erasing = false; return; }
+      var em = emSize(), xs = lv.pts.map(function (p) { return p[0]; }), ys = lv.pts.map(function (p) { return p[1]; });
+      var a = anchorFor((Math.min.apply(null, xs) + Math.max.apply(null, xs)) / 2, (Math.min.apply(null, ys) + Math.max.apply(null, ys)) / 2);
+      lv.path.remove();
+      if (!a) return;
+      var pts = [], last = null;
+      lv.pts.forEach(function (p) {
+        var q = [+((p[0] - a.ox) / em).toFixed(3), +((p[1] - a.oy) / em).toFixed(3)];
+        if (!last || Math.abs(q[0] - last[0]) + Math.abs(q[1] - last[1]) >= 0.04) { pts.push(q); last = q; }
+      });
+      var end = lv.pts[lv.pts.length - 1];
+      pts.push([+((end[0] - a.ox) / em).toFixed(3), +((end[1] - a.oy) / em).toFixed(3)]);
+      notesPush();
+      an.notes.push({ id: uid('n'), type: lv.hl ? 'hl' : 'ink', color: lv.color, w: lv.hl ? 0.9 : 0.12,
+        a: { i: +a.el.getAttribute('data-bi'), k: a.el.getAttribute('data-k') }, pts: pts });
+      drawNotes(); drawNotesBar();
+    }
+    layer.addEventListener('pointerup', up);
+    layer.addEventListener('pointercancel', up);
+  }
 
   // ---------- settings ----------
   function openSettings() {
