@@ -1368,10 +1368,11 @@
     var sx = 0, sy = 0, stime = 0;
     e.sheet.addEventListener('touchstart', function (ev) { var p = ev.changedTouches[0]; sx = p.clientX; sy = p.clientY; stime = Date.now(); }, { passive: true });
     e.sheet.addEventListener('touchend', function (ev) {
-      if (an.on) return;
+      if (an.on || pinch.used) { if (!ev.touches.length) pinch.used = false; return; }
       var p = ev.changedTouches[0], dx = p.clientX - sx, dy = p.clientY - sy;
       if (Math.abs(dx) > 90 && Math.abs(dy) < 50 && Date.now() - stime < 600) stageStep(dx < 0 ? 1 : -1);
     }, { passive: true });
+    bindPinch(e.sheet);
   }
   function loadStageSong() {
     setPlaying(false);
@@ -1449,7 +1450,67 @@
       saveRec('setlists', c);
     } else { st.ctx.tr = st.tr; st.ctx.acc = st.acc; }
   }
-  function setFont(d) { prefs.fontSize = clamp(prefs.fontSize + d, FS_MIN, FS_MAX); savePrefs(); st.el.sheet.style.fontSize = prefs.fontSize + 'px'; st.pos = st.el.sheet.scrollTop; drawNotes(); }
+  function setFont(d) { applyFont(prefs.fontSize + d, null); savePrefs(); }
+  // Change the text size and keep the same spot of the song under (x, y), or under the top of the view.
+  function applyFont(px, at) {
+    var sheet = st.el && st.el.sheet;
+    if (!sheet) return;
+    px = clamp(Math.round(px), FS_MIN, FS_MAX);
+    if (px === prefs.fontSize && sheet.style.fontSize === px + 'px') return;
+    var sr = sheet.getBoundingClientRect();
+    var vy = at ? at.y - sr.top : 0;
+    var cy = sheet.scrollTop + vy, keep = null;
+    var els = sheet.querySelectorAll('[data-bi]');
+    for (var i = 0; i < els.length; i++) {
+      var r = els[i].getBoundingClientRect(), top = r.top - sr.top + sheet.scrollTop;
+      if (top + r.height >= cy) { keep = { el: els[i], frac: r.height ? Math.max(0, Math.min(1, (cy - top) / r.height)) : 0 }; break; }
+    }
+    prefs.fontSize = px;
+    sheet.style.fontSize = px + 'px';
+    if (keep) {
+      var r2 = keep.el.getBoundingClientRect(), top2 = r2.top - sr.top + sheet.scrollTop;
+      sheet.scrollTop = top2 + keep.frac * r2.height - vy;
+    }
+    st.pos = sheet.scrollTop;
+    drawNotes();
+  }
+  // Pinch with two fingers to change the text size. The browser's own page zoom is turned off over the
+  // song (touch-action in the CSS), so lines wrap again to fit instead of running off the screen.
+  var pinch = { d0: 0, fs0: 0, on: false, used: false, raf: 0, next: null };
+  function bindPinch(sheet) {
+    function dist(t) { var dx = t[0].clientX - t[1].clientX, dy = t[0].clientY - t[1].clientY; return Math.sqrt(dx * dx + dy * dy); }
+    function mid(t) { return { x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 }; }
+    sheet.addEventListener('touchstart', function (ev) {
+      if (ev.touches.length === 2) { pinch.d0 = dist(ev.touches); pinch.fs0 = prefs.fontSize; pinch.on = false; }
+    }, { passive: true });
+    sheet.addEventListener('touchmove', function (ev) {
+      if (ev.touches.length !== 2 || !pinch.d0) return;
+      var ratio = dist(ev.touches) / pinch.d0;
+      if (!pinch.on && Math.abs(ratio - 1) < 0.06) return; // two fingers moving together scroll
+      pinch.on = true; pinch.used = true;
+      if (ev.cancelable) ev.preventDefault();
+      pinch.next = { px: pinch.fs0 * ratio, at: mid(ev.touches) };
+      if (!pinch.raf) pinch.raf = requestAnimationFrame(function () {
+        pinch.raf = 0;
+        if (pinch.next) { applyFont(pinch.next.px, pinch.next.at); pinch.next = null; }
+      });
+    }, { passive: false });
+    function end(ev) {
+      if (ev.touches.length < 2) {
+        if (pinch.on) savePrefs();
+        pinch.d0 = 0; pinch.on = false;
+      }
+    }
+    sheet.addEventListener('touchend', end, { passive: true });
+    sheet.addEventListener('touchcancel', end, { passive: true });
+    // On a PC, a trackpad pinch or Ctrl and the mouse wheel does the same.
+    sheet.addEventListener('wheel', function (ev) {
+      if (!ev.ctrlKey) return;
+      ev.preventDefault();
+      applyFont(prefs.fontSize * Math.exp(-ev.deltaY / 600), { x: ev.clientX, y: ev.clientY });
+      clearTimeout(pinch.wt); pinch.wt = setTimeout(savePrefs, 400);
+    }, { passive: false });
+  }
   // The speed is stored on the song, so it comes back the next time the song is opened.
   var speedSongId = null;
   function setSpeed(n) {

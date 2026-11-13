@@ -1,5 +1,5 @@
 /* Songgiggin service worker: the app works without a connection once it has been opened. */
-const VERSION = '3.0.0-mwev505e';
+const VERSION = '3.1.0-mwevftbh';
 const SHELL = 'songgiggin-shell-' + VERSION;
 const FONTS = 'songgiggin-fonts-v1';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];

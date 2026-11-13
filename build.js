@@ -19,7 +19,7 @@ fs.writeFileSync(path.join(__dirname, 'dist', 'index.html'), html);
 console.log('built dist/index.html', (html.length / 1024).toFixed(1) + ' KiB');
 
 // ---- installable version for hosting outside Claude: dist-pwa/ ----
-const VERSION = '3.0.0-' + Date.now().toString(36);
+const VERSION = '3.1.0-' + Date.now().toString(36);
 const pwaHead = [
   '<link rel="manifest" href="manifest.webmanifest">',
   '<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">',

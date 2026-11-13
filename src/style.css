@@ -364,3 +364,5 @@ a.brand:hover { filter: brightness(1.08); }
   .notesbar .btn.primary { margin-left: auto; position: sticky; right: 0; }
 }
 .note-text { width: max-content; max-width: min(18em, 92vw); }
+/* pinch on the song changes the text size, not the page zoom */
+.stsheet { touch-action: pan-x pan-y; }
