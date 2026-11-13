@@ -43,7 +43,9 @@
 :root[data-theme="dark"]:not([data-mode="light"]) { --bg: #0f1216; --surface: #171b22; --ink: #eceef2; --muted: #98a2b0; --line: #2b323d; --accent: #f4ae3d; --accent-ink: #1b1203; --danger: #ff8478; --ok: #62d391; color-scheme: dark; }
 :root[data-mode="dark"] { --bg: #0f1216; --surface: #171b22; --ink: #eceef2; --muted: #98a2b0; --line: #2b323d; --accent: #f4ae3d; --accent-ink: #1b1203; --danger: #ff8478; --ok: #62d391; color-scheme: dark; }
 /* Black: pure black for OLED screens and dark rooms. Text a little dimmer so it does not glare. */
-:root[data-mode="black"] { --bg: #0f1216; --surface: #171b22; --ink: #eceef2; --muted: #98a2b0; --line: #2b323d; --accent: #f4ae3d; --accent-ink: #1b1203; --danger: #ff8478; --ok: #62d391; color-scheme: dark; --bg: #000000; --surface: #050506; --ink: #d4d8de; --muted: #8a919c; --line: #23272d; }
+/* The extra :not() parts make this win over the dark rules above, also when the phone is in dark mode
+   or the host page sets data-theme="dark". */
+:root[data-mode="black"]:not([data-mode="x"]):not([data-theme="x"]) { --bg: #0f1216; --surface: #171b22; --ink: #eceef2; --muted: #98a2b0; --line: #2b323d; --accent: #f4ae3d; --accent-ink: #1b1203; --danger: #ff8478; --ok: #62d391; color-scheme: dark; --bg: #000000; --surface: #000000; --ink: #d4d8de; --muted: #8a919c; --line: #2a2e35; }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }

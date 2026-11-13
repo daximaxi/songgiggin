@@ -22,7 +22,9 @@
 :root[data-theme="dark"]:not([data-mode="light"]) { /*@DARK@*/ }
 :root[data-mode="dark"] { /*@DARK@*/ }
 /* Black: pure black for OLED screens and dark rooms. Text a little dimmer so it does not glare. */
-:root[data-mode="black"] { /*@DARK@*/ --bg: #000000; --surface: #050506; --ink: #d4d8de; --muted: #8a919c; --line: #23272d; }
+/* The extra :not() parts make this win over the dark rules above, also when the phone is in dark mode
+   or the host page sets data-theme="dark". */
+:root[data-mode="black"]:not([data-mode="x"]):not([data-theme="x"]) { /*@DARK@*/ --bg: #000000; --surface: #000000; --ink: #d4d8de; --muted: #8a919c; --line: #2a2e35; }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
