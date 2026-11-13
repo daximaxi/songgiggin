@@ -368,7 +368,6 @@ a.brand:hover { filter: brightness(1.08); }
 .notesbtn { margin-right: 4px; }
 @media (max-width: 760px) {
   .nhint { display: none; }
-  .notesbtn span { display: none; }
 }
 @media (max-width: 760px) {
   .notesbar { flex-wrap: nowrap; overflow-x: auto; gap: 2px; padding: 4px 6px; scrollbar-width: none; }
@@ -378,6 +377,15 @@ a.brand:hover { filter: brightness(1.08); }
 .note-text { width: max-content; max-width: min(18em, 92vw); }
 /* pinch on the song changes the text size, not the page zoom */
 .stsheet { touch-action: pan-x pan-y; }
+
+/* ---------- v3.2 ---------- */
+.datebox { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.datebox .input { color: var(--ink); }
+.nsizes { display: inline-flex; gap: 2px; padding: 0 4px; border-left: 1px solid var(--line); margin-left: 2px; }
+.nsize { width: 34px; height: 34px; border-radius: 6px; border: 1px solid transparent; background: transparent; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.nsize i { display: block; border-radius: 50%; background: var(--ink); }
+.nsize[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); }
+.sttop .stedit { margin-left: -6px; }
 
 </style>
 </head>
@@ -1024,6 +1032,7 @@ a.brand:hover { filter: brightness(1.08); }
     textT: '<path d="M5 6V4h14v2M12 4v16M9 20h6"/>',
     eraser: '<path d="M9 20h11M4.5 14.5l9-9 6 6-8.5 8.5H9z"/>',
     undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/>',
+    docedit: '<path d="M13 3H5v18h14V9z"/><path d="M13 3v6h6"/><path d="M9 17l.6-2.6 4.8-4.8 2 2-4.8 4.8z"/>',
     eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
     eyeoff: '<path d="M2 12s3.6-7 10-7c2 0 3.7.7 5.1 1.6M22 12s-3.6 7-10 7c-2 0-3.7-.7-5.1-1.6M4 20L20 4"/>'
   };
@@ -1103,6 +1112,9 @@ a.brand:hover { filter: brightness(1.08); }
       mNewTags: 'New tags', mNothing: 'Everything in the file is already here. Nothing to import.', mDone: 'Import finished',
       mBad: 'This file could not be read as a song or a Songgiggin file.',
       nLists: function (n) { return n === 1 ? '1 setlist' : n + ' setlists'; },
+      sizeFine: 'Thin line', sizeMed: 'Medium line', sizeThick: 'Thick line', gigDate: 'Gig date',
+      inkSmooth: 'Handwriting smoothing', smooth0: 'Off', smooth1: 'Low', smooth2: 'Medium', smooth3: 'High',
+      inkSmoothHint: 'Evens out wobble in lines you draw. Applies to new lines. A pen that reports pressure draws thicker lines when you press harder.',
       notes: 'Notes', notesPen: 'Pen', notesMarker: 'Highlighter', notesText: 'Text', notesEraser: 'Eraser', notesUndo: 'Undo',
       notesClear: 'Clear all', notesDone: 'Done', notesShow: 'Show notes', notesHide: 'Hide notes', notesSaved: 'Notes saved',
       notesTitle: 'Save your notes?', notesUnsaved: 'You have notes on this song that are not saved.',
@@ -1165,6 +1177,9 @@ a.brand:hover { filter: brightness(1.08); }
       mNewTags: 'Ný tags', mNothing: 'Allt í skránni er þegar hér. Ekkert að flytja inn.', mDone: 'Innflutningi lokið',
       mBad: 'Ekki tókst að lesa þessa skrá sem lag eða Songgiggin skrá.',
       nLists: function (n) { return (n % 10 === 1 && n % 100 !== 11) ? n + ' lagalisti' : n + ' lagalistar'; },
+      sizeFine: 'Fín lína', sizeMed: 'Miðlungs lína', sizeThick: 'Þykk lína', gigDate: 'Dagsetning giggs',
+      inkSmooth: 'Mýkt handskriftar', smooth0: 'Engin', smooth1: 'Lítil', smooth2: 'Miðlungs', smooth3: 'Mikil',
+      inkSmoothHint: 'Jafnar út titring í línum sem þú teiknar. Gildir um nýjar línur. Penni sem sendir þrýsting teiknar þykkari línu þegar þú þrýstir fastar.',
       notes: 'Glósur', notesPen: 'Penni', notesMarker: 'Yfirstrikun', notesText: 'Texti', notesEraser: 'Strokleður', notesUndo: 'Afturkalla',
       notesClear: 'Hreinsa allt', notesDone: 'Lokið', notesShow: 'Sýna glósur', notesHide: 'Fela glósur', notesSaved: 'Glósur vistaðar',
       notesTitle: 'Vista glósurnar?', notesUnsaved: 'Þú ert með óvistaðar glósur á þessu lagi.',
@@ -1186,7 +1201,7 @@ a.brand:hover { filter: brightness(1.08); }
   function lsGet(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
   function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage may be unavailable */ } }
   var prefs = Object.assign(
-    { lang: /^is/i.test(navigator.language || '') ? 'is' : 'en', theme: 'auto', fontSize: 20, defaultSpeed: 10, accent: 'orange', poolSort: 'title', setlistSort: 'created' },
+    { lang: /^is/i.test(navigator.language || '') ? 'is' : 'en', theme: 'auto', fontSize: 20, defaultSpeed: 10, accent: 'orange', poolSort: 'title', setlistSort: 'created', penSize: 1, markerSize: 1, inkSmooth: 2 },
     lsGet(LS_PREFS) || {}
   );
   function savePrefs() { lsSet(LS_PREFS, prefs); }
@@ -1954,7 +1969,7 @@ a.brand:hover { filter: brightness(1.08); }
           h('button', { class: 'btn primary', type: 'button', disabled: !items.length, onclick: function () { openStage({ setlistId: sl.id, index: 0 }); } }, ico('play'), t('start')),
           h('button', { class: 'btn', type: 'button', onclick: function () { pickSongs(sl.id); } }, ico('plus'), t('addSongs')),
           h('button', { class: 'btn', type: 'button', onclick: function () { exportSetlist(sl.id); } }, ico('export'), t('exportBtn')),
-          dateInput,
+          h('label', { class: 'datebox' }, h('span', { text: t('gigDate') }), dateInput),
           h('span', { class: 'count hint', text: [t('nSongs')(items.length), setlistDates(sl)].filter(Boolean).join(' · ') }),
           h('span', { class: 'spacer' }),
           h('button', { class: 'btn ghost danger', type: 'button', onclick: function () {
@@ -2311,12 +2326,12 @@ a.brand:hover { filter: brightness(1.08); }
     stageEl.replaceChildren(
       h('div', { class: 'sttop' },
         iconBtn('x', t('close'), function () { notesGuard(closeStage); }),
+        iconBtn('docedit', t('editSong'), function () { notesGuard(stageToEditor); }, 'stedit'),
         h('div', { class: 'sttitle' }, e.title, e.sub),
         h('div', { class: 'stctl' }, textBtn('−', t('keyDown'), function () { shiftKey(-1); }), e.keys, textBtn('+', t('keyUp'), function () { shiftKey(1); }), e.acc),
         h('div', { class: 'stctl' },
           e.notesBtn = h('button', { class: 'btn small notesbtn', type: 'button', 'aria-label': t('notes'), title: t('notes'), onclick: notesStart }, ico('pen'), h('span', { text: t('notes') })),
           e.eyeBtn = iconBtn('eye', t('notesHide'), function () { prefs.hideNotes = !prefs.hideNotes; savePrefs(); drawNotes(); }),
-          iconBtn('edit', t('editSong'), function () { notesGuard(stageToEditor); }),
           h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('textSmaller'), title: t('textSmaller'), text: 'A−', onclick: function () { setFont(-2); } }),
           h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('textLarger'), title: t('textLarger'), text: 'A+', onclick: function () { setFont(2); } }),
           iconBtn('expand', t('fullscreen'), function () {
@@ -2539,6 +2554,31 @@ a.brand:hover { filter: brightness(1.08); }
   // A note is stored on the song and anchored to one line of it: { a: { i: block index, k: block text },
   // pts: [[x, y], ...] in em from that line's top left corner }. Ems follow the text size, and the line
   // key lets a note find its line again after lines are added above it or the chords are transposed.
+  var SIZES = { pen: [0.07, 0.12, 0.2], marker: [0.6, 0.9, 1.3] };
+  var SMOOTH = [0, 0.35, 0.55, 0.72];
+  function penWidth(hl) { var list = hl ? SIZES.marker : SIZES.pen, i = hl ? prefs.markerSize : prefs.penSize; return list[clamp(i | 0, 0, 2)]; }
+  // Width of a pressure line at one point: light touch thin, firm press thick.
+  function pressW(base, p) { return base * (0.35 + 1.3 * (p == null ? 0.5 : p)); }
+  // A filled outline around the points, so a line can get thicker and thinner along the way.
+  function outlineD(pts, widths) {
+    if (pts.length < 2) return pathD(pts);
+    var L = [], R = [];
+    for (var i = 0; i < pts.length; i++) {
+      var a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+      var dx = b[0] - a[0], dy = b[1] - a[1], len = Math.sqrt(dx * dx + dy * dy) || 1, hw = widths[i] / 2;
+      L.push([pts[i][0] - dy / len * hw, pts[i][1] + dx / len * hw]);
+      R.push([pts[i][0] + dy / len * hw, pts[i][1] - dx / len * hw]);
+    }
+    return pathD(L.concat(R.reverse())) + 'Z';
+  }
+  function inkPathEl(pts, widths, color, uniformW, hl) {
+    if (widths) {
+      var mn = Math.min.apply(null, widths);
+      return svgEl('path', { d: outlineD(pts, widths), fill: color, stroke: color, 'stroke-width': Math.max(0.8, mn * 0.6), 'stroke-linejoin': 'round', class: 'ink' });
+    }
+    return svgEl('path', { d: pathD(pts), fill: 'none', stroke: color, 'stroke-width': Math.max(1.5, uniformW),
+      'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: hl ? 0.4 : 1, class: hl ? 'hl' : 'ink' });
+  }
   var PENS = [['nred', '#e03131'], ['nblue', '#1c6fd6'], ['nink', 'ink'], ['ngreen', '#2f9e44']];
   var MARKERS = [['hyellow', '#ffd43b'], ['hgreen', '#8ce99a'], ['hpink', '#faa2c1']];
   var an = { on: false, tool: 'pen', pen: PENS[0][1], marker: MARKERS[0][1], notes: [], dirty: false, undo: [], penSeen: false,
@@ -2620,8 +2660,8 @@ a.brand:hover { filter: brightness(1.08); }
       var pts = n.pts.map(function (p) { return [ox + p[0] * em, oy + p[1] * em]; });
       var g = svgEl('g', { 'data-id': n.id });
       var d = pathD(pts);
-      g.appendChild(svgEl('path', { d: d, fill: 'none', stroke: inkColor(n.color), 'stroke-width': Math.max(1.5, n.w * em),
-        'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: n.type === 'hl' ? 0.4 : 1, class: n.type === 'hl' ? 'hl' : 'ink' }));
+      var widths = n.pr && n.type === 'ink' ? n.pts.map(function (p) { return pressW(n.w * em, p[2]); }) : null;
+      g.appendChild(inkPathEl(pts, widths, inkColor(n.color), n.w * em, n.type === 'hl'));
       if (an.on) g.appendChild(svgEl('path', { d: d, fill: 'none', stroke: 'transparent', 'stroke-width': Math.max(18, n.w * em), class: 'hit' }));
       an.svg.appendChild(g);
     });
@@ -2676,6 +2716,13 @@ a.brand:hover { filter: brightness(1.08); }
       return h('button', { class: 'iconbtn tool', type: 'button', 'aria-pressed': String(an.tool === id), 'aria-label': label, title: label,
         onclick: function () { an.tool = id; drawNotesBar(); drawNotes(); } }, ico(icon), extra || null);
     }
+    function sizes(key, dots) {
+      return h('span', { class: 'nsizes' }, [t('sizeFine'), t('sizeMed'), t('sizeThick')].map(function (label, i) {
+        return h('button', { class: 'nsize', type: 'button', 'aria-pressed': String((prefs[key] | 0) === i), 'aria-label': label, title: label,
+          onclick: function () { prefs[key] = i; savePrefs(); drawNotesBar(); } },
+          h('i', { style: 'width:' + dots[i] + 'px;height:' + dots[i] + 'px' }));
+      }));
+    }
     function swatch(list, cur, set) {
       return h('span', { class: 'nswatches' }, list.map(function (c) {
         return h('button', { class: 'nswatch', type: 'button', 'aria-pressed': String(cur === c[1]), 'aria-label': t('c_' + c[0]), title: t('c_' + c[0]),
@@ -2684,9 +2731,11 @@ a.brand:hover { filter: brightness(1.08); }
     }
     setKids(bar,
       h('span', { class: 'ngroup' }, tool('pen', 'pen', t('notesPen')),
-        an.tool === 'pen' ? swatch(PENS, an.pen, function (v) { an.pen = v; }) : null),
+        an.tool === 'pen' ? swatch(PENS, an.pen, function (v) { an.pen = v; }) : null,
+        an.tool === 'pen' ? sizes('penSize', [3, 6, 10]) : null),
       h('span', { class: 'ngroup' }, tool('marker', 'marker', t('notesMarker')),
-        an.tool === 'marker' ? swatch(MARKERS, an.marker, function (v) { an.marker = v; }) : null),
+        an.tool === 'marker' ? swatch(MARKERS, an.marker, function (v) { an.marker = v; }) : null,
+        an.tool === 'marker' ? sizes('markerSize', [8, 12, 17]) : null),
       tool('text', 'textT', t('notesText')),
       tool('eraser', 'eraser', t('notesEraser')),
       h('span', { class: 'nsep' }),
@@ -2696,6 +2745,15 @@ a.brand:hover { filter: brightness(1.08); }
       h('button', { class: 'btn small primary', type: 'button', onclick: function () { notesEnd(true); } }, t('notesDone')));
   }
 
+  function smoothPts(pts) {
+    if (pts.length < 3) return pts;
+    return pts.map(function (p, i) {
+      if (i === 0 || i === pts.length - 1) return p;
+      var a = pts[i - 1], b = pts[i + 1], q = [(a[0] + 2 * p[0] + b[0]) / 4, (a[1] + 2 * p[1] + b[1]) / 4];
+      if (p.length > 2) q.push((a[2] + 2 * p[2] + b[2]) / 4);
+      return q;
+    });
+  }
   // Anchor a set of points (px, relative to the sheet) to the line they sit on.
   function anchorFor(cx, cy) {
     var els = blockEls(), base = an.body.getBoundingClientRect(), best = null, bestD = 1e9;
@@ -2768,10 +2826,14 @@ a.brand:hover { filter: brightness(1.08); }
       }
       if (an.tool === 'text') { addText(local(ev)); return; }
       if (an.tool === 'eraser') { an.erasing = false; eraseAt(ev); an.live = { erase: true, id: ev.pointerId }; return; }
-      var hl = an.tool === 'marker', color = hl ? an.marker : an.pen, em = emSize();
-      var path = svgEl('path', { fill: 'none', stroke: inkColor(color), 'stroke-width': (hl ? 0.9 : 0.12) * em, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: hl ? 0.4 : 1 });
+      var hl = an.tool === 'marker', color = hl ? an.marker : an.pen, em = emSize(), w = penWidth(hl);
+      // Pressure only from a real pen; fingers and mice report a fixed value.
+      var pr = !hl && ev.pointerType === 'pen' && ev.pressure > 0;
+      var p0 = local(ev);
+      if (pr) p0.push(ev.pressure);
+      var path = inkPathEl([p0], pr ? [pressW(w * em, ev.pressure)] : null, inkColor(color), w * em, hl);
       an.svg.appendChild(path);
-      an.live = { id: ev.pointerId, pts: [local(ev)], path: path, hl: hl, color: color };
+      an.live = { id: ev.pointerId, pts: [p0], raw: p0, path: path, hl: hl, color: color, w: w, pr: pr, f: SMOOTH[clamp(prefs.inkSmooth | 0, 0, 3)] };
     });
     layer.addEventListener('pointermove', function (ev) {
       var pinfo = an.ptrs[ev.pointerId];
@@ -2783,12 +2845,20 @@ a.brand:hover { filter: brightness(1.08); }
       }
       if (!an.live || an.live.id !== ev.pointerId) return;
       if (an.live.erase) { eraseAt(ev); return; }
+      var lv = an.live, em = emSize();
       var evs = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev];
       (evs.length ? evs : [ev]).forEach(function (ce) {
-        var p = local(ce), last = an.live.pts[an.live.pts.length - 1];
-        if (Math.abs(p[0] - last[0]) + Math.abs(p[1] - last[1]) >= 1.5) an.live.pts.push(p);
+        var raw = local(ce), last = lv.pts[lv.pts.length - 1];
+        if (lv.pr) raw.push(ce.pressure > 0 ? ce.pressure : last[2]);
+        lv.raw = raw;
+        // Smoothing: each new point moves only part of the way towards the finger or pen.
+        var q = [last[0] + (raw[0] - last[0]) * (1 - lv.f), last[1] + (raw[1] - last[1]) * (1 - lv.f)];
+        if (lv.pr) q.push(last[2] + (raw[2] - last[2]) * 0.5);
+        if (Math.abs(q[0] - last[0]) + Math.abs(q[1] - last[1]) >= 1.2) lv.pts.push(q);
       });
-      an.live.path.setAttribute('d', pathD(an.live.pts));
+      var live = lv.pts.concat([lv.raw]);
+      if (lv.pr) lv.path.setAttribute('d', outlineD(live, live.map(function (p) { return pressW(lv.w * em, p[2]); })));
+      else lv.path.setAttribute('d', pathD(live));
     });
     function up(ev) {
       delete an.ptrs[ev.pointerId];
@@ -2802,16 +2872,20 @@ a.brand:hover { filter: brightness(1.08); }
       var a = anchorFor((Math.min.apply(null, xs) + Math.max.apply(null, xs)) / 2, (Math.min.apply(null, ys) + Math.max.apply(null, ys)) / 2);
       lv.path.remove();
       if (!a) return;
+      var src = lv.pts.concat([lv.raw]);
+      // Stronger smoothing levels also even out the finished line a little.
+      for (var pass = 1; pass < (prefs.inkSmooth | 0); pass++) src = smoothPts(src);
       var pts = [], last = null;
-      lv.pts.forEach(function (p) {
+      src.forEach(function (p, i) {
         var q = [+((p[0] - a.ox) / em).toFixed(3), +((p[1] - a.oy) / em).toFixed(3)];
-        if (!last || Math.abs(q[0] - last[0]) + Math.abs(q[1] - last[1]) >= 0.04) { pts.push(q); last = q; }
+        if (lv.pr) q.push(+(p[2] || 0.5).toFixed(2));
+        if (!last || i === src.length - 1 || Math.abs(q[0] - last[0]) + Math.abs(q[1] - last[1]) >= 0.04) { pts.push(q); last = q; }
       });
-      var end = lv.pts[lv.pts.length - 1];
-      pts.push([+((end[0] - a.ox) / em).toFixed(3), +((end[1] - a.oy) / em).toFixed(3)]);
       notesPush();
-      an.notes.push({ id: uid('n'), type: lv.hl ? 'hl' : 'ink', color: lv.color, w: lv.hl ? 0.9 : 0.12,
-        a: { i: +a.el.getAttribute('data-bi'), k: a.el.getAttribute('data-k') }, pts: pts });
+      var note = { id: uid('n'), type: lv.hl ? 'hl' : 'ink', color: lv.color, w: lv.w,
+        a: { i: +a.el.getAttribute('data-bi'), k: a.el.getAttribute('data-k') }, pts: pts };
+      if (lv.pr) note.pr = true;
+      an.notes.push(note);
       drawNotes(); drawNotesBar();
     }
     layer.addEventListener('pointerup', up);
@@ -2866,6 +2940,9 @@ a.brand:hover { filter: brightness(1.08); }
         h('div', { class: 'field' }, h('span', { text: t('theme') }),
           seg([['auto', t('auto')], ['dark', t('dark')], ['light', t('light')]], prefs.theme, function (v) { prefs.theme = v; savePrefs(); applyPrefs(); draw(); })),
         h('div', { class: 'field' }, h('span', { text: t('color') }), swatches),
+        h('div', { class: 'field' }, h('span', { text: t('inkSmooth') }),
+          seg([[0, t('smooth0')], [1, t('smooth1')], [2, t('smooth2')], [3, t('smooth3')]], prefs.inkSmooth | 0, function (v) { prefs.inkSmooth = v; savePrefs(); draw(); }),
+          h('span', { class: 'hint', text: t('inkSmoothHint') })),
         h('div', { class: 'field' }, h('span', { text: t('defaultSpeed') }),
           h('div', { class: 'stepper' },
             h('button', { class: 'btn', type: 'button', 'aria-label': t('slower'), text: '−', onclick: function () { step(-1); } }),

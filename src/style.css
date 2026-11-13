@@ -356,7 +356,6 @@ a.brand:hover { filter: brightness(1.08); }
 .notesbtn { margin-right: 4px; }
 @media (max-width: 760px) {
   .nhint { display: none; }
-  .notesbtn span { display: none; }
 }
 @media (max-width: 760px) {
   .notesbar { flex-wrap: nowrap; overflow-x: auto; gap: 2px; padding: 4px 6px; scrollbar-width: none; }
@@ -366,3 +365,12 @@ a.brand:hover { filter: brightness(1.08); }
 .note-text { width: max-content; max-width: min(18em, 92vw); }
 /* pinch on the song changes the text size, not the page zoom */
 .stsheet { touch-action: pan-x pan-y; }
+
+/* ---------- v3.2 ---------- */
+.datebox { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.datebox .input { color: var(--ink); }
+.nsizes { display: inline-flex; gap: 2px; padding: 0 4px; border-left: 1px solid var(--line); margin-left: 2px; }
+.nsize { width: 34px; height: 34px; border-radius: 6px; border: 1px solid transparent; background: transparent; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.nsize i { display: block; border-radius: 50%; background: var(--ink); }
+.nsize[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); }
+.sttop .stedit { margin-left: -6px; }
