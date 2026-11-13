@@ -1,0 +1,103 @@
+import asyncio, json, os
+from playwright.async_api import async_playwright
+URL = 'file:///home/claude/songgiggin/dist/index.html'
+DL = '/tmp/sgdl/'
+
+async def main():
+    async with async_playwright() as p:
+        b = await p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--no-sandbox'])
+        ctx = await b.new_context(viewport={'width': 1180, 'height': 860}, color_scheme='dark', locale='is-IS', accept_downloads=True)
+        page = await ctx.new_page(); errors = []
+        page.on('pageerror', lambda e: errors.append(str(e)))
+        await page.goto(URL); await page.wait_for_selector('.rows .row')
+        pool = lambda: page.locator('.rows .row .t b').all_inner_texts()
+
+        # --- explicit save ---
+        await page.get_by_role('button', name='Nýtt lag').click()
+        print('save disabled at start:', await page.is_disabled('#ed-save'))
+        await page.fill('#ed-title', 'Prufulag')
+        print('status:', await page.inner_text('#ed-status'), '| save enabled:', not await page.is_disabled('#ed-save'))
+        await page.click('#tab-setlists')
+        print('dialog:', await page.locator('dialog h2').inner_text())
+        await page.get_by_role('button', name='Hætta við').click()
+        print('still editing:', await page.input_value('#ed-title'))
+        await page.click('#brand')
+        await page.get_by_role('button', name='Henda').click()
+        print('after discard, pool:', await pool())
+        await page.get_by_role('button', name='Nýtt lag').click()
+        await page.fill('#ed-title', 'Vistað lag'); await page.fill('#ed-body', '[G]Halló [C]heimur')
+        await page.click('#tab-songs')
+        await page.locator('dialog').get_by_role('button', name='Vista').click()
+        print('after save, pool:', await pool())
+        # import opens an unsaved song; Ctrl+S saves it
+        await page.get_by_role('button', name='Flytja inn').first.click()
+        await page.fill('#import-text', 'Innflutt\nBandið\n\nG  D\nla la\n')
+        await page.locator('dialog .btn.primary').click()
+        print('imported, in pool before save?', 'Innflutt' in await page.evaluate("JSON.stringify(JSON.parse(localStorage.getItem('songgiggin.data.v1')).songs)"))
+        await page.keyboard.press('Control+s')
+        print('status after Ctrl+S:', await page.inner_text('#ed-status'))
+        # edit existing, then discard keeps the saved version
+        await page.fill('#ed-title', 'Innflutt BREYTT')
+        await page.click('#brand'); await page.get_by_role('button', name='Henda').click()
+        print('pool after discarding an edit:', await pool())
+
+        # --- tag + setlist with a key change, then export ---
+        await page.click('#tab-setlists')
+        await page.get_by_role('button', name='Nýr lagalisti').click()
+        await page.fill('#setlist-name', 'Gigg í kvöld'); await page.wait_for_timeout(700)
+        await page.get_by_role('button', name='Bæta við lögum').click()
+        await page.locator('dialog .item', has_text='Vistað lag').get_by_role('button').click()
+        await page.locator('dialog .item', has_text='Innflutt').get_by_role('button').click()
+        await page.get_by_role('button', name='Lokið').click()
+        await page.locator('.setsongs li').nth(0).get_by_label('Hækka tóntegund um hálftón').click()
+        await page.locator('.setsongs li').nth(0).get_by_label('Hækka tóntegund um hálftón').click()
+        await page.locator('.sethead').get_by_role('button', name='Flytja út').click()
+        print('export dialog file:', await page.inner_text('dialog .filename'))
+        async with page.expect_download() as d: await page.get_by_role('button', name='Hlaða niður').click()
+        dl = await d.value; set_path = DL + dl.suggested_filename; await dl.save_as(set_path)
+        await page.get_by_role('button', name='Loka').click()
+        await page.click('#tab-songs')
+        await page.get_by_role('button', name='Flytja út').click()
+        async with page.expect_download() as d: await page.get_by_role('button', name='Hlaða niður').click()
+        dl = await d.value; lib_path = DL + dl.suggested_filename; await dl.save_as(lib_path)
+        await page.get_by_role('button', name='Loka').click()
+        lib = json.load(open(lib_path))
+        print('files:', os.path.basename(set_path), '|', os.path.basename(lib_path), '| library songs:', [s['title'] for s in lib['songs']])
+        # single song as ChordPro text
+        await page.locator('.rows .row', has_text='Vistað lag').get_by_role('button', name='Breyta').click()
+        await page.get_by_role('button', name='Flytja út lag', exact=True).click()
+        async with page.expect_download() as d: await page.get_by_role('button', name='Hlaða niður').click()
+        dl = await d.value; song_path = DL + dl.suggested_filename; await dl.save_as(song_path)
+        print('song file:', os.path.basename(song_path), json.dumps(open(song_path, encoding='utf-8').read()))
+        await page.get_by_role('button', name='Loka').click()
+
+        # --- a bandmate's device: import the setlist file ---
+        ctx2 = await b.new_context(viewport={'width': 1180, 'height': 860}, color_scheme='light', locale='is-IS')
+        p2 = await ctx2.new_page(); p2.on('pageerror', lambda e: errors.append('p2 ' + str(e)))
+        await p2.goto(URL); await p2.wait_for_selector('.rows .row')
+        await p2.get_by_role('button', name='Flytja inn').first.click()
+        async with p2.expect_file_chooser() as fc: await p2.get_by_role('button', name='Opna skrá').click()
+        await (await fc.value).set_files(set_path)
+        await p2.wait_for_selector('dialog .summary')
+        print('summary:', [r.replace('\n', ' = ') for r in await p2.locator('dialog .summary .item').all_inner_texts()])
+        await p2.locator('dialog .btn.primary').click()
+        await p2.click('#tab-setlists'); await p2.locator('.listcard', has_text='Gigg í kvöld').click()
+        print('bandmate setlist keys:', [k.replace('\n', ' ') for k in await p2.locator('.setsongs li .keys').all_inner_texts()])
+        # importing the same file again
+        await p2.click('#tab-songs')
+        await p2.get_by_role('button', name='Flytja inn').first.click()
+        async with p2.expect_file_chooser() as fc: await p2.get_by_role('button', name='Opna skrá').click()
+        await (await fc.value).set_files(set_path)
+        await p2.wait_for_selector('dialog .summary')
+        print('again:', await p2.locator('dialog p').last.inner_text())
+        await p2.get_by_role('button', name='Loka').click()
+        # a ChordPro text file opens unsaved in the editor
+        await p2.get_by_role('button', name='Flytja inn').first.click()
+        async with p2.expect_file_chooser() as fc: await p2.get_by_role('button', name='Opna skrá').click()
+        await (await fc.value).set_files(song_path)
+        await p2.wait_for_selector('#ed-body')
+        print('txt import:', await p2.input_value('#ed-title'), '|', await p2.input_value('#ed-key'), '|', await p2.inner_text('#ed-status'))
+        await p2.screenshot(path='/home/claude/shots/v2-bandmate-editor.png')
+        print('ERRORS:', errors)
+        await b.close()
+asyncio.run(main())
