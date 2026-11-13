@@ -47,3 +47,11 @@ fs.writeFileSync(path.join(pdir, 'sw.js'), fs.readFileSync(path.join(__dirname, 
 ['manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'].forEach(f =>
   fs.copyFileSync(path.join(__dirname, 'pwa', f), path.join(pdir, f)));
 console.log('built dist-pwa/ (' + VERSION + ')');
+
+// ---- GitHub Pages serves the same files from docs/ ----
+const ddir = path.join(__dirname, 'docs');
+fs.rmSync(ddir, { recursive: true, force: true });
+fs.mkdirSync(ddir, { recursive: true });
+fs.readdirSync(pdir).forEach(f => fs.copyFileSync(path.join(pdir, f), path.join(ddir, f)));
+fs.writeFileSync(path.join(ddir, '.nojekyll'), '');
+console.log('copied to docs/ for GitHub Pages');
