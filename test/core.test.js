@@ -225,7 +225,7 @@ const lib = {
   tags: { t1: { id: 't1', name: 'Hresst', order: 0 }, t2: { id: 't2', name: '80s', order: 1 }, t3: { id: 't3', name: 'Ónotað', order: 2 } }
 };
 let bun = C.exportBundle(lib, 'library');
-eq([bun.format, bun.songs.map(x => x.id), bun.setlists.length, bun.tags.length], ['songgiggin', ['s1', 's2'], 1, 3]);
+eq([bun.format, bun.songs.map(x => x.id), bun.setlists.length, bun.tags.length], ['giggari', ['s1', 's2'], 1, 3]);
 bun = C.exportBundle(lib, 'setlist', 'l1');
 eq([bun.songs.map(x => x.id), bun.tags.map(x => x.name)], [['s1'], ['Hresst', '80s']]);
 const parsed = C.parseBundle(JSON.stringify(bun));
@@ -260,4 +260,7 @@ eq(cp, '{title: Eitt}\n{artist: A}\n{key: G}\n{tempo: 100}\n\n[G]Hæ\n');
 const back = C.importText(cp);
 eq([back.title, back.artist, back.key, back.bpm, back.body], ['Eitt', 'A', 'G', 100, '[G]Hæ\n']);
 
+// files from before the rename (Songgiggin) still import
+eq(!!C.parseBundle(JSON.stringify({ format: 'songgiggin', version: 1, songs: [], setlists: [], tags: [] })), true);
+eq(C.parseBundle(JSON.stringify({ format: 'other', version: 1, songs: [] })), null);
 console.log('core tests passed:', n);

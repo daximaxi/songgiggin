@@ -1,7 +1,7 @@
-/* Songgiggin service worker: the app works without a connection once it has been opened. */
+/* GIGGARI service worker: the app works without a connection once it has been opened. */
 const VERSION = '/*@VERSION@*/';
-const SHELL = 'songgiggin-shell-' + VERSION;
-const FONTS = 'songgiggin-fonts-v1';
+const SHELL = 'giggari-shell-' + VERSION;
+const FONTS = 'giggari-fonts-v1';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './icon-maskable-512.png', './jspdf.umd.min.js'];
 
 self.addEventListener('install', (event) => {
@@ -11,7 +11,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('songgiggin-shell-') && k !== SHELL).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => (k.startsWith('giggari-shell-') && k !== SHELL) || k.startsWith('songgiggin-')).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });

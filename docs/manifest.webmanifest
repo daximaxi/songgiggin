@@ -1,7 +1,7 @@
 {
-  "name": "Songgiggin",
-  "short_name": "Songgiggin",
-  "description": "Lög með hljómum, lagalistar og sjálfvirkt skrun fyrir giggið.",
+  "name": "GIGGARI",
+  "short_name": "GIGGARI",
+  "description": "GIGGARI: lög með hljómum, lagalistar og sjálfvirkt skrun fyrir giggið.",
   "lang": "is",
   "start_url": "./",
   "scope": "./",

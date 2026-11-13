@@ -1,4 +1,4 @@
-/* Songgiggin app: song pool, editor, setlists, stage view. Vanilla JS, no libraries. */
+/* GIGGARI app: song pool, editor, setlists, stage view. Vanilla JS, no libraries. */
 (function () {
   'use strict';
   var C = window.Core;
@@ -37,6 +37,8 @@
     pause: '<path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor" stroke="none"/>',
     edit: '<path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/>',
     trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5"/>',
+    archive: '<path d="M3 4h18v4H3zM5 8v12h14V8M10 12h4"/>',
+    restore: '<path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4"/>',
     up: '<path d="M6 15l6-6 6 6"/>',
     down: '<path d="M6 9l6 6 6-6"/>',
     x: '<path d="M6 6l12 12M18 6L6 18"/>',
@@ -92,6 +94,14 @@
       searchSongs: 'Search title or artist', noSongs: 'No songs yet. Add your first one with New song.',
       noMatch: 'No songs match your search.', untitled: 'Untitled', example: 'Example',
       edit: 'Edit', del: 'Delete', addToSetlist: 'Add to setlist', songDeleted: 'Song deleted', undo: 'Undo',
+      archive: 'Archive', toArchive: 'Move to archive', songArchived: 'Song moved to the archive', setlistArchived: 'Setlist moved to the archive',
+      restore: 'Restore', restored: 'Restored', deleteForever: 'Delete for good', deleteForeverTitle: 'Delete for good?',
+      deleteForeverText: '“{n}” will be deleted for good. This cannot be undone.',
+      deleteForeverLists: function (k) { return 'It also disappears from ' + k + (k === 1 ? ' setlist.' : ' setlists.'); },
+      archivedSince: 'Archived {d}', inArchive: 'archived', deletedForever: 'Deleted',
+      archiveEmpty: 'Nothing in the archive. Songs and setlists you move here can be restored.',
+      archiveHint: 'Songs in the archive stay on the setlists they are on. Deleting for good cannot be undone.',
+      archiveSongs: 'Songs', archiveSetlists: 'Setlists',
       newSetlist: 'New setlist', noSetlists: 'No setlists yet. Create one and pull songs in from the pool.',
       back: 'Back', setlistName: 'Setlist name', date: 'Date', start: 'Start', addSongs: 'Add songs',
       deleteSetlist: 'Delete setlist', setlistDeleted: 'Setlist deleted',
@@ -131,18 +141,18 @@
       importHint: 'Copy a song from a website and paste it here. Title, artist and key are read from the first lines when possible, and chords above the lyrics are moved onto the right syllable.',
       importPlaceholder: 'Paste the song here', importBtn: 'Import', importEmpty: 'Paste a song first.',
       exportBtn: 'Export', exportLib: 'Export song pool', exportSetlist: 'Export setlist', exportSong: 'Export song',
-      exportLibDesc: 'All your songs, setlists and tags in one file. Import it here on another device, or send it to someone who uses Songgiggin. The example songs are left out.',
+      exportLibDesc: 'All your songs, setlists and tags in one file. Import it here on another device, or send it to someone who uses GIGGARI. The example songs are left out.',
       exportSetlistDesc: 'This setlist with its songs, the keys you set for it and the tags they use. Whoever imports it gets the whole setlist ready to play.',
-      exportSongDesc: 'The song as a ChordPro text file. Other chord apps can open it, and Songgiggin can import it again.',
+      exportSongDesc: 'The song as a ChordPro text file. Other chord apps can open it, and GIGGARI can import it again.',
       download: 'Download', copy: 'Copy', copied: 'Copied. Paste it in a message or into Import on another device.',
       copyManual: 'Select all the text below and copy it.', fileSaved: 'File saved', fileBusy: 'A save is already waiting for your answer.',
       fileFailed: 'The file could not be saved here. Use Copy instead.', openFile: 'Open file',
-      fileHint: 'Or open a file: a Songgiggin file (.json) or songs as text or ChordPro files.',
+      fileHint: 'Or open a file: a GIGGARI file (.json) or songs as text or ChordPro files.',
       mTitle: 'Import file', mInFile: 'In the file', mNewSongs: 'New songs', mUpdSongs: 'Songs updated (newer in the file)',
       mSameSongs: 'Songs already up to date', mKeepSongs: 'Songs where your copy is newer (kept)', mNewLists: 'New setlists',
       mUpdLists: 'Setlists updated (newer in the file)', mSameLists: 'Setlists already up to date', mKeepLists: 'Setlists where your copy is newer (kept)',
       mNewTags: 'New tags', mNothing: 'Everything in the file is already here. Nothing to import.', mDone: 'Import finished',
-      mBad: 'This file could not be read as a song or a Songgiggin file.',
+      mBad: 'This file could not be read as a song or a GIGGARI file.',
       nLists: function (n) { return n === 1 ? '1 setlist' : n + ' setlists'; },
       sizeFine: 'Thin line', sizeMed: 'Medium line', sizeThick: 'Thick line', gigDate: 'Gig date',
       inkSmooth: 'Handwriting smoothing', smooth0: 'Off', smooth1: 'Low', smooth2: 'Medium', smooth3: 'High',
@@ -173,6 +183,14 @@
       searchSongs: 'Leita að titli eða flytjanda', noSongs: 'Engin lög enn. Bættu við fyrsta laginu með Nýtt lag.',
       noMatch: 'Engin lög passa við leitina.', untitled: 'Án titils', example: 'Dæmi',
       edit: 'Breyta', del: 'Eyða', addToSetlist: 'Bæta á lagalista', songDeleted: 'Lagi eytt', undo: 'Afturkalla',
+      archive: 'Geymsla', toArchive: 'Setja í geymslu', songArchived: 'Lag sett í geymslu', setlistArchived: 'Lagalisti settur í geymslu',
+      restore: 'Sækja aftur', restored: 'Sótt úr geymslu', deleteForever: 'Eyða endanlega', deleteForeverTitle: 'Eyða endanlega?',
+      deleteForeverText: '„{n}“ verður eytt fyrir fullt og allt. Það er ekki hægt að afturkalla.',
+      deleteForeverLists: function (k) { return 'Það hverfur líka af ' + k + (k === 1 ? ' lagalista.' : ' lagalistum.'); },
+      archivedSince: 'Í geymslu síðan {d}', inArchive: 'í geymslu', deletedForever: 'Eytt',
+      archiveEmpty: 'Ekkert í geymslu. Lög og lagalista sem fara hingað er hægt að sækja aftur.',
+      archiveHint: 'Lög í geymslu haldast á lagalistum sem þau eru á. Ekki er hægt að afturkalla endanlega eyðingu.',
+      archiveSongs: 'Lög', archiveSetlists: 'Lagalistar',
       newSetlist: 'Nýr lagalisti', noSetlists: 'Engir lagalistar enn. Búðu til lista og sæktu lög úr lagasafninu.',
       back: 'Til baka', setlistName: 'Nafn lagalista', date: 'Dagsetning', start: 'Byrja', addSongs: 'Bæta við lögum',
       deleteSetlist: 'Eyða lagalista', setlistDeleted: 'Lagalista eytt',
@@ -212,18 +230,18 @@
       importHint: 'Afritaðu lag af vefsíðu og límdu það hér. Titill, flytjandi og tóntegund eru lesin úr fyrstu línunum þegar hægt er, og hljómar fyrir ofan texta eru færðir á rétt atkvæði.',
       importPlaceholder: 'Límdu lagið hér', importBtn: 'Flytja inn', importEmpty: 'Límdu lag inn fyrst.',
       exportBtn: 'Flytja út', exportLib: 'Flytja út lagasafnið', exportSetlist: 'Flytja út lagalista', exportSong: 'Flytja út lag',
-      exportLibDesc: 'Öll lögin þín, lagalistar og tags í einni skrá. Þú getur flutt hana inn hér á öðru tæki eða sent hana einhverjum sem notar Songgiggin. Dæmalögin eru ekki með.',
+      exportLibDesc: 'Öll lögin þín, lagalistar og tags í einni skrá. Þú getur flutt hana inn hér á öðru tæki eða sent hana einhverjum sem notar Giggarann. Dæmalögin eru ekki með.',
       exportSetlistDesc: 'Lagalistinn ásamt lögunum, tóntegundunum sem þú valdir fyrir hann og tags-unum þeirra. Sá sem flytur hann inn fær allan lagalistann tilbúinn.',
-      exportSongDesc: 'Lagið sem ChordPro textaskrá. Önnur hljómaöpp geta opnað hana og Songgiggin getur flutt hana inn aftur.',
+      exportSongDesc: 'Lagið sem ChordPro textaskrá. Önnur hljómaöpp geta opnað hana og Giggarinn getur flutt hana inn aftur.',
       download: 'Hlaða niður', copy: 'Afrita', copied: 'Afritað. Límdu það í skilaboð eða í Flytja inn á öðru tæki.',
       copyManual: 'Veldu allan textann hér fyrir neðan og afritaðu hann.', fileSaved: 'Skrá vistuð', fileBusy: 'Vistun bíður nú þegar eftir svari frá þér.',
       fileFailed: 'Ekki var hægt að vista skrána hér. Notaðu Afrita í staðinn.', openFile: 'Opna skrá',
-      fileHint: 'Eða opnaðu skrá: Songgiggin skrá (.json) eða lög sem texta- eða ChordPro skrár.',
+      fileHint: 'Eða opnaðu skrá: skrá úr Giggaranum (.json) eða lög sem texta- eða ChordPro skrár.',
       mTitle: 'Flytja inn skrá', mInFile: 'Í skránni', mNewSongs: 'Ný lög', mUpdSongs: 'Lög uppfærð (nýrri í skránni)',
       mSameSongs: 'Lög sem eru þegar eins', mKeepSongs: 'Lög þar sem þín útgáfa er nýrri (haldið)', mNewLists: 'Nýir lagalistar',
       mUpdLists: 'Lagalistar uppfærðir (nýrri í skránni)', mSameLists: 'Lagalistar sem eru þegar eins', mKeepLists: 'Lagalistar þar sem þín útgáfa er nýrri (haldið)',
       mNewTags: 'Ný tags', mNothing: 'Allt í skránni er þegar hér. Ekkert að flytja inn.', mDone: 'Innflutningi lokið',
-      mBad: 'Ekki tókst að lesa þessa skrá sem lag eða Songgiggin skrá.',
+      mBad: 'Ekki tókst að lesa þessa skrá sem lag eða skrá úr Giggaranum.',
       nLists: function (n) { return (n % 10 === 1 && n % 100 !== 11) ? n + ' lagalisti' : n + ' lagalistar'; },
       sizeFine: 'Fín lína', sizeMed: 'Miðlungs lína', sizeThick: 'Þykk lína', gigDate: 'Dagsetning giggs',
       inkSmooth: 'Mýkt handskriftar', smooth0: 'Engin', smooth1: 'Lítil', smooth2: 'Miðlungs', smooth3: 'Mikil',
@@ -556,13 +574,20 @@
   function songTitle(s) { return (s && s.title && s.title.trim()) || t('untitled'); }
   function liveSongs() {
     return Object.keys(data.songs).map(function (id) { return data.songs[id]; })
-      .filter(function (sg) { return !sg.deleted; })
+      .filter(function (sg) { return !sg.deleted && !sg.archived; })
       .sort(function (a, b) { return coll.compare(songTitle(a), songTitle(b)); });
   }
+  // Songs or setlists in the archive, newest first.
+  function archivedOf(kind) {
+    return Object.keys(data[kind]).map(function (id) { return data[kind][id]; })
+      .filter(function (r) { return r.archived && !r.deleted; })
+      .sort(function (a, b) { return (b.archived || 0) - (a.archived || 0); });
+  }
+  function archiveCount() { return archivedOf('songs').length + archivedOf('setlists').length; }
   function liveSetlists() {
     var mode = prefs.setlistSort;
     return Object.keys(data.setlists).map(function (id) { return data.setlists[id]; })
-      .filter(function (sl) { return !sl.deleted; })
+      .filter(function (sl) { return !sl.deleted && !sl.archived; })
       .sort(function (a, b) {
         if (mode === 'name') return coll.compare(a.name || '', b.name || '');
         if (mode === 'edited') return (b.updatedAt || 0) - (a.updatedAt || 0);
@@ -735,6 +760,7 @@
   function setTabs() {
     $('#tab-songs').toggleAttribute('aria-current', false);
     $('#tab-setlists').toggleAttribute('aria-current', false);
+    if (ui.view === 'archive') return;
     var cur = (ui.view === 'songs' || ui.view === 'edit') ? '#tab-songs' : '#tab-setlists';
     $(cur).setAttribute('aria-current', 'page');
   }
@@ -743,7 +769,7 @@
     if (ed) leaveEditor();
     ui.view = view;
     if (extra) Object.assign(ui, extra);
-    var hash = (view === 'songs' || view === 'edit') ? '#songs' : '#setlists';
+    var hash = view === 'archive' ? '#archive' : (view === 'songs' || view === 'edit') ? '#songs' : '#setlists';
     if (location.hash !== hash) { try { history.replaceState(null, '', hash); } catch (e) { location.hash = hash; } }
     render();
     main.scrollTop = 0;
@@ -754,6 +780,7 @@
     if (ui.view === 'edit') return renderEditor();
     if (ui.view === 'setlists') return renderSetlists();
     if (ui.view === 'setlist') return renderSetlist();
+    if (ui.view === 'archive') return renderArchive();
     renderSongs();
   }
   // Called when synced data arrives. Never rebuilds a view the user is typing in.
@@ -819,7 +846,7 @@
         h('span', { class: 'acts' },
           iconBtn('listadd', t('addToSetlist'), function () { chooseSetlistFor(sg); }),
           iconBtn('edit', t('edit'), function () { openEditor(sg.id); }),
-          iconBtn('trash', t('del'), function () { deleteSong(sg.id); })));
+          iconBtn('archive', t('toArchive'), function () { archiveSong(sg.id); })));
     }
     function drawFilter() {
       setKids.apply(null, [filterEl].concat(tags.map(function (tg) {
@@ -858,6 +885,7 @@
         h('span', { class: 'spacer' }),
         h('button', { class: 'btn', type: 'button', onclick: openImport }, ico('import'), t('importSong')),
         h('button', { class: 'btn', type: 'button', onclick: exportLibrary }, ico('export'), t('exportBtn')),
+        archiveBtn('songs'),
         h('button', { class: 'btn primary', type: 'button', onclick: function () { openEditor(null); } }, ico('plus'), t('newSong'))),
       h('div', { class: 'poolbar' },
         h('label', { class: 'search' }, ico('search'), searchInput),
@@ -910,9 +938,10 @@
         h('button', { class: 'btn primary', type: 'button', onclick: doImport }, ico('import'), t('importBtn')))));
     setTimeout(function () { ta.focus(); }, 0);
   }
-  function deleteSong(id) {
-    var s = clone(data.songs[id]); s.deleted = true; saveRec('songs', s); render();
-    toast(t('songDeleted'), t('undo'), function () { var r = clone(data.songs[id]); delete r.deleted; saveRec('songs', r); render(); });
+  // The trash button moves a song to the archive. It can be restored there, or deleted for good.
+  function archiveSong(id) {
+    var s = clone(data.songs[id]); s.archived = Date.now(); saveRec('songs', s); render();
+    toast(t('songArchived'), t('undo'), function () { var r = clone(data.songs[id]); delete r.archived; saveRec('songs', r); render(); });
   }
   function chooseSetlistFor(song) {
     function addTo(sl) {
@@ -943,7 +972,7 @@
     }
     return downloadsP;
   }
-  function safeName(n) { return String(n || '').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '').replace(/\s+/g, ' ').trim().slice(0, 80) || 'Songgiggin'; }
+  function safeName(n) { return String(n || '').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '').replace(/\s+/g, ' ').trim().slice(0, 80) || 'GIGGARI'; }
   function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
   function saveFile(filename, text) {
     return getDownloads().then(function (dl) {
@@ -982,12 +1011,12 @@
   function exportLibrary() {
     var b = C.exportBundle(data, 'library');
     openExport(t('exportLib'), t('exportLibDesc') + ' ' + t('nSongs')(b.songs.length) + ', ' + t('nLists')(b.setlists.length) + '.',
-      'Songgiggin ' + today() + '.json', JSON.stringify(b, null, 1));
+      'GIGGARI ' + today() + '.json', JSON.stringify(b, null, 1));
   }
   function exportSetlist(id) {
     var b = C.exportBundle(data, 'setlist', id), sl = data.setlists[id];
     openExport(t('exportSetlist'), t('exportSetlistDesc') + ' ' + t('nSongs')(b.songs.length) + '.',
-      safeName('Songgiggin - ' + (sl.name || t('untitled'))) + '.json', JSON.stringify(b, null, 1));
+      safeName('GIGGARI - ' + (sl.name || t('untitled'))) + '.json', JSON.stringify(b, null, 1));
   }
   function exportSong(rec) {
     openExport(t('exportSong'), t('exportSongDesc'), safeName([rec.title || t('untitled'), rec.artist].filter(Boolean).join(' - ')) + '.txt', C.songToChordPro(rec));
@@ -995,7 +1024,7 @@
   function songFromImport(r, fallbackTitle) {
     return { id: uid('s'), title: r.title || fallbackTitle || '', artist: r.artist, key: r.key, bpm: r.bpm, body: r.body, tags: [], createdAt: Date.now() };
   }
-  // Files picked in the import dialog: Songgiggin files are merged, text files become songs.
+  // Files picked in the import dialog: GIGGARI (and old Songgiggin) files are merged, text files become songs.
   function importFiles(files) {
     return Promise.all(Array.prototype.map.call(files, function (f) {
       return (f.text ? f.text() : new Response(f).text()).then(function (txt) { return { name: f.name, text: txt }; }, function () { return { name: f.name, text: '' }; });
@@ -1060,6 +1089,7 @@
         h('h1', { text: t('setlists') }),
         h('span', { class: 'spacer' }),
         h('label', { class: 'sortbox' }, h('span', { text: t('sortBy') }), sortSel),
+        archiveBtn('setlists'),
         h('button', { class: 'btn primary', type: 'button', onclick: function () {
           var sl = newSetlistRec(); saveRec('setlists', sl); go('setlist', { setlistId: sl.id });
           var n = $('#setlist-name'); if (n) { n.focus(); n.select(); }
@@ -1075,10 +1105,58 @@
       })) : h('div', { class: 'empty', text: t('noSetlists') })));
   }
 
+  // ----- archive -----
+  function archiveBtn(from) {
+    var n = archiveCount();
+    return h('button', { class: 'btn archbtn', type: 'button', 'aria-label': t('archive') + (n ? ' (' + n + ')' : ''),
+      onclick: function () { go('archive', { archiveFrom: from }); } }, ico('archive'), h('span', { text: t('archive') }), n ? h('span', { class: 'chip', text: String(n) }) : null);
+  }
+  function confirmDeleteForever(kind, rec) {
+    var name = kind === 'songs' ? songTitle(rec) : (rec.name || t('untitled'));
+    var onLists = kind === 'songs' ? Object.keys(data.setlists).map(function (id) { return data.setlists[id]; })
+      .filter(function (sl) { return !sl.deleted && (sl.items || []).some(function (it) { return it.songId === rec.id; }); }).length : 0;
+    openDialog(h('div', { class: 'dlg' },
+      h('h2', { text: t('deleteForeverTitle') }),
+      h('p', { text: t('deleteForeverText').replace('{n}', name) }),
+      onLists ? h('p', { class: 'hint', text: t('deleteForeverLists')(onLists) }) : null,
+      h('div', { class: 'foot' },
+        h('button', { class: 'btn ghost', type: 'button', text: t('cancel'), onclick: closeDialog }),
+        h('button', { class: 'btn danger', type: 'button', onclick: function () {
+          closeDialog();
+          var c = clone(data[kind][rec.id]); c.deleted = true; saveRec(kind, c);
+          toast(t('deletedForever')); render();
+        } }, ico('trash'), t('deleteForever')))));
+  }
+  function renderArchive() {
+    var songs = archivedOf('songs'), lists = archivedOf('setlists');
+    function restore(kind, rec) {
+      var c = clone(data[kind][rec.id]); delete c.archived; saveRec(kind, c); toast(t('restored')); render();
+    }
+    function row(kind, rec) {
+      var title = kind === 'songs' ? songTitle(rec) : (rec.name || t('untitled'));
+      var sub = [kind === 'songs' ? rec.artist : t('nSongs')(visibleItems(rec).length), t('archivedSince').replace('{d}', fmtDate(rec.archived))].filter(Boolean).join(' · ');
+      return h('div', { class: 'row archrow' },
+        h('span', { class: 'open' }, h('span', { class: 't' }, h('b', { text: title }), h('small', { text: sub }))),
+        h('span', { class: 'acts' },
+          h('button', { class: 'btn small', type: 'button', onclick: function () { restore(kind, rec); } }, ico('restore'), t('restore')),
+          h('button', { class: 'btn small ghost danger', type: 'button', onclick: function () { confirmDeleteForever(kind, rec); } }, ico('trash'), t('deleteForever'))));
+    }
+    var back = ui.archiveFrom === 'setlists' ? 'setlists' : 'songs';
+    main.replaceChildren(h('div', { class: 'col' },
+      h('div', null, h('button', { class: 'btn ghost', type: 'button', onclick: function () { go(back); } }, ico('left'), back === 'setlists' ? t('setlists') : t('songPool'))),
+      h('div', { class: 'pagehead' }, h('h1', { text: t('archive') }), h('span', { class: 'count', text: String(songs.length + lists.length) })),
+      h('p', { class: 'hint', text: t('archiveHint') }),
+      !songs.length && !lists.length ? h('div', { class: 'empty', text: t('archiveEmpty') }) : null,
+      songs.length ? h('section', { class: 'group' }, h('h2', { class: 'grouphead' }, h('span', { text: t('archiveSongs') }), h('small', { text: String(songs.length) })),
+        h('div', { class: 'rows' }, songs.map(function (r) { return row('songs', r); }))) : null,
+      lists.length ? h('section', { class: 'group' }, h('h2', { class: 'grouphead' }, h('span', { text: t('archiveSetlists') }), h('small', { text: String(lists.length) })),
+        h('div', { class: 'rows' }, lists.map(function (r) { return row('setlists', r); }))) : null));
+  }
+
   var nameTimer = 0;
   function renderSetlist() {
     var sl = data.setlists[ui.setlistId];
-    if (!sl || sl.deleted) { ui.view = 'setlists'; return renderSetlists(); }
+    if (!sl || sl.deleted || sl.archived) { ui.view = 'setlists'; return renderSetlists(); }
     var items = visibleItems(sl);
     function mutate(fn) { var c = clone(data.setlists[sl.id]); fn(c); if (c.example) delete c.example; saveRec('setlists', c); }
     function idxOf(c, itUid) { for (var i = 0; i < c.items.length; i++) if (c.items[i].uid === itUid) return i; return -1; }
@@ -1102,7 +1180,7 @@
       return h('li', null,
         h('span', { class: 'num', text: String(i + 1) }),
         h('button', { class: 'open', type: 'button', onclick: function () { openStage({ setlistId: sl.id, index: i }); } },
-          h('b', { text: songTitle(song) }), song.artist ? h('small', { text: song.artist }) : null),
+          h('b', null, songTitle(song), song.archived ? h('span', { class: 'tag arch', text: t('inArchive') }) : null), song.artist ? h('small', { text: song.artist }) : null),
         h('span', { class: 'keybox' },
           textBtn('−', t('keyDown'), function () { shift(-1); }),
           h('span', { class: 'keys' },
@@ -1139,9 +1217,9 @@
           h('span', { class: 'count hint', text: [t('nSongs')(items.length), setlistDates(sl)].filter(Boolean).join(' · ') }),
           h('span', { class: 'spacer' }),
           h('button', { class: 'btn ghost danger', type: 'button', onclick: function () {
-            var id = sl.id; mutate(function (c) { c.deleted = true; }); go('setlists');
-            toast(t('setlistDeleted'), t('undo'), function () { var r = clone(data.setlists[id]); delete r.deleted; saveRec('setlists', r); render(); });
-          } }, ico('trash'), t('deleteSetlist')))),
+            var id = sl.id; mutate(function (c) { c.archived = Date.now(); }); go('setlists');
+            toast(t('setlistArchived'), t('undo'), function () { var r = clone(data.setlists[id]); delete r.archived; saveRec('setlists', r); render(); });
+          } }, ico('archive'), t('toArchive')))),
       listEl));
   }
   function pickSongs(setlistId) {
@@ -1410,8 +1488,8 @@
         h('button', { class: 'btn ghost danger', type: 'button', onclick: function () {
           var id = r.id, existed = !!data.songs[id];
           ed = null; ui.view = 'songs';
-          if (existed) deleteSong(id); else render();
-        } }, ico('trash'), t('del'))),
+          if (existed) archiveSong(id); else render();
+        } }, ico('archive'), t('toArchive'))),
       h('div', { class: 'fields' }, fTitle.wrap, fArtist.wrap, fKey.wrap, fBpm.wrap),
       tagBox,
       tools,
@@ -2401,7 +2479,7 @@
       var n = doc.getNumberOfPages(), label = sl ? (sl.name || t('untitled')) : songTitle(target.song);
       for (var p = 1; p <= n; p++) {
         doc.setPage(p); font('normal', 8, 130);
-        text('Songgiggin · ' + label, L, PH - 24);
+        text('GIGGARI · ' + label, L, PH - 24);
         var pg = t('page') + ' ' + p + ' / ' + n; text(pg, R - width(pg), PH - 24);
       }
       return doc;
@@ -2613,8 +2691,8 @@
 
   // ---------- routing and start ----------
   function fromHash() {
-    var want = location.hash === '#setlists' ? 'setlists' : 'songs';
-    var cur = (ui.view === 'songs' || ui.view === 'edit') ? 'songs' : 'setlists';
+    var want = location.hash === '#setlists' ? 'setlists' : location.hash === '#archive' ? 'archive' : 'songs';
+    var cur = ui.view === 'archive' ? 'archive' : (ui.view === 'songs' || ui.view === 'edit') ? 'songs' : 'setlists';
     if (want !== cur) go(want);
   }
   window.addEventListener('hashchange', fromHash);
@@ -2625,6 +2703,7 @@
   function start(snap) {
     applyPrefs();
     if (location.hash === '#setlists') ui.view = 'setlists';
+    if (location.hash === '#archive') ui.view = 'archive';
     if (snap && snap.view === 'setlist' && snap.setlistId) { ui.view = 'setlist'; ui.setlistId = snap.setlistId; }
     ready = hasRecords();
     render();

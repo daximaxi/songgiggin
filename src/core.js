@@ -1,4 +1,4 @@
-/* Songgiggin core: ChordPro parsing, chords-over-lyrics conversion, transposing.
+/* GIGGARI core: ChordPro parsing, chords-over-lyrics conversion, transposing.
    Pure functions, no DOM. Runs in the browser (window.Core) and in Node (tests). */
 (function (root) {
   'use strict';
@@ -466,7 +466,7 @@
       .replace(/\n{3,}/g, '\n\n').trim() + '\n';
   }
 
-  // ---------- Songgiggin files: export and merge ----------
+  // ---------- GIGGARI files: export and merge (also reads files from Songgiggin, the old name) ----------
 
   function live(map) { return Object.keys(map || {}).map(function (k) { return map[k]; }).filter(function (r) { return r && !r.deleted; }); }
   function copy(o) { return JSON.parse(JSON.stringify(o)); }
@@ -487,14 +487,14 @@
     var used = {};
     songs.forEach(function (sg) { (sg.tags || []).forEach(function (id) { used[id] = 1; }); });
     var tags = live(data.tags).filter(function (tg) { return kind !== 'setlist' || used[tg.id]; });
-    return { format: 'songgiggin', version: 1, kind: kind, exportedAt: Date.now(),
+    return { format: 'giggari', version: 1, kind: kind, exportedAt: Date.now(),
       songs: copy(songs), setlists: copy(setlists), tags: copy(tags) };
   }
 
   function parseBundle(text) {
     var b;
     try { b = JSON.parse(String(text || '').trim()); } catch (e) { return null; }
-    if (!b || b.format !== 'songgiggin' || !Array.isArray(b.songs)) return null;
+    if (!b || (b.format !== 'giggari' && b.format !== 'songgiggin') || !Array.isArray(b.songs)) return null;
     b.setlists = Array.isArray(b.setlists) ? b.setlists : [];
     b.tags = Array.isArray(b.tags) ? b.tags : [];
     b.songs = b.songs.filter(function (x) { return x && typeof x.id === 'string' && typeof x.body === 'string'; });

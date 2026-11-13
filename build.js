@@ -19,7 +19,7 @@ fs.writeFileSync(path.join(__dirname, 'dist', 'index.html'), html);
 console.log('built dist/index.html', (html.length / 1024).toFixed(1) + ' KiB');
 
 // ---- installable version for hosting outside Claude: dist-pwa/ ----
-const VERSION = '3.4.0-' + Date.now().toString(36);
+const VERSION = '3.5.0-' + Date.now().toString(36);
 const pwaHead = [
   '<link rel="manifest" href="manifest.webmanifest">',
   '<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">',
@@ -28,7 +28,7 @@ const pwaHead = [
   '<link rel="apple-touch-icon" href="apple-touch-icon.png">',
   '<meta name="mobile-web-app-capable" content="yes">',
   '<meta name="apple-mobile-web-app-capable" content="yes">',
-  '<meta name="apple-mobile-web-app-title" content="Songgiggin">',
+  '<meta name="apple-mobile-web-app-title" content="GIGGARI">',
   // PDF export loads jsPDF from the app's own files so it also works offline.
   '<script>window.SG_JSPDF = "jspdf.umd.min.js";</script>'
 ].join('\n');
@@ -39,7 +39,7 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
 // Ask the browser not to clear the songs when the phone runs low on space.
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
 </script>`;
-const pwaHtml = html.replace('<title>Songgiggin</title>', () => '<title>Songgiggin</title>\n' + pwaHead)
+const pwaHtml = html.replace('<title>GIGGARI</title>', () => '<title>GIGGARI</title>\n' + pwaHead)
   .replace('</body>', () => pwaBoot + '\n</body>');
 const pdir = path.join(__dirname, 'dist-pwa');
 fs.rmSync(pdir, { recursive: true, force: true });
