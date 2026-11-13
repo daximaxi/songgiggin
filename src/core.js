@@ -550,7 +550,141 @@
     return head.join('\n') + (head.length ? '\n\n' : '') + String(song.body || '').replace(/\s+$/, '') + '\n';
   }
 
+  // ---------- chord diagrams (guitar, standard tuning) ----------
+
+  // Quality spellings -> one of the shape families below. approx: the diagram leaves notes out.
+  var QUAL_MAP = [
+    [/^(|maj|M|major)$/, 'maj'], [/^(m|min|mi|-)$/, 'm'], [/^7$/, '7'], [/^(m7|min7|mi7|-7)$/, 'm7'],
+    [/^(maj7|M7|Δ|Δ7|ma7|j7)$/, 'maj7'], [/^sus2$/, 'sus2'], [/^(sus|sus4)$/, 'sus4'], [/^(7sus4|7sus|sus7)$/, '7sus4'],
+    [/^6$/, '6'], [/^(m6|min6|-6)$/, 'm6'], [/^9$/, '9'], [/^(add9|add2|2)$/, 'add9'],
+    [/^(dim|°|º|o)$/, 'dim'], [/^(dim7|°7|º7|o7)$/, 'dim7'], [/^(m7b5|m7\(b5\)|ø|ø7|-7b5)$/, 'm7b5'],
+    [/^(aug|\+|#5|\(#5\))$/, 'aug'], [/^5$/, '5']
+  ];
+  var QUAL_APPROX = [
+    [/^(maj9|M9|Δ9|maj13|maj7#11)$/, 'maj7'], [/^(m9|m11|min9|-9|m7add11)$/, 'm7'], [/^(mmaj7|m\(maj7\)|mM7|-Δ7)$/, 'm'],
+    [/^(9sus4|11)$/, '7sus4'], [/^(13|7b9|7#9|7b5|7#5|7#11|7b13|9b5|7alt|alt)$/, '7'], [/^(6\/9|69|6add9)$/, '6'],
+    [/^(madd9|m\(add9\)|m2)$/, 'm'], [/^(aug7|\+7|7\+)$/, '7'], [/^(sus2\/4|sus24)$/, 'sus4']
+  ];
+  var INTERVALS = {
+    maj: [0, 4, 7], m: [0, 3, 7], 7: [0, 4, 7, 10], m7: [0, 3, 7, 10], maj7: [0, 4, 7, 11], sus2: [0, 2, 7], sus4: [0, 5, 7],
+    '7sus4': [0, 5, 7, 10], 6: [0, 4, 7, 9], m6: [0, 3, 7, 9], 9: [0, 2, 4, 7, 10], add9: [0, 2, 4, 7], dim: [0, 3, 6],
+    dim7: [0, 3, 6, 9], m7b5: [0, 3, 6, 10], aug: [0, 4, 8], 5: [0, 7]
+  };
+  // Open shapes, low E string first. x = not played.
+  var OPEN = {
+    'C|maj': 'x32010', 'C|7': 'x32310', 'C|maj7': 'x32000', 'C|add9': 'x32033', 'C|sus4': 'x33011', 'C|sus2': 'x30013',
+    'D|maj': 'xx0232', 'D|m': 'xx0231', 'D|7': 'xx0212', 'D|maj7': 'xx0222', 'D|m7': 'xx0211', 'D|sus2': 'xx0230',
+    'D|sus4': 'xx0233', 'D|6': 'xx0202', 'D|5': 'xx0235',
+    'E|maj': '022100', 'E|m': '022000', 'E|7': '020100', 'E|m7': '022030', 'E|maj7': '021100', 'E|sus4': '022200',
+    'E|7sus4': '020200', 'E|add9': '024100', 'E|5': '022xxx',
+    'F|maj7': 'xx3210',
+    'G|maj': '320003', 'G|7': '320001', 'G|maj7': '320002', 'G|6': '320000', 'G|sus4': '330013', 'G|add9': '320203',
+    'A|maj': 'x02220', 'A|m': 'x02210', 'A|7': 'x02020', 'A|m7': 'x02010', 'A|maj7': 'x02120', 'A|sus2': 'x02200',
+    'A|sus4': 'x02230', 'A|7sus4': 'x02030', 'A|6': 'x02222', 'A|m6': 'x02212', 'A|add9': 'x02420', 'A|5': 'x022xx',
+    'B|7': 'x21202', 'B|m7': 'x20202'
+  };
+  // Movable shapes: fret offsets from the root fret on the low E string (E form) or the A string (A form).
+  var MOVE = {
+    E: { maj: [0, 2, 2, 1, 0, 0], m: [0, 2, 2, 0, 0, 0], 7: [0, 2, 0, 1, 0, 0], m7: [0, 2, 0, 0, 0, 0],
+      maj7: [0, null, 1, 1, 0, null], sus4: [0, 2, 2, 2, 0, 0], '7sus4': [0, 2, 0, 2, 0, 0], 9: [0, 2, 0, 1, 0, 2],
+      add9: [0, 2, 4, 1, 0, 0], m6: [0, null, -1, 0, 0, null], 6: [0, null, -1, 1, 0, null], dim7: [0, null, -1, 0, -1, null],
+      m7b5: [0, null, 0, 0, -1, null], 5: [0, 2, 2, null, null, null] },
+    A: { maj: [null, 0, 2, 2, 2, 0], m: [null, 0, 2, 2, 1, 0], 7: [null, 0, 2, 0, 2, 0], m7: [null, 0, 2, 0, 1, 0],
+      maj7: [null, 0, 2, 1, 2, 0], sus2: [null, 0, 2, 2, 0, 0], sus4: [null, 0, 2, 2, 3, 0], '7sus4': [null, 0, 2, 0, 3, 0],
+      6: [null, 0, 2, 2, 2, 2], m6: [null, 0, 2, 2, 1, 2], 9: [null, 0, -1, 0, 0, 0], add9: [null, 0, 2, 4, 2, 0],
+      dim: [null, 0, 1, 2, 1, null], dim7: [null, 0, 1, 2, 1, 2], m7b5: [null, 0, 1, 0, 1, null], aug: [null, 0, 3, 2, 2, 1],
+      5: [null, 0, 2, 2, null, null] }
+  };
+  var TUNING = [4, 9, 2, 7, 11, 4];
+
+  function chordFamily(qual) {
+    var q = String(qual || '').replace(/\s+/g, '');
+    for (var i = 0; i < QUAL_MAP.length; i++) if (QUAL_MAP[i][0].test(q)) return { fam: QUAL_MAP[i][1], approx: false };
+    for (var j = 0; j < QUAL_APPROX.length; j++) if (QUAL_APPROX[j][0].test(q)) return { fam: QUAL_APPROX[j][1], approx: true };
+    if (/^m(?!aj)/.test(q)) return { fam: /7/.test(q) ? 'm7' : 'm', approx: true };
+    if (/^(maj|M|Δ)/.test(q)) return { fam: 'maj7', approx: true };
+    if (/^sus/.test(q)) return { fam: 'sus4', approx: true };
+    if (/^(7|9|11|13)/.test(q)) return { fam: '7', approx: true };
+    return null;
+  }
+  function parseFrets(s) { return s.split('').map(function (c) { return c === 'x' ? null : parseInt(c, 10); }); }
+
+  /** "F#m7/C#" -> { name, frets: [lowE..highE] (null = not played), base: first fret shown, barre, approx, fam }; null if unknown. */
+  function chordShape(name) {
+    var c = parseChord(name);
+    if (!c) return null;
+    var f = chordFamily(c.qual);
+    if (!f) return null;
+    var root = noteIndex(c.root, c.acc), frets = null;
+    var openKey = SHARP[root] + '|' + f.fam, openKey2 = FLAT[root] + '|' + f.fam;
+    if (OPEN[openKey] || OPEN[openKey2]) frets = parseFrets(OPEN[openKey] || OPEN[openKey2]);
+    else {
+      var best = null;
+      [['E', 4], ['A', 9]].forEach(function (form) {
+        var tpl = MOVE[form[0]][f.fam];
+        if (!tpl) return;
+        var r = mod12(root - form[1]);
+        var lowest = Math.min.apply(null, tpl.filter(function (x) { return x != null; }));
+        if (r + lowest < 0) r += 12;
+        var fr = tpl.map(function (x) { return x == null ? null : r + x; });
+        var top = Math.max.apply(null, fr.filter(function (x) { return x != null; }));
+        if (!best || top < best.top) best = { frets: fr, top: top };
+      });
+      if (best) frets = best.frets;
+    }
+    if (!frets) return null;
+    var played = frets.filter(function (x) { return x != null && x > 0; });
+    var maxF = played.length ? Math.max.apply(null, played) : 0, minF = played.length ? Math.min.apply(null, played) : 0;
+    var base = maxF <= 5 ? 1 : minF;
+    // A barre: the lowest fret, held on the lowest played string and on at least one more, with no
+    // open or muted string in between.
+    var barre = null;
+    if (minF > 0) {
+      var firstPlayed = -1;
+      for (var s = 0; s < 6; s++) if (frets[s] != null) { firstPlayed = s; break; }
+      var on = [];
+      frets.forEach(function (x, k) { if (x === minF) on.push(k); });
+      if (on.length >= 2 && frets[firstPlayed] === minF) {
+        var from = on[0], to = on[on.length - 1], ok = true;
+        for (var k = from; k <= to; k++) if (frets[k] == null || frets[k] < minF) ok = false;
+        if (ok && to - from >= 2) barre = { fret: minF, from: from, to: to };
+      }
+    }
+    return { name: String(name).trim(), frets: frets, base: base, barre: barre, approx: f.approx, fam: f.fam };
+  }
+
+  /** Pitch classes sounded by a fret list (used by the tests). */
+  function shapeNotes(frets) {
+    var out = [];
+    frets.forEach(function (x, s) { if (x != null) { var n = mod12(TUNING[s] + x); if (out.indexOf(n) < 0) out.push(n); } });
+    return out;
+  }
+
+  /** Chord names in a song body, in order of first use, after transposing by n. */
+  function songChords(body, n, flat) {
+    var seen = {}, out = [];
+    chordsIn(body).forEach(function (c) {
+      var x = n ? transposeChord(c, n, flat) : c;
+      if (!seen[x]) { seen[x] = 1; out.push(x); }
+    });
+    return out;
+  }
+
+  // ---------- capo ----------
+  var EASY_KEYS = { C: 1, G: 1, D: 1, A: 1, E: 1, Am: 1, Em: 1, Dm: 1 };
+  /** For a sounding key: what each capo fret 0..9 turns it into, and whether the shapes are easy open chords. */
+  function capoOptions(key) {
+    var k = parseKey(key), out = [];
+    for (var c = 0; c <= 9; c++) {
+      var shape = k ? keyName(k.idx - c, k.minor) : '';
+      out.push({ capo: c, shapeKey: shape, easy: !!EASY_KEYS[shape] });
+    }
+    return out;
+  }
+
   var Core = {
+    chordShape: chordShape, shapeNotes: shapeNotes, songChords: songChords, chordFamily: chordFamily, INTERVALS: INTERVALS,
+    capoOptions: capoOptions, noteIndex: noteIndex,
     parseChord: parseChord, transposeChord: transposeChord, transposeBracket: transposeBracket,
     isChordish: isChordish, parseKey: parseKey, keyName: keyName, normalizeKey: normalizeKey,
     transposeKey: transposeKey, prefersFlats: prefersFlats, chordsIn: chordsIn,

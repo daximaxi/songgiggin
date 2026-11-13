@@ -19,7 +19,7 @@ fs.writeFileSync(path.join(__dirname, 'dist', 'index.html'), html);
 console.log('built dist/index.html', (html.length / 1024).toFixed(1) + ' KiB');
 
 // ---- installable version for hosting outside Claude: dist-pwa/ ----
-const VERSION = '3.2.0-' + Date.now().toString(36);
+const VERSION = '3.3.0-' + Date.now().toString(36);
 const pwaHead = [
   '<link rel="manifest" href="manifest.webmanifest">',
   '<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">',
@@ -28,7 +28,9 @@ const pwaHead = [
   '<link rel="apple-touch-icon" href="apple-touch-icon.png">',
   '<meta name="mobile-web-app-capable" content="yes">',
   '<meta name="apple-mobile-web-app-capable" content="yes">',
-  '<meta name="apple-mobile-web-app-title" content="Songgiggin">'
+  '<meta name="apple-mobile-web-app-title" content="Songgiggin">',
+  // PDF export loads jsPDF from the app's own files so it also works offline.
+  '<script>window.SG_JSPDF = "jspdf.umd.min.js";</script>'
 ].join('\n');
 const pwaBoot = `<script>
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
@@ -44,7 +46,7 @@ fs.rmSync(pdir, { recursive: true, force: true });
 fs.mkdirSync(pdir, { recursive: true });
 fs.writeFileSync(path.join(pdir, 'index.html'), pwaHtml);
 fs.writeFileSync(path.join(pdir, 'sw.js'), fs.readFileSync(path.join(__dirname, 'pwa', 'sw.js'), 'utf8').replace('/*@VERSION@*/', VERSION));
-['manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'].forEach(f =>
+['manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'jspdf.umd.min.js'].forEach(f =>
   fs.copyFileSync(path.join(__dirname, 'pwa', f), path.join(pdir, f)));
 console.log('built dist-pwa/ (' + VERSION + ')');
 

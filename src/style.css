@@ -374,3 +374,74 @@ a.brand:hover { filter: brightness(1.08); }
 .nsize i { display: block; border-radius: 50%; background: var(--ink); }
 .nsize[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); }
 .sttop .stedit { margin-left: -6px; }
+
+/* ---------- v3.3: chord diagrams, capo, lyrics only, print ---------- */
+.stsheet, .preview { position: relative; }
+.ch[data-c] { cursor: pointer; }
+.cd { margin: 0; display: inline-flex; flex-direction: column; align-items: center; width: 4.2em; color: var(--ink); }
+.cd figcaption { font-weight: 700; font-size: .85em; color: var(--accent); display: flex; gap: 2px; align-items: baseline; white-space: nowrap; }
+.cd figcaption small { color: var(--muted); font-weight: 400; }
+.cd-svg { width: 100%; height: auto; display: block; }
+.cd-ln { stroke: currentColor; stroke-width: 1; opacity: .55; }
+.cd-nut { stroke: currentColor; stroke-width: 3; }
+.cd-dot { fill: currentColor; }
+.cd-open { fill: none; stroke: currentColor; stroke-width: 1.2; }
+.cd-x { stroke: currentColor; stroke-width: 1.2; fill: none; }
+.cd-fr { fill: currentColor; font-size: 9px; font-family: var(--font-body); }
+.cd-none { height: 4.6em; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 1.4em; }
+.cd-strip { display: flex; flex-wrap: wrap; gap: .4em .9em; padding: 0 0 .8em; margin-bottom: .6em; border-bottom: 1px solid var(--line); font-size: .85em; }
+.cd-pop {
+  position: absolute; z-index: 5; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .25); padding: 8px 10px 6px; display: flex; flex-direction: column; align-items: center; font-size: 22px; max-width: 220px;
+}
+.cd-pop .cd { width: 5em; }
+.cd-pop .hint { font-size: 12px; text-align: center; }
+.capobtn { min-height: 36px; padding: 2px 10px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.capobtn.on { color: var(--accent); border-color: var(--accent); }
+.chordsbtn { min-height: 36px; padding: 2px 10px; }
+.chordsbtn[aria-pressed="false"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.iconbtn[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+.capogrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.capoopt { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 6px 2px; min-height: 64px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); }
+.capoopt b { font-family: var(--font-display); font-size: 26px; line-height: 1; }
+.capoopt small { font-size: 11px; color: var(--muted); }
+.capoopt .sk { font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
+.capoopt.easy { border-color: var(--accent); border-style: dashed; }
+.capoopt[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); border-style: solid; }
+.capoopt[aria-pressed="true"] small { color: inherit; }
+.easydot { display: inline-block; width: 14px; height: 10px; border: 1px dashed var(--accent); border-radius: 3px; vertical-align: middle; }
+.setsongs .capobtn { margin-left: 2px; }
+.printopts { display: flex; flex-direction: column; gap: 12px; }
+.check { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+.check input { width: 22px; height: 22px; accent-color: var(--accent); }
+@media (max-width: 760px) {
+  .capogrid { grid-template-columns: repeat(5, 1fr); }
+  .cd-strip { font-size: .75em; }
+}
+
+/* print */
+#print { display: none; }
+@media print {
+  @page { margin: 14mm 14mm 16mm; }
+  html, body { height: auto !important; overflow: visible !important; background: #fff !important; color: #000 !important; }
+  #app, #stage, #toast, dialog { display: none !important; }
+  #print { display: block; color: #000; font-family: var(--font-body); }
+  #print .p-song { break-inside: auto; margin-bottom: 1.6em; }
+  #print .p-song.newpage + .p-song.newpage, #print .p-list + .p-song.newpage { break-before: page; }
+  #print .p-title { font-family: var(--font-display); font-weight: 800; font-size: 2em; text-transform: uppercase; line-height: 1; margin: 0; }
+  #print .p-sub { color: #444; font-size: .9em; margin: .2em 0 .8em; }
+  #print .ch { color: #000; }
+  #print .ch.an, #print .cmt, #print .sec, #print .tabnote { color: #444; }
+  #print .chorus { border-left-color: #000; }
+  #print .cd, #print .cd figcaption { color: #000; }
+  #print .cd-strip { border-bottom-color: #999; }
+  #print .ln { break-inside: avoid; }
+  #print .p-list h1 { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; margin: 0 0 .2em; line-height: 1; }
+  #print .p-list ol { margin: .4em 0 0; padding-left: 0; list-style: none; }
+  #print .p-list li { display: flex; align-items: baseline; gap: .5em; border-bottom: 1px solid #bbb; padding: .15em 0; break-inside: avoid; }
+  #print .p-list li .n { font-family: var(--font-display); font-weight: 800; width: 1.6em; text-align: right; flex: none; }
+  #print .p-list li .tt { flex: 1; font-weight: 700; }
+  #print .p-list li .kk { font-family: var(--font-mono); white-space: nowrap; }
+  #print .p-list.big { font-size: 26px; }
+  #print .p-list.big h1 { font-size: 1.6em; }
+}

@@ -12,6 +12,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Songgiggin">
+<script>window.SG_JSPDF = "jspdf.umd.min.js";</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&display=swap">
@@ -395,6 +396,77 @@ a.brand:hover { filter: brightness(1.08); }
 .nsize[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); }
 .sttop .stedit { margin-left: -6px; }
 
+/* ---------- v3.3: chord diagrams, capo, lyrics only, print ---------- */
+.stsheet, .preview { position: relative; }
+.ch[data-c] { cursor: pointer; }
+.cd { margin: 0; display: inline-flex; flex-direction: column; align-items: center; width: 4.2em; color: var(--ink); }
+.cd figcaption { font-weight: 700; font-size: .85em; color: var(--accent); display: flex; gap: 2px; align-items: baseline; white-space: nowrap; }
+.cd figcaption small { color: var(--muted); font-weight: 400; }
+.cd-svg { width: 100%; height: auto; display: block; }
+.cd-ln { stroke: currentColor; stroke-width: 1; opacity: .55; }
+.cd-nut { stroke: currentColor; stroke-width: 3; }
+.cd-dot { fill: currentColor; }
+.cd-open { fill: none; stroke: currentColor; stroke-width: 1.2; }
+.cd-x { stroke: currentColor; stroke-width: 1.2; fill: none; }
+.cd-fr { fill: currentColor; font-size: 9px; font-family: var(--font-body); }
+.cd-none { height: 4.6em; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 1.4em; }
+.cd-strip { display: flex; flex-wrap: wrap; gap: .4em .9em; padding: 0 0 .8em; margin-bottom: .6em; border-bottom: 1px solid var(--line); font-size: .85em; }
+.cd-pop {
+  position: absolute; z-index: 5; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .25); padding: 8px 10px 6px; display: flex; flex-direction: column; align-items: center; font-size: 22px; max-width: 220px;
+}
+.cd-pop .cd { width: 5em; }
+.cd-pop .hint { font-size: 12px; text-align: center; }
+.capobtn { min-height: 36px; padding: 2px 10px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.capobtn.on { color: var(--accent); border-color: var(--accent); }
+.chordsbtn { min-height: 36px; padding: 2px 10px; }
+.chordsbtn[aria-pressed="false"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.iconbtn[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+.capogrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.capoopt { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 6px 2px; min-height: 64px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); }
+.capoopt b { font-family: var(--font-display); font-size: 26px; line-height: 1; }
+.capoopt small { font-size: 11px; color: var(--muted); }
+.capoopt .sk { font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
+.capoopt.easy { border-color: var(--accent); border-style: dashed; }
+.capoopt[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); border-style: solid; }
+.capoopt[aria-pressed="true"] small { color: inherit; }
+.easydot { display: inline-block; width: 14px; height: 10px; border: 1px dashed var(--accent); border-radius: 3px; vertical-align: middle; }
+.setsongs .capobtn { margin-left: 2px; }
+.printopts { display: flex; flex-direction: column; gap: 12px; }
+.check { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+.check input { width: 22px; height: 22px; accent-color: var(--accent); }
+@media (max-width: 760px) {
+  .capogrid { grid-template-columns: repeat(5, 1fr); }
+  .cd-strip { font-size: .75em; }
+}
+
+/* print */
+#print { display: none; }
+@media print {
+  @page { margin: 14mm 14mm 16mm; }
+  html, body { height: auto !important; overflow: visible !important; background: #fff !important; color: #000 !important; }
+  #app, #stage, #toast, dialog { display: none !important; }
+  #print { display: block; color: #000; font-family: var(--font-body); }
+  #print .p-song { break-inside: auto; margin-bottom: 1.6em; }
+  #print .p-song.newpage + .p-song.newpage, #print .p-list + .p-song.newpage { break-before: page; }
+  #print .p-title { font-family: var(--font-display); font-weight: 800; font-size: 2em; text-transform: uppercase; line-height: 1; margin: 0; }
+  #print .p-sub { color: #444; font-size: .9em; margin: .2em 0 .8em; }
+  #print .ch { color: #000; }
+  #print .ch.an, #print .cmt, #print .sec, #print .tabnote { color: #444; }
+  #print .chorus { border-left-color: #000; }
+  #print .cd, #print .cd figcaption { color: #000; }
+  #print .cd-strip { border-bottom-color: #999; }
+  #print .ln { break-inside: avoid; }
+  #print .p-list h1 { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; margin: 0 0 .2em; line-height: 1; }
+  #print .p-list ol { margin: .4em 0 0; padding-left: 0; list-style: none; }
+  #print .p-list li { display: flex; align-items: baseline; gap: .5em; border-bottom: 1px solid #bbb; padding: .15em 0; break-inside: avoid; }
+  #print .p-list li .n { font-family: var(--font-display); font-weight: 800; width: 1.6em; text-align: right; flex: none; }
+  #print .p-list li .tt { flex: 1; font-weight: 700; }
+  #print .p-list li .kk { font-family: var(--font-mono); white-space: nowrap; }
+  #print .p-list.big { font-size: 26px; }
+  #print .p-list.big h1 { font-size: 1.6em; }
+}
+
 </style>
 </head>
 <body>
@@ -414,6 +486,7 @@ a.brand:hover { filter: brightness(1.08); }
 <div id="stage" hidden></div>
 <dialog id="dlg"></dialog>
 <div id="toast" hidden role="status"></div>
+<div id="print" aria-hidden="true"></div>
 <script>
 /* Songgiggin core: ChordPro parsing, chords-over-lyrics conversion, transposing.
    Pure functions, no DOM. Runs in the browser (window.Core) and in Node (tests). */
@@ -967,7 +1040,141 @@ a.brand:hover { filter: brightness(1.08); }
     return head.join('\n') + (head.length ? '\n\n' : '') + String(song.body || '').replace(/\s+$/, '') + '\n';
   }
 
+  // ---------- chord diagrams (guitar, standard tuning) ----------
+
+  // Quality spellings -> one of the shape families below. approx: the diagram leaves notes out.
+  var QUAL_MAP = [
+    [/^(|maj|M|major)$/, 'maj'], [/^(m|min|mi|-)$/, 'm'], [/^7$/, '7'], [/^(m7|min7|mi7|-7)$/, 'm7'],
+    [/^(maj7|M7|Δ|Δ7|ma7|j7)$/, 'maj7'], [/^sus2$/, 'sus2'], [/^(sus|sus4)$/, 'sus4'], [/^(7sus4|7sus|sus7)$/, '7sus4'],
+    [/^6$/, '6'], [/^(m6|min6|-6)$/, 'm6'], [/^9$/, '9'], [/^(add9|add2|2)$/, 'add9'],
+    [/^(dim|°|º|o)$/, 'dim'], [/^(dim7|°7|º7|o7)$/, 'dim7'], [/^(m7b5|m7\(b5\)|ø|ø7|-7b5)$/, 'm7b5'],
+    [/^(aug|\+|#5|\(#5\))$/, 'aug'], [/^5$/, '5']
+  ];
+  var QUAL_APPROX = [
+    [/^(maj9|M9|Δ9|maj13|maj7#11)$/, 'maj7'], [/^(m9|m11|min9|-9|m7add11)$/, 'm7'], [/^(mmaj7|m\(maj7\)|mM7|-Δ7)$/, 'm'],
+    [/^(9sus4|11)$/, '7sus4'], [/^(13|7b9|7#9|7b5|7#5|7#11|7b13|9b5|7alt|alt)$/, '7'], [/^(6\/9|69|6add9)$/, '6'],
+    [/^(madd9|m\(add9\)|m2)$/, 'm'], [/^(aug7|\+7|7\+)$/, '7'], [/^(sus2\/4|sus24)$/, 'sus4']
+  ];
+  var INTERVALS = {
+    maj: [0, 4, 7], m: [0, 3, 7], 7: [0, 4, 7, 10], m7: [0, 3, 7, 10], maj7: [0, 4, 7, 11], sus2: [0, 2, 7], sus4: [0, 5, 7],
+    '7sus4': [0, 5, 7, 10], 6: [0, 4, 7, 9], m6: [0, 3, 7, 9], 9: [0, 2, 4, 7, 10], add9: [0, 2, 4, 7], dim: [0, 3, 6],
+    dim7: [0, 3, 6, 9], m7b5: [0, 3, 6, 10], aug: [0, 4, 8], 5: [0, 7]
+  };
+  // Open shapes, low E string first. x = not played.
+  var OPEN = {
+    'C|maj': 'x32010', 'C|7': 'x32310', 'C|maj7': 'x32000', 'C|add9': 'x32033', 'C|sus4': 'x33011', 'C|sus2': 'x30013',
+    'D|maj': 'xx0232', 'D|m': 'xx0231', 'D|7': 'xx0212', 'D|maj7': 'xx0222', 'D|m7': 'xx0211', 'D|sus2': 'xx0230',
+    'D|sus4': 'xx0233', 'D|6': 'xx0202', 'D|5': 'xx0235',
+    'E|maj': '022100', 'E|m': '022000', 'E|7': '020100', 'E|m7': '022030', 'E|maj7': '021100', 'E|sus4': '022200',
+    'E|7sus4': '020200', 'E|add9': '024100', 'E|5': '022xxx',
+    'F|maj7': 'xx3210',
+    'G|maj': '320003', 'G|7': '320001', 'G|maj7': '320002', 'G|6': '320000', 'G|sus4': '330013', 'G|add9': '320203',
+    'A|maj': 'x02220', 'A|m': 'x02210', 'A|7': 'x02020', 'A|m7': 'x02010', 'A|maj7': 'x02120', 'A|sus2': 'x02200',
+    'A|sus4': 'x02230', 'A|7sus4': 'x02030', 'A|6': 'x02222', 'A|m6': 'x02212', 'A|add9': 'x02420', 'A|5': 'x022xx',
+    'B|7': 'x21202', 'B|m7': 'x20202'
+  };
+  // Movable shapes: fret offsets from the root fret on the low E string (E form) or the A string (A form).
+  var MOVE = {
+    E: { maj: [0, 2, 2, 1, 0, 0], m: [0, 2, 2, 0, 0, 0], 7: [0, 2, 0, 1, 0, 0], m7: [0, 2, 0, 0, 0, 0],
+      maj7: [0, null, 1, 1, 0, null], sus4: [0, 2, 2, 2, 0, 0], '7sus4': [0, 2, 0, 2, 0, 0], 9: [0, 2, 0, 1, 0, 2],
+      add9: [0, 2, 4, 1, 0, 0], m6: [0, null, -1, 0, 0, null], 6: [0, null, -1, 1, 0, null], dim7: [0, null, -1, 0, -1, null],
+      m7b5: [0, null, 0, 0, -1, null], 5: [0, 2, 2, null, null, null] },
+    A: { maj: [null, 0, 2, 2, 2, 0], m: [null, 0, 2, 2, 1, 0], 7: [null, 0, 2, 0, 2, 0], m7: [null, 0, 2, 0, 1, 0],
+      maj7: [null, 0, 2, 1, 2, 0], sus2: [null, 0, 2, 2, 0, 0], sus4: [null, 0, 2, 2, 3, 0], '7sus4': [null, 0, 2, 0, 3, 0],
+      6: [null, 0, 2, 2, 2, 2], m6: [null, 0, 2, 2, 1, 2], 9: [null, 0, -1, 0, 0, 0], add9: [null, 0, 2, 4, 2, 0],
+      dim: [null, 0, 1, 2, 1, null], dim7: [null, 0, 1, 2, 1, 2], m7b5: [null, 0, 1, 0, 1, null], aug: [null, 0, 3, 2, 2, 1],
+      5: [null, 0, 2, 2, null, null] }
+  };
+  var TUNING = [4, 9, 2, 7, 11, 4];
+
+  function chordFamily(qual) {
+    var q = String(qual || '').replace(/\s+/g, '');
+    for (var i = 0; i < QUAL_MAP.length; i++) if (QUAL_MAP[i][0].test(q)) return { fam: QUAL_MAP[i][1], approx: false };
+    for (var j = 0; j < QUAL_APPROX.length; j++) if (QUAL_APPROX[j][0].test(q)) return { fam: QUAL_APPROX[j][1], approx: true };
+    if (/^m(?!aj)/.test(q)) return { fam: /7/.test(q) ? 'm7' : 'm', approx: true };
+    if (/^(maj|M|Δ)/.test(q)) return { fam: 'maj7', approx: true };
+    if (/^sus/.test(q)) return { fam: 'sus4', approx: true };
+    if (/^(7|9|11|13)/.test(q)) return { fam: '7', approx: true };
+    return null;
+  }
+  function parseFrets(s) { return s.split('').map(function (c) { return c === 'x' ? null : parseInt(c, 10); }); }
+
+  /** "F#m7/C#" -> { name, frets: [lowE..highE] (null = not played), base: first fret shown, barre, approx, fam }; null if unknown. */
+  function chordShape(name) {
+    var c = parseChord(name);
+    if (!c) return null;
+    var f = chordFamily(c.qual);
+    if (!f) return null;
+    var root = noteIndex(c.root, c.acc), frets = null;
+    var openKey = SHARP[root] + '|' + f.fam, openKey2 = FLAT[root] + '|' + f.fam;
+    if (OPEN[openKey] || OPEN[openKey2]) frets = parseFrets(OPEN[openKey] || OPEN[openKey2]);
+    else {
+      var best = null;
+      [['E', 4], ['A', 9]].forEach(function (form) {
+        var tpl = MOVE[form[0]][f.fam];
+        if (!tpl) return;
+        var r = mod12(root - form[1]);
+        var lowest = Math.min.apply(null, tpl.filter(function (x) { return x != null; }));
+        if (r + lowest < 0) r += 12;
+        var fr = tpl.map(function (x) { return x == null ? null : r + x; });
+        var top = Math.max.apply(null, fr.filter(function (x) { return x != null; }));
+        if (!best || top < best.top) best = { frets: fr, top: top };
+      });
+      if (best) frets = best.frets;
+    }
+    if (!frets) return null;
+    var played = frets.filter(function (x) { return x != null && x > 0; });
+    var maxF = played.length ? Math.max.apply(null, played) : 0, minF = played.length ? Math.min.apply(null, played) : 0;
+    var base = maxF <= 5 ? 1 : minF;
+    // A barre: the lowest fret, held on the lowest played string and on at least one more, with no
+    // open or muted string in between.
+    var barre = null;
+    if (minF > 0) {
+      var firstPlayed = -1;
+      for (var s = 0; s < 6; s++) if (frets[s] != null) { firstPlayed = s; break; }
+      var on = [];
+      frets.forEach(function (x, k) { if (x === minF) on.push(k); });
+      if (on.length >= 2 && frets[firstPlayed] === minF) {
+        var from = on[0], to = on[on.length - 1], ok = true;
+        for (var k = from; k <= to; k++) if (frets[k] == null || frets[k] < minF) ok = false;
+        if (ok && to - from >= 2) barre = { fret: minF, from: from, to: to };
+      }
+    }
+    return { name: String(name).trim(), frets: frets, base: base, barre: barre, approx: f.approx, fam: f.fam };
+  }
+
+  /** Pitch classes sounded by a fret list (used by the tests). */
+  function shapeNotes(frets) {
+    var out = [];
+    frets.forEach(function (x, s) { if (x != null) { var n = mod12(TUNING[s] + x); if (out.indexOf(n) < 0) out.push(n); } });
+    return out;
+  }
+
+  /** Chord names in a song body, in order of first use, after transposing by n. */
+  function songChords(body, n, flat) {
+    var seen = {}, out = [];
+    chordsIn(body).forEach(function (c) {
+      var x = n ? transposeChord(c, n, flat) : c;
+      if (!seen[x]) { seen[x] = 1; out.push(x); }
+    });
+    return out;
+  }
+
+  // ---------- capo ----------
+  var EASY_KEYS = { C: 1, G: 1, D: 1, A: 1, E: 1, Am: 1, Em: 1, Dm: 1 };
+  /** For a sounding key: what each capo fret 0..9 turns it into, and whether the shapes are easy open chords. */
+  function capoOptions(key) {
+    var k = parseKey(key), out = [];
+    for (var c = 0; c <= 9; c++) {
+      var shape = k ? keyName(k.idx - c, k.minor) : '';
+      out.push({ capo: c, shapeKey: shape, easy: !!EASY_KEYS[shape] });
+    }
+    return out;
+  }
+
   var Core = {
+    chordShape: chordShape, shapeNotes: shapeNotes, songChords: songChords, chordFamily: chordFamily, INTERVALS: INTERVALS,
+    capoOptions: capoOptions, noteIndex: noteIndex,
     parseChord: parseChord, transposeChord: transposeChord, transposeBracket: transposeBracket,
     isChordish: isChordish, parseKey: parseKey, keyName: keyName, normalizeKey: normalizeKey,
     transposeKey: transposeKey, prefersFlats: prefersFlats, chordsIn: chordsIn,
@@ -1042,7 +1249,9 @@ a.brand:hover { filter: brightness(1.08); }
     undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/>',
     docedit: '<path d="M13 3H5v18h14V9z"/><path d="M13 3v6h6"/><path d="M9 17l.6-2.6 4.8-4.8 2 2-4.8 4.8z"/>',
     eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
-    eyeoff: '<path d="M2 12s3.6-7 10-7c2 0 3.7.7 5.1 1.6M22 12s-3.6 7-10 7c-2 0-3.7-.7-5.1-1.6M4 20L20 4"/>'
+    eyeoff: '<path d="M2 12s3.6-7 10-7c2 0 3.7.7 5.1 1.6M22 12s-3.6 7-10 7c-2 0-3.7-.7-5.1-1.6M4 20L20 4"/>',
+    grid: '<path d="M6 4h12M6 4v16M10 4v16M14 4v16M18 4v16M6 9h12M6 14h12"/><circle cx="10" cy="11.5" r="1.7" fill="currentColor"/><circle cx="14" cy="6.5" r="1.7" fill="currentColor"/>',
+    printer: '<path d="M7 9V3h10v6M7 17H4v-8h16v8h-3M7 14h10v7H7z"/>'
   };
   function ico(name) {
     var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -1132,7 +1341,17 @@ a.brand:hover { filter: brightness(1.08); }
       save: 'Save', saved: 'Saved', unsaved: 'Unsaved changes', unsavedTitle: 'Save this song?',
       unsavedNew: 'This new song has not been saved yet.', unsavedText: 'This song has changes that are not saved.', discard: 'Discard',
       imported: 'Imported. Check the title, artist and key, then save.', importedGuess: 'Imported. The key was guessed from the chords, so check it, then save.', cancel: 'Cancel',
-      nSongs: function (n) { return n === 1 ? '1 song' : n + ' songs'; }
+      nSongs: function (n) { return n === 1 ? '1 song' : n + ' songs'; },
+      capo: 'Capo', capoHint: 'The chords are shown as you finger them with the capo on. The song still sounds in {k}.', capoHintNoKey: 'The chords are shown as you finger them with the capo on.',
+      capoNone: 'No capo', shapes: 'Shapes', easyShapes: 'Easy shapes', fret: 'Fret',
+      chordsOn: 'Chords', lyricsOnly: 'Lyrics only', showChords: 'Show chords', hideChords: 'Lyrics only (hide chords)',
+      chordsInList: 'Chords in this setlist', diagrams: 'Chord diagrams', diagramsShow: 'Show chord diagrams', diagramsHide: 'Hide chord diagrams',
+      noDiagram: 'No diagram for this chord', approxDiagram: 'Simplified: some notes are left out', notesLyricsOnly: 'Notes are hidden while only lyrics are shown.',
+      print: 'Print / PDF', printTitle: 'Print or PDF', printWhat: 'What', pSongs: 'The setlist and its songs', pListOnly: 'Only the setlist, in large type (for the stage floor)',
+      pChords: 'Chords', pWithChords: 'With chords', pLyricsOnly: 'Lyrics only', pDiagrams: 'Chord diagrams at the top of each song',
+      pNewPage: 'Each song on a new page', pSize: 'Text size', pSmall: 'Small', pMedium: 'Medium', pLarge: 'Large',
+      printBtn: 'Print', pdfBtn: 'Download PDF', pdfMaking: 'Making the PDF…', pdfFailed: 'The PDF could not be made. Check the connection and try again.',
+      printBlocked: 'Printing does not work here. Use Download PDF and print the file.', notesNotPrinted: 'Notes are not printed.', page: 'Page', contd: 'continued'
     },
     is: {
       songs: 'Lög', setlists: 'Lagalistar', songPool: 'Lagasafn', newSong: 'Nýtt lag',
@@ -1197,7 +1416,17 @@ a.brand:hover { filter: brightness(1.08); }
       save: 'Vista', saved: 'Vistað', unsaved: 'Óvistaðar breytingar', unsavedTitle: 'Vista lagið?',
       unsavedNew: 'Nýja lagið hefur ekki verið vistað.', unsavedText: 'Lagið hefur breyst síðan það var vistað.', discard: 'Henda',
       imported: 'Flutt inn. Athugaðu titil, flytjanda og tóntegund og vistaðu svo.', importedGuess: 'Flutt inn. Tóntegundin var giskuð út frá hljómunum. Athugaðu hana og vistaðu svo.', cancel: 'Hætta við',
-      nSongs: function (n) { return (n % 10 === 1 && n % 100 !== 11) ? n + ' lag' : n + ' lög'; }
+      nSongs: function (n) { return (n % 10 === 1 && n % 100 !== 11) ? n + ' lag' : n + ' lög'; },
+      capo: 'Capo', capoHint: 'Hljómarnir birtast eins og þú gripur þá með capo. Lagið hljómar áfram í {k}.', capoHintNoKey: 'Hljómarnir birtast eins og þú gripur þá með capo.',
+      capoNone: 'Ekkert capo', shapes: 'Grip', easyShapes: 'Auðveld grip', fret: 'Band',
+      chordsOn: 'Hljómar', lyricsOnly: 'Aðeins texti', showChords: 'Sýna hljóma', hideChords: 'Aðeins texti (fela hljóma)',
+      chordsInList: 'Hljómar á þessum lagalista', diagrams: 'Hljómamyndir', diagramsShow: 'Sýna hljómamyndir', diagramsHide: 'Fela hljómamyndir',
+      noDiagram: 'Engin mynd til fyrir þennan hljóm', approxDiagram: 'Einfaldað: sumar nótur vantar', notesLyricsOnly: 'Glósur eru faldar þegar aðeins texti er sýndur.',
+      print: 'Prenta / PDF', printTitle: 'Prenta eða PDF', printWhat: 'Hvað', pSongs: 'Lagalistinn og lögin', pListOnly: 'Aðeins lagalistinn, stórt letur (á sviðsgólfið)',
+      pChords: 'Hljómar', pWithChords: 'Með hljómum', pLyricsOnly: 'Aðeins texti', pDiagrams: 'Hljómamyndir efst á hverju lagi',
+      pNewPage: 'Hvert lag á nýrri síðu', pSize: 'Leturstærð', pSmall: 'Lítið', pMedium: 'Miðlungs', pLarge: 'Stórt',
+      printBtn: 'Prenta', pdfBtn: 'Sækja PDF', pdfMaking: 'Bý til PDF…', pdfFailed: 'Ekki tókst að búa til PDF. Athugaðu nettenginguna og reyndu aftur.',
+      printBlocked: 'Prentun virkar ekki hér. Notaðu Sækja PDF og prentaðu skrána.', notesNotPrinted: 'Glósur eru ekki prentaðar.', page: 'Bls.', contd: 'frh.'
     }
   };
   function t(k) {
@@ -1540,18 +1769,28 @@ a.brand:hover { filter: brightness(1.08); }
     if (b.type === 'empty') return 'e';
     return b.type.charAt(0) + ':' + String(b.text || '').toLowerCase();
   }
-  function renderSheet(song, tr, accPref) {
+  // tr: semitones the song is moved; opts.capo: chords are shown as fingered with that capo;
+  // opts.noChords: lyrics only (chords, chord-only lines and tab left out).
+  function renderSheet(song, tr, accPref, opts) {
+    opts = opts || {};
+    var noCh = !!opts.noChords;
+    tr = (tr || 0) - (opts.capo || 0);
     var parsed = C.parseSong(song.body);
     var sp = C.resolveSpelling(song.key, song.body, tr, accPref || 'auto');
-    var root = h('div', { class: 'sheet-body' }), chorusEl = null, hasTab = false;
+    var root = h('div', { class: 'sheet-body' + (noCh ? ' nochords' : '') }), chorusEl = null, hasTab = false, lastGap = true;
     parsed.blocks.forEach(function (b, bi) {
       var el;
+      if (noCh) {
+        var chordOnly = b.type === 'line' && b.segs.some(function (s) { return !!s.chord; }) && b.segs.every(function (s) { return !s.text.trim(); });
+        if (b.type === 'tab' || chordOnly || (b.type === 'empty' && lastGap)) return;
+        lastGap = b.type === 'empty';
+      }
       if (b.type === 'empty') el = h('div', { class: 'ln gap' });
       else if (b.type === 'section') el = h('div', { class: 'sec', text: b.text });
       else if (b.type === 'comment') el = h('div', { class: 'cmt', text: b.text });
       else if (b.type === 'tab') { hasTab = true; el = h('pre', { class: 'tab', text: b.lines.join('\n') }); }
       else {
-        var has = b.segs.some(function (s) { return !!s.chord; });
+        var has = !noCh && b.segs.some(function (s) { return !!s.chord; });
         var onlyCh = has && b.segs.every(function (s) { return !s.text.trim(); });
         el = h('div', { class: 'ln' + (onlyCh ? ' only-ch' : '') }, C.toGroups(b.segs).map(function (g) {
           return h('span', { class: 'grp' }, g.map(function (u) {
@@ -1563,7 +1802,7 @@ a.brand:hover { filter: brightness(1.08); }
                 else if (!C.isChordish(u.chord) && !u.chord.split(/\s+/).some(function (x) { return C.parseChord(x); })) { txt = u.chord; an = true; }
                 else txt = sp.keep ? u.chord : C.transposeBracket(u.chord, tr, sp.flat);
               }
-              chEl = h('span', { class: 'ch' + (an ? ' an' : ''), text: txt });
+              chEl = h('span', { class: 'ch' + (an ? ' an' : ''), text: txt, 'data-c': txt && !an ? txt : null });
             }
             return h('span', { class: 'u' }, chEl, h('span', { class: 'ly', text: u.text }));
           }));
@@ -1578,6 +1817,75 @@ a.brand:hover { filter: brightness(1.08); }
     });
     if (hasTab && ((tr % 12) + 12) % 12 !== 0) root.appendChild(h('div', { class: 'tabnote', text: t('tabNote') }));
     return root;
+  }
+  // The chords a sheet shows, spelled as on the sheet.
+  function sheetChords(song, tr, accPref, capo) {
+    var n = (tr || 0) - (capo || 0);
+    var sp = C.resolveSpelling(song.key, song.body, n, accPref || 'auto');
+    var raw = [];
+    C.parseSong(song.body).blocks.forEach(function (b) {
+      if (b.type !== 'line') return;
+      b.segs.forEach(function (s) {
+        if (!s.chord || s.chord.charAt(0) === '*') return;
+        s.chord.split(/\s+/).forEach(function (x) { if (C.parseChord(x)) raw.push(sp.keep ? x : C.transposeChord(x, n, sp.flat)); });
+      });
+    });
+    return raw.filter(function (x, i) { return raw.indexOf(x) === i; });
+  }
+
+  // ---------- chord diagrams ----------
+  // One guitar chord as an SVG, drawn in the current text colour. Sized in em so it follows the text size.
+  function diagramSvg(shape) {
+    var W = 64, H = 80, x0 = 13, dx = 9, y0 = 16, dy = 12.4, nf = 5;
+    var s = document.createElementNS(SVGNS, 'svg');
+    s.setAttribute('viewBox', '0 0 ' + W + ' ' + H); s.setAttribute('class', 'cd-svg'); s.setAttribute('aria-hidden', 'true');
+    function add(tag, a) { var el = document.createElementNS(SVGNS, tag); for (var k in a) el.setAttribute(k, a[k]); s.appendChild(el); return el; }
+    for (var i = 0; i < 6; i++) add('line', { x1: x0 + i * dx, y1: y0, x2: x0 + i * dx, y2: y0 + nf * dy, class: 'cd-ln' });
+    for (var f = 0; f <= nf; f++) add('line', { x1: x0, y1: y0 + f * dy, x2: x0 + 5 * dx, y2: y0 + f * dy, class: f === 0 && shape.base === 1 ? 'cd-nut' : 'cd-ln' });
+    if (shape.base > 1) { var tx = add('text', { x: x0 - 4, y: y0 + dy * 0.72, 'text-anchor': 'end', class: 'cd-fr' }); tx.textContent = String(shape.base); }
+    if (shape.barre) {
+      var by = y0 + (shape.barre.fret - shape.base + 0.5) * dy;
+      add('rect', { x: x0 + shape.barre.from * dx - 3.6, y: by - 3.6, width: (shape.barre.to - shape.barre.from) * dx + 7.2, height: 7.2, rx: 3.6, class: 'cd-dot' });
+    }
+    shape.frets.forEach(function (fr, k) {
+      var x = x0 + k * dx;
+      if (fr == null) { add('path', { d: 'M' + (x - 2.6) + ' ' + (y0 - 9.6) + 'l5.2 5.2m0-5.2l-5.2 5.2', class: 'cd-x' }); return; }
+      if (fr === 0) { add('circle', { cx: x, cy: y0 - 7, r: 2.6, class: 'cd-open' }); return; }
+      if (shape.barre && fr === shape.barre.fret && k >= shape.barre.from && k <= shape.barre.to) return;
+      add('circle', { cx: x, cy: y0 + (fr - shape.base + 0.5) * dy, r: 3.6, class: 'cd-dot' });
+    });
+    return s;
+  }
+  function diagramCard(name) {
+    var shape = C.chordShape(name);
+    return h('figure', { class: 'cd' + (shape ? '' : ' none'), title: shape ? (shape.approx ? t('approxDiagram') : name) : t('noDiagram') },
+      h('figcaption', null, h('span', { text: name }), shape && shape.approx ? h('small', { text: '≈' }) : null),
+      shape ? diagramSvg(shape) : h('div', { class: 'cd-none', text: '?' }));
+  }
+  // Tap a chord on a sheet: its diagram pops up beside it. A second tap anywhere closes it.
+  var chordPop = null;
+  function closeChordPop() { if (chordPop) { chordPop.remove(); chordPop = null; } }
+  function showChordPop(chEl, host) {
+    var name = chEl.getAttribute('data-c');
+    closeChordPop();
+    if (!name) return;
+    var first = name.split(/\s+/)[0];
+    var pop = h('div', { class: 'cd-pop', role: 'dialog', 'aria-label': first },
+      diagramCard(first),
+      C.chordShape(first) ? null : h('small', { class: 'hint', text: t('noDiagram') }));
+    host.appendChild(pop);
+    var hr = host.getBoundingClientRect(), r = chEl.getBoundingClientRect();
+    var left = r.left - hr.left + host.scrollLeft, top = r.bottom - hr.top + host.scrollTop + 4;
+    pop.style.left = Math.max(4, Math.min(left, host.clientWidth - pop.offsetWidth - 8)) + 'px';
+    pop.style.top = top + 'px';
+    chordPop = pop;
+  }
+  function bindChordTaps(host) {
+    host.addEventListener('click', function (ev) {
+      var ch = ev.target.closest && ev.target.closest('.ch[data-c]');
+      if (chordPop && (!ch || chordPop.contains(ev.target))) { closeChordPop(); return; }
+      if (ch && host.contains(ch)) { ev.stopPropagation(); showChordPop(ch, host); }
+    });
   }
 
   // ---------- views ----------
@@ -1809,7 +2117,7 @@ a.brand:hover { filter: brightness(1.08); }
       }
       // Outside Claude: an ordinary browser download.
       try {
-        var url = URL.createObjectURL(new Blob([text], { type: /\.json$/.test(filename) ? 'application/json' : 'text/plain' }));
+        var url = URL.createObjectURL(new Blob([text], { type: /\.pdf$/.test(filename) ? 'application/pdf' : /\.json$/.test(filename) ? 'application/json' : 'text/plain' }));
         var a = h('a', { href: url, download: filename, hidden: true });
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
@@ -1962,6 +2270,13 @@ a.brand:hover { filter: brightness(1.08); }
             h('span', { class: 'k' }, h('small', { text: t('original') }), h('b', { text: song.key || '–' })),
             h('span', { class: 'k cur' }, h('small', { text: t('inSetlist') }), h('b', { text: keyAfter(song, tr) }))),
           textBtn('+', t('keyUp'), function () { shift(1); })),
+        sl.hideChords ? null : (function () {
+          var cp = itemCapo(song, it);
+          return h('button', { class: 'btn small capobtn' + (cp ? ' on' : ''), type: 'button', 'aria-label': cp ? t('capo') + ' ' + cp : t('capoNone'),
+            onclick: function () {
+              openCapo(song, tr, cp, function (c) { mutate(function (x) { var k = idxOf(x, it.uid); if (k >= 0) x.items[k].capo = c; }); render(); });
+            } }, cp ? t('capo') + ' ' + cp + (song.key ? ' · ' + keyAfter(song, tr - cp) : '') : t('capo'));
+        })(),
         h('span', { class: 'acts' },
           iconBtn('up', t('moveUp'), function () { move(-1); }, i === 0 ? 'off' : ''),
           iconBtn('down', t('moveDown'), function () { move(1); }, i === items.length - 1 ? 'off' : ''),
@@ -1977,6 +2292,10 @@ a.brand:hover { filter: brightness(1.08); }
           h('button', { class: 'btn primary', type: 'button', disabled: !items.length, onclick: function () { openStage({ setlistId: sl.id, index: 0 }); } }, ico('play'), t('start')),
           h('button', { class: 'btn', type: 'button', onclick: function () { pickSongs(sl.id); } }, ico('plus'), t('addSongs')),
           h('button', { class: 'btn', type: 'button', onclick: function () { exportSetlist(sl.id); } }, ico('export'), t('exportBtn')),
+          h('button', { class: 'btn', type: 'button', onclick: function () { openPrint({ setlistId: sl.id }); } }, ico('printer'), t('print')),
+          h('span', { class: 'seg', role: 'group', 'aria-label': t('chordsInList') },
+            h('button', { type: 'button', 'aria-pressed': String(!sl.hideChords), text: t('chordsOn'), onclick: function () { if (sl.hideChords) { mutate(function (c) { c.hideChords = false; }); render(); } } }),
+            h('button', { type: 'button', 'aria-pressed': String(!!sl.hideChords), text: t('lyricsOnly'), onclick: function () { if (!sl.hideChords) { mutate(function (c) { c.hideChords = true; }); render(); } } })),
           h('label', { class: 'datebox' }, h('span', { text: t('gigDate') }), dateInput),
           h('span', { class: 'count hint', text: [t('nSongs')(items.length), setlistDates(sl)].filter(Boolean).join(' · ') }),
           h('span', { class: 'spacer' }),
@@ -2078,7 +2397,8 @@ a.brand:hover { filter: brightness(1.08); }
   function renderEditor() {
     var r = ed.rec;
     var preview = h('div', { class: 'preview' });
-    function drawPreview() { preview.replaceChildren(h('h2', { text: t('preview') }), renderSheet(r, 0, 'auto')); }
+    bindChordTaps(preview);
+    function drawPreview() { closeChordPop(); preview.replaceChildren(h('h2', { text: t('preview') }), renderSheet(r, 0, 'auto')); }
 
     function field(id, label, value, oninput, attrs) {
       var input = h('input', Object.assign({ class: 'input', id: id, type: 'text', value: value || '', autocomplete: 'off' }, attrs || {}));
@@ -2230,6 +2550,7 @@ a.brand:hover { filter: brightness(1.08); }
         h('span', { class: 'spacer' }),
         h('button', { class: 'btn primary', id: 'ed-save', type: 'button', onclick: edSave }, t('save')),
         iconBtn('export', t('exportSong'), function () { exportSong(ed.rec); }),
+        iconBtn('printer', t('print'), function () { openPrint({ song: clone(ed.rec) }); }),
         ed.ret
           ? h('button', { class: 'btn', type: 'button', onclick: backToStage }, ico('play'), t('backToStage'))
           : h('button', { class: 'btn', type: 'button', onclick: function () {
@@ -2336,8 +2657,16 @@ a.brand:hover { filter: brightness(1.08); }
         iconBtn('x', t('close'), function () { notesGuard(closeStage); }),
         iconBtn('docedit', t('editSong'), function () { notesGuard(stageToEditor); }, 'stedit'),
         h('div', { class: 'sttitle' }, e.title, e.sub),
-        h('div', { class: 'stctl' }, textBtn('−', t('keyDown'), function () { shiftKey(-1); }), e.keys, textBtn('+', t('keyUp'), function () { shiftKey(1); }), e.acc),
+        h('div', { class: 'stctl' }, textBtn('−', t('keyDown'), function () { shiftKey(-1); }), e.keys, textBtn('+', t('keyUp'), function () { shiftKey(1); }), e.acc,
+          e.capo = h('button', { class: 'btn small capobtn', type: 'button', onclick: function () {
+            var info = stageInfo(); if (!info) return;
+            openCapo(info.song, st.tr, st.capo, function (c) { st.capo = c; saveStageCapo(); var top = st.el.sheet.scrollTop; drawStage(true); st.el.sheet.scrollTop = top; });
+          } })),
         h('div', { class: 'stctl' },
+          e.chordsBtn = h('button', { class: 'btn small chordsbtn', type: 'button', onclick: function () {
+            st.noChords = !st.noChords; saveStageNoChords(); var top = st.el.sheet.scrollTop; drawStage(true); st.el.sheet.scrollTop = top;
+          } }),
+          e.diagBtn = iconBtn('grid', t('diagramsShow'), function () { prefs.showDiagrams = !prefs.showDiagrams; savePrefs(); drawStage(true); }),
           e.notesBtn = h('button', { class: 'btn small notesbtn', type: 'button', 'aria-label': t('notes'), title: t('notes'), onclick: notesStart }, ico('pen'), h('span', { text: t('notes') })),
           e.eyeBtn = iconBtn('eye', t('notesHide'), function () { prefs.hideNotes = !prefs.hideNotes; savePrefs(); drawNotes(); }),
           h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('textSmaller'), title: t('textSmaller'), text: 'A−', onclick: function () { setFont(-2); } }),
@@ -2365,6 +2694,7 @@ a.brand:hover { filter: brightness(1.08); }
       if (Math.abs(dx) > 90 && Math.abs(dy) < 50 && Date.now() - stime < 600) stageStep(dx < 0 ? 1 : -1);
     }, { passive: true });
     bindPinch(e.sheet);
+    bindChordTaps(e.sheet);
   }
   function loadStageSong() {
     setPlaying(false);
@@ -2372,6 +2702,8 @@ a.brand:hover { filter: brightness(1.08); }
     if (!info) { closeStage(); return; }
     st.tr = info.item ? (info.item.tr || 0) : (st.ctx.tr || 0);
     st.acc = info.item ? (info.item.acc || 'auto') : (st.ctx.acc || 'auto');
+    st.capo = itemCapo(info.song, info.item);
+    st.noChords = info.sl ? !!info.sl.hideChords : !!prefs.soloNoChords;
     st.speed = clamp(info.song.speed || prefs.defaultSpeed, SPEED_MIN, SPEED_MAX);
     drawStage(true);
     st.el.sheet.scrollTop = 0; st.pos = 0;
@@ -2385,18 +2717,36 @@ a.brand:hover { filter: brightness(1.08); }
     var two = info.item || st.tr !== 0;
     setKids(e.keys,
       h('span', { class: 'k' }, h('small', { text: two ? t('original') : t('key') }), h('b', { text: song.key || '–' })),
-      two ? h('span', { class: 'k cur' }, h('small', { text: info.item ? t('inSetlist') : t('now') }), h('b', { text: keyAfter(song, st.tr) })) : null);
+      two ? h('span', { class: 'k cur' }, h('small', { text: info.item ? t('inSetlist') : t('now') }), h('b', { text: keyAfter(song, st.tr) })) : null,
+      st.capo && !st.noChords ? h('span', { class: 'k' }, h('small', { text: t('shapes') }), h('b', { text: song.key ? keyAfter(song, st.tr - st.capo) : '–' })) : null);
     e.acc.textContent = st.acc === 'sharp' ? '♯' : st.acc === 'flat' ? '♭' : '♯♭';
+    e.acc.hidden = st.noChords; e.capo.hidden = st.noChords; e.diagBtn.hidden = st.noChords;
+    e.capo.textContent = st.capo ? t('capo') + ' ' + st.capo : t('capo');
+    e.capo.setAttribute('aria-label', st.capo ? t('capo') + ' ' + st.capo : t('capoNone'));
+    e.capo.classList.toggle('on', !!st.capo);
+    e.chordsBtn.textContent = st.noChords ? t('lyricsOnly') : t('chordsOn');
+    e.chordsBtn.setAttribute('aria-pressed', String(!st.noChords));
+    e.chordsBtn.title = st.noChords ? t('showChords') : t('hideChords');
+    e.diagBtn.setAttribute('aria-pressed', String(!!prefs.showDiagrams));
+    e.diagBtn.setAttribute('aria-label', prefs.showDiagrams ? t('diagramsHide') : t('diagramsShow'));
+    e.diagBtn.title = e.diagBtn.getAttribute('aria-label');
     e.speed.textContent = String(st.speed);
     e.sheet.style.fontSize = prefs.fontSize + 'px';
     if (redrawSheet) {
+      closeChordPop();
       var end = h('div', { class: 'stend' });
       if (info.items) {
         var nx = info.items[st.ctx.index + 1];
         if (nx) end.appendChild(h('button', { class: 'btn', type: 'button', onclick: function () { stageStep(1); } }, t('nextUp') + ': ' + songTitle(data.songs[nx.songId]), ico('right')));
         else end.appendChild(h('span', { text: t('endOfSet') }));
       }
-      e.sheet.replaceChildren(renderSheet(song, st.tr, st.acc), end);
+      var strip = null;
+      if (prefs.showDiagrams && !st.noChords) {
+        var names = sheetChords(song, st.tr, st.acc, st.capo);
+        if (names.length) strip = h('div', { class: 'cd-strip', 'aria-label': t('diagrams') }, names.map(diagramCard));
+      }
+      e.sheet.replaceChildren.apply(e.sheet, [strip, renderSheet(song, st.tr, st.acc, { capo: st.capo, noChords: st.noChords }),
+        st.noChords && song.notes && song.notes.length ? h('p', { class: 'hint', text: t('notesLyricsOnly') }) : null, end].filter(Boolean));
       st.stamp = song.id + '\n' + (song.body || '') + '\n' + (song.key || '');
       mountNotes();
     }
@@ -2433,6 +2783,46 @@ a.brand:hover { filter: brightness(1.08); }
     loadStageSong();
   }
   function shiftKey(d) { st.tr = wrapTr(st.tr + d); saveStageKey(); var top = st.el.sheet.scrollTop; drawStage(true); st.el.sheet.scrollTop = top; }
+  // Capo: on a setlist it belongs to that place in the list; elsewhere it is the song's own default.
+  function itemCapo(song, item) {
+    if (item && item.capo != null) return item.capo | 0;
+    return (song && song.capo) | 0;
+  }
+  function saveStageCapo() {
+    var info = stageInfo();
+    if (!info) return;
+    if (info.item) {
+      var c = clone(info.sl);
+      c.items.forEach(function (it) { if (it.uid === info.item.uid) it.capo = st.capo; });
+      if (c.example) delete c.example;
+      saveRec('setlists', c);
+    } else if ((info.song.capo | 0) !== st.capo) {
+      var s = clone(info.song); s.capo = st.capo; if (s.example) delete s.example; saveRec('songs', s);
+    }
+  }
+  function saveStageNoChords() {
+    var info = stageInfo();
+    if (info && info.sl) {
+      var c = clone(info.sl); c.hideChords = st.noChords; if (c.example) delete c.example; saveRec('setlists', c);
+    } else { prefs.soloNoChords = st.noChords; savePrefs(); }
+  }
+  // Pick a capo fret. Shows what each fret turns the chords into, easy open shapes marked.
+  function openCapo(song, tr, cur, onpick) {
+    var key = song.key ? keyAfter(song, tr) : '';
+    var opts = C.capoOptions(key);
+    openDialog(h('div', { class: 'dlg' },
+      h('h2', { text: t('capo') }),
+      h('p', { class: 'hint', text: key ? t('capoHint').replace('{k}', key) : t('capoHintNoKey') }),
+      h('div', { class: 'capogrid' }, opts.map(function (o) {
+        return h('button', { class: 'capoopt' + (o.easy ? ' easy' : ''), type: 'button', 'aria-pressed': String(o.capo === cur),
+          onclick: function () { closeDialog(); onpick(o.capo); } },
+          h('b', { text: o.capo ? String(o.capo) : '0' }),
+          h('small', { text: o.capo ? t('fret') : t('capoNone') }),
+          o.shapeKey ? h('span', { class: 'sk', text: t('shapes') + ' ' + o.shapeKey }) : null);
+      })),
+      key ? h('p', { class: 'hint' }, h('span', { class: 'easydot' }), ' ' + t('easyShapes')) : null,
+      h('div', { class: 'foot' }, h('button', { class: 'btn ghost', type: 'button', text: t('close'), onclick: closeDialog }))));
+  }
   function saveStageKey() {
     var info = stageInfo();
     if (info && info.item) {
@@ -2634,15 +3024,15 @@ a.brand:hover { filter: brightness(1.08); }
     var e = st.el;
     if (!e) return;
     var sg = stageSong(), all = shownNotes();
-    var hidden = !an.on && prefs.hideNotes;
+    var hidden = !an.on && (prefs.hideNotes || st.noChords);
     if (e.eyeBtn) {
       var has = !!(sg && sg.notes && sg.notes.length);
-      e.eyeBtn.hidden = an.on || !has;
+      e.eyeBtn.hidden = an.on || !has || st.noChords;
       e.eyeBtn.replaceChildren(ico(prefs.hideNotes ? 'eyeoff' : 'eye'));
       e.eyeBtn.setAttribute('aria-label', prefs.hideNotes ? t('notesShow') : t('notesHide'));
       e.eyeBtn.title = e.eyeBtn.getAttribute('aria-label');
     }
-    if (e.notesBtn) e.notesBtn.hidden = an.on;
+    if (e.notesBtn) e.notesBtn.hidden = an.on || st.noChords;
     if (!an.body || !an.layer || !an.layer.isConnected) return;
     an.layer.classList.toggle('drawing', an.on);
     an.layer.classList.toggle('erase', an.on && an.tool === 'eraser');
@@ -2898,6 +3288,314 @@ a.brand:hover { filter: brightness(1.08); }
     }
     layer.addEventListener('pointerup', up);
     layer.addEventListener('pointercancel', up);
+  }
+
+  // ---------- print and PDF ----------
+  // target: { setlistId } or { song }. Entries carry the key, capo and spelling the song is played with.
+  function printEntries(target) {
+    if (target.setlistId) {
+      var sl = data.setlists[target.setlistId];
+      return visibleItems(sl).map(function (it) {
+        var song = data.songs[it.songId];
+        return { song: song, tr: it.tr || 0, acc: it.acc || 'auto', capo: itemCapo(song, it) };
+      });
+    }
+    return [{ song: target.song, tr: 0, acc: 'auto', capo: (target.song.capo | 0) }];
+  }
+  function entryMeta(en, noChords) {
+    var s = en.song, bits = [];
+    if (s.key) bits.push(t('key') + ' ' + keyAfter(s, en.tr));
+    if (en.capo && !noChords) bits.push(t('capo') + ' ' + en.capo + (s.key ? ' (' + t('shapes').toLowerCase() + ' ' + keyAfter(s, en.tr - en.capo) + ')' : ''));
+    if (s.bpm) bits.push(s.bpm + ' BPM');
+    return bits.join(' · ');
+  }
+  function openPrint(target) {
+    var sl = target.setlistId ? data.setlists[target.setlistId] : null;
+    var po = Object.assign({ what: 'songs', diagrams: false, newPage: true, size: 'm' }, prefs.print || {});
+    po.chords = sl ? !sl.hideChords : (prefs.print && prefs.print.chords != null ? prefs.print.chords : true);
+    function seg(options, cur, set) {
+      return h('div', { class: 'seg' }, options.map(function (o) {
+        return h('button', { type: 'button', 'aria-pressed': String(o[0] === cur), text: o[1], onclick: function () { set(o[0]); draw(); } });
+      }));
+    }
+    function check(label, on, set) {
+      var cb = h('input', { type: 'checkbox', checked: on });
+      cb.addEventListener('change', function () { set(cb.checked); draw(); });
+      return h('label', { class: 'check' }, cb, h('span', { text: label }));
+    }
+    function keep() { prefs.print = { what: po.what, diagrams: po.diagrams, newPage: po.newPage, size: po.size, chords: sl ? (prefs.print || {}).chords : po.chords }; savePrefs(); }
+    function draw() {
+      var listOnly = sl && po.what === 'list';
+      openDialog(h('div', { class: 'dlg' },
+        h('h2', { text: t('printTitle') }),
+        h('p', { class: 'hint', text: sl ? (sl.name || t('untitled')) + ' · ' + t('nSongs')(visibleItems(sl).length) : songTitle(target.song) }),
+        h('div', { class: 'printopts' },
+          sl ? h('div', { class: 'field' }, h('span', { text: t('printWhat') }),
+            seg([['songs', t('pSongs')], ['list', t('pListOnly')]], po.what, function (v) { po.what = v; })) : null,
+          listOnly ? null : h('div', { class: 'field' }, h('span', { text: t('pChords') }),
+            seg([[true, t('pWithChords')], [false, t('pLyricsOnly')]], po.chords, function (v) { po.chords = v; })),
+          listOnly || !po.chords ? null : check(t('pDiagrams'), po.diagrams, function (v) { po.diagrams = v; }),
+          listOnly || !sl ? null : check(t('pNewPage'), po.newPage, function (v) { po.newPage = v; }),
+          listOnly ? null : h('div', { class: 'field' }, h('span', { text: t('pSize') }),
+            seg([['s', t('pSmall')], ['m', t('pMedium')], ['l', t('pLarge')]], po.size, function (v) { po.size = v; })),
+          listOnly ? null : h('p', { class: 'hint', text: t('notesNotPrinted') })),
+        h('div', { class: 'foot' },
+          h('button', { class: 'btn ghost', type: 'button', text: t('cancel'), onclick: closeDialog }),
+          h('button', { class: 'btn', type: 'button', onclick: function () { keep(); closeDialog(); printHtml(target, po); } }, ico('printer'), t('printBtn')),
+          h('button', { class: 'btn primary', type: 'button', onclick: function () { keep(); closeDialog(); makePdf(target, po); } }, ico('import'), t('pdfBtn')))));
+    }
+    draw();
+  }
+  var PRINT_PT = { s: 10, m: 12, l: 15 };
+
+  // Print: the browser lays the songs out exactly as on screen, in black on white.
+  function printHtml(target, po) {
+    var box = $('#print'), sl = target.setlistId ? data.setlists[target.setlistId] : null;
+    var entries = printEntries(target), parts = [];
+    box.style.fontSize = PRINT_PT[po.size] + 'pt';
+    if (sl) parts.push(listHtml(sl, entries, po));
+    if (!sl || po.what !== 'list') entries.forEach(function (en) {
+      var strip = null;
+      if (po.chords && po.diagrams) {
+        var names = sheetChords(en.song, en.tr, en.acc, en.capo);
+        if (names.length) strip = h('div', { class: 'cd-strip' }, names.map(diagramCard));
+      }
+      var meta = entryMeta(en, !po.chords);
+      parts.push(h('section', { class: 'p-song' + (sl && po.newPage ? ' newpage' : '') },
+        h('h1', { class: 'p-title', text: songTitle(en.song) }),
+        h('p', { class: 'p-sub', text: [en.song.artist, meta].filter(Boolean).join(' · ') }),
+        strip, renderSheet(en.song, en.tr, en.acc, { capo: en.capo, noChords: !po.chords })));
+    });
+    setKids.apply(null, [box].concat(parts));
+    var fired = false;
+    function on() { fired = true; }
+    window.addEventListener('beforeprint', on);
+    setTimeout(function () {
+      try { window.print(); } catch (e) { /* blocked */ }
+      setTimeout(function () {
+        window.removeEventListener('beforeprint', on);
+        if (!fired) toast(t('printBlocked'));
+      }, 1500);
+    }, 60);
+  }
+  window.addEventListener('afterprint', function () { var b = $('#print'); if (b) b.replaceChildren(); });
+  function listHtml(sl, entries, po) {
+    var big = po.what === 'list';
+    return h('section', { class: 'p-list' + (big ? ' big' : '') },
+      h('h1', { text: sl.name || t('untitled') }),
+      sl.date ? h('p', { class: 'p-sub', text: fmtGig(sl.date) }) : null,
+      h('ol', null, entries.map(function (en, i) {
+        var k = en.song.key ? keyAfter(en.song, en.tr) : '';
+        var cap = en.capo && po.chords !== false && !sl.hideChords ? ' · ' + t('capo') + ' ' + en.capo : '';
+        return h('li', null, h('span', { class: 'n', text: String(i + 1) }), h('span', { class: 'tt', text: songTitle(en.song) }), h('span', { class: 'kk', text: k + cap }));
+      })));
+  }
+
+  // PDF: drawn with jsPDF, loaded the first time it is needed.
+  var jspdfP = null;
+  function loadJsPDF() {
+    if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+    if (!jspdfP) jspdfP = new Promise(function (res, rej) {
+      var s = document.createElement('script');
+      s.src = window.SG_JSPDF || 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload = function () { if (window.jspdf && window.jspdf.jsPDF) res(window.jspdf.jsPDF); else { jspdfP = null; rej(new Error('no jsPDF')); } };
+      s.onerror = function () { jspdfP = null; s.remove(); rej(new Error('load failed')); };
+      document.head.appendChild(s);
+    });
+    return jspdfP;
+  }
+  // The built-in PDF fonts know the Western European letters (á, ð, þ, æ, ö ...), not music signs.
+  var CP1252 = '€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ';
+  function pdfText(s) {
+    return String(s == null ? '' : s).replace(/♯/g, '#').replace(/♭/g, 'b').replace(/[−‐‑]/g, '-').replace(/Δ/g, 'maj')
+      .replace(/[   ]/g, ' ').replace(/[^\u0000-ÿ]/g, function (c) { return CP1252.indexOf(c) >= 0 ? c : '?'; });
+  }
+  function makePdf(target, po) {
+    toast(t('pdfMaking'));
+    loadJsPDF().then(function (JsPDF) {
+      var sl = target.setlistId ? data.setlists[target.setlistId] : null;
+      var doc = buildPdf(JsPDF, target, po);
+      var name = sl ? (sl.name || t('untitled')) : [songTitle(target.song), target.song.artist].filter(Boolean).join(' - ');
+      return saveFile(safeName(name) + '.pdf', doc.output('arraybuffer'));
+    }).catch(function () { toast(t('pdfFailed')); });
+  }
+  function buildPdf(JsPDF, target, po) {
+    var doc = new JsPDF({ unit: 'pt', format: 'a4' });
+    var PW = doc.internal.pageSize.getWidth(), PH = doc.internal.pageSize.getHeight();
+    var L = 42, R = PW - 42, TOP = 46, BOT = PH - 48;
+    var sl = target.setlistId ? data.setlists[target.setlistId] : null;
+    var entries = printEntries(target);
+    var fs = PRINT_PT[po.size] || 12;
+    var GRAY = 90, cx = { y: TOP, title: '', chorus: null, used: false };
+    function font(style, size, gray) { doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor(gray || 0); }
+    function text(s, x, y) { doc.text(pdfText(s), x, y); }
+    function width(s) { return doc.getTextWidth(pdfText(s)); }
+    function chorusBar(toY) { if (cx.chorus != null) { doc.setDrawColor(0); doc.setLineWidth(2); doc.line(L + 1, cx.chorus, L + 1, toY); } }
+    function newPage() {
+      chorusBar(cx.y);
+      doc.addPage(); cx.y = TOP;
+      if (cx.title) { font('italic', fs * 0.8, GRAY); text(cx.title + ' (' + t('contd') + ')', L, cx.y + fs * 0.8); cx.y += fs * 1.6; }
+      if (cx.chorus != null) cx.chorus = cx.y;
+    }
+    function need(hgt) { if (cx.y + hgt > BOT && cx.used) newPage(); cx.used = true; }
+
+    // ---- setlist overview ----
+    if (sl) {
+      var big = po.what === 'list', lf = big ? 26 : 14;
+      cx.used = true;
+      font('bold', big ? 40 : 26); text(String(sl.name || t('untitled')).toUpperCase(), L, cx.y + (big ? 34 : 22)); cx.y += big ? 50 : 34;
+      if (sl.date) { font('normal', big ? 16 : 11, GRAY); text(fmtGig(sl.date), L, cx.y); cx.y += big ? 26 : 18; }
+      cx.y += 6;
+      entries.forEach(function (en, i) {
+        need(lf * 1.6);
+        var k = en.song.key ? keyAfter(en.song, en.tr) : '';
+        if (en.capo && po.chords) k += '  ' + t('capo') + ' ' + en.capo;
+        font('bold', lf); var nw = width('00');
+        doc.text(String(i + 1), L + nw, cx.y + lf, { align: 'right' });
+        font('normal', lf * 0.8); var kw = width(k);
+        font('bold', lf);
+        var title = pdfText(songTitle(en.song)), maxW = R - (L + nw + lf * 0.6) - kw - 12;
+        while (title.length > 3 && doc.getTextWidth(title) > maxW) title = title.slice(0, -2) + '…';
+        doc.text(title, L + nw + lf * 0.6, cx.y + lf);
+        font('normal', lf * 0.8); text(k, R - kw, cx.y + lf);
+        cx.y += lf * 1.55;
+        doc.setDrawColor(190); doc.setLineWidth(0.5); doc.line(L, cx.y - lf * 0.25, R, cx.y - lf * 0.25);
+      });
+      if (big) return finish();
+    }
+
+    // ---- songs ----
+    entries.forEach(function (en, idx) {
+      var song = en.song, noCh = !po.chords;
+      if (idx > 0 || sl) {
+        if (sl && po.newPage) { cx.title = ''; doc.addPage(); cx.y = TOP; cx.used = false; }
+        else { cx.y += fs * 1.6; need(fs * 6); }
+      }
+      cx.title = ''; cx.used = true;
+      font('bold', fs * 1.9); text(songTitle(song).toUpperCase(), L, cx.y + fs * 1.6); cx.y += fs * 2.2;
+      var sub = [song.artist, entryMeta(en, noCh)].filter(Boolean).join(' · ');
+      if (sub) { font('normal', fs * 0.85, GRAY); text(sub, L, cx.y + fs * 0.6); cx.y += fs * 1.4; }
+      cx.y += fs * 0.4;
+      cx.title = songTitle(song);
+      if (!noCh && po.diagrams) drawDiagrams(sheetChords(song, en.tr, en.acc, en.capo));
+      drawBody(song, en.tr - en.capo, en.acc, noCh);
+    });
+    return finish();
+
+    function finish() {
+      var n = doc.getNumberOfPages(), label = sl ? (sl.name || t('untitled')) : songTitle(target.song);
+      for (var p = 1; p <= n; p++) {
+        doc.setPage(p); font('normal', 8, 130);
+        text('Songgiggin · ' + label, L, PH - 24);
+        var pg = t('page') + ' ' + p + ' / ' + n; text(pg, R - width(pg), PH - 24);
+      }
+      return doc;
+    }
+    function drawDiagrams(names) {
+      if (!names.length) return;
+      var cw = 44, ch = 64, gap = 10, x = L;
+      need(ch + 6);
+      names.forEach(function (nm) {
+        if (x + cw > R) { x = L; cx.y += ch + 6; need(ch + 6); }
+        pdfDiagram(nm, x, cx.y, cw);
+        x += cw + gap;
+      });
+      cx.y += ch + 4;
+      doc.setDrawColor(190); doc.setLineWidth(0.5); doc.line(L, cx.y, R, cx.y); cx.y += fs * 0.8;
+    }
+    function pdfDiagram(nm, x, y, w) {
+      var shape = C.chordShape(nm), sx = w / 64;
+      font('bold', 9); var tw = width(nm + (shape && shape.approx ? ' ~' : ''));
+      text(nm + (shape && shape.approx ? ' ~' : ''), x + (w - tw) / 2, y + 8);
+      if (!shape) { font('normal', 14, GRAY); text('?', x + w / 2 - 3, y + 36); return; }
+      var x0 = x + 13 * sx, dx = 9 * sx, y0 = y + 22, dy = 7.2, nf = 5;
+      doc.setDrawColor(110); doc.setLineWidth(0.5);
+      for (var i = 0; i < 6; i++) doc.line(x0 + i * dx, y0, x0 + i * dx, y0 + nf * dy);
+      for (var f = 0; f <= nf; f++) {
+        if (f === 0 && shape.base === 1) { doc.setDrawColor(0); doc.setLineWidth(1.8); } else { doc.setDrawColor(110); doc.setLineWidth(0.5); }
+        doc.line(x0, y0 + f * dy, x0 + 5 * dx, y0 + f * dy);
+      }
+      if (shape.base > 1) { font('normal', 6.5); var bw = width(String(shape.base)); text(String(shape.base), x0 - 3 - bw, y0 + dy * 0.75); }
+      doc.setFillColor(0); doc.setDrawColor(0); doc.setLineWidth(0.7);
+      if (shape.barre) {
+        var by = y0 + (shape.barre.fret - shape.base + 0.5) * dy;
+        doc.roundedRect(x0 + shape.barre.from * dx - 2.4, by - 2.4, (shape.barre.to - shape.barre.from) * dx + 4.8, 4.8, 2.4, 2.4, 'F');
+      }
+      shape.frets.forEach(function (fr, k) {
+        var xx = x0 + k * dx;
+        if (fr == null) { doc.line(xx - 1.8, y0 - 6.5, xx + 1.8, y0 - 2.9); doc.line(xx + 1.8, y0 - 6.5, xx - 1.8, y0 - 2.9); return; }
+        if (fr === 0) { doc.circle(xx, y0 - 4.7, 1.8, 'S'); return; }
+        if (shape.barre && fr === shape.barre.fret && k >= shape.barre.from && k <= shape.barre.to) return;
+        doc.circle(xx, y0 + (fr - shape.base + 0.5) * dy, 2.5, 'F');
+      });
+    }
+    function drawBody(song, n, accPref, noCh) {
+      var parsed = C.parseSong(song.body), sp = C.resolveSpelling(song.key, song.body, n, accPref || 'auto');
+      var inChorus = false, lastGap = true, hasTab = false;
+      var cfs = fs * 0.95, chordRow = fs * 1.2, lyricRow = fs * 1.32;
+      parsed.blocks.forEach(function (b) {
+        if (noCh) {
+          var co = b.type === 'line' && b.segs.some(function (s) { return !!s.chord; }) && b.segs.every(function (s) { return !s.text.trim(); });
+          if (b.type === 'tab' || co || (b.type === 'empty' && lastGap)) return;
+          lastGap = b.type === 'empty';
+        }
+        if (b.chorus && !inChorus) { inChorus = true; cx.chorus = cx.y; }
+        if (!b.chorus && inChorus) { chorusBar(cx.y); cx.chorus = null; inChorus = false; }
+        var left = L + (inChorus ? 10 : 0);
+        if (b.type === 'empty') { cx.y += fs * 0.85; return; }
+        if (b.type === 'section') { need(fs * 1.7); cx.y += fs * 0.35; font('bold', fs * 0.88, GRAY); text(String(b.text).toUpperCase(), left, cx.y + fs * 0.9); cx.y += fs * 1.3; return; }
+        if (b.type === 'comment') { need(fs * 1.5); font('italic', fs * 0.88, GRAY); text(b.text, left, cx.y + fs * 0.9); cx.y += fs * 1.45; return; }
+        if (b.type === 'tab') {
+          hasTab = true;
+          var longest = Math.max.apply(null, b.lines.map(function (l) { return l.length; }).concat([1]));
+          var tsz = Math.min(fs * 0.8, (R - left) / (longest * 0.6));
+          doc.setFont('courier', 'normal'); doc.setFontSize(tsz); doc.setTextColor(0);
+          cx.y += tsz * 0.3;
+          b.lines.forEach(function (l) { need(tsz * 1.25); doc.text(pdfText(l), left, cx.y + tsz); cx.y += tsz * 1.25; });
+          cx.y += tsz * 0.3;
+          return;
+        }
+        // a lyric line with chords: chords sit above the syllable they were written in front of
+        var has = !noCh && b.segs.some(function (s) { return !!s.chord; });
+        var onlyCh = has && b.segs.every(function (s) { return !s.text.trim(); });
+        var groups = C.toGroups(b.segs).map(function (g) {
+          return g.map(function (u) {
+            var ch = '', an = false;
+            if (has && u.chord) {
+              if (u.chord.charAt(0) === '*') { ch = u.chord.slice(1); an = true; }
+              else if (!C.isChordish(u.chord) && !u.chord.split(/\s+/).some(function (x) { return C.parseChord(x); })) { ch = u.chord; an = true; }
+              else ch = sp.keep ? u.chord : C.transposeBracket(u.chord, n, sp.flat);
+            }
+            font(an ? 'italic' : 'bold', cfs); var cw = ch ? width(ch) + (onlyCh ? fs * 0.9 : fs * 0.45) : 0;
+            font('normal', fs); var lw = onlyCh ? 0 : width(u.text);
+            return { ch: ch, an: an, text: u.text, w: Math.max(cw, lw) };
+          });
+        });
+        var rows = [], row = [], x = left;
+        groups.forEach(function (g) {
+          var gw = g.reduce(function (a, u) { return a + u.w; }, 0);
+          if (x + gw > R && row.length) { rows.push(row); row = []; x = left; }
+          g.forEach(function (u) { row.push({ u: u, x: x }); x += u.w; });
+        });
+        if (row.length) rows.push(row);
+        rows.forEach(function (r) {
+          var rh = (has ? chordRow : 0) + (onlyCh ? 0 : lyricRow);
+          need(rh);
+          if (has) r.forEach(function (it) {
+            if (!it.u.ch) return;
+            font(it.u.an ? 'italic' : 'bold', cfs, it.u.an ? GRAY : 0); text(it.u.ch, it.x, cx.y + cfs);
+          });
+          if (!onlyCh) {
+            font('normal', fs);
+            var by = cx.y + (has ? chordRow : 0) + fs * 0.98;
+            r.forEach(function (it) { if (it.u.text.trim()) text(it.u.text, it.x, by); });
+          }
+          cx.y += rh;
+        });
+      });
+      if (inChorus) { chorusBar(cx.y); cx.chorus = null; }
+      if (hasTab && ((n % 12) + 12) % 12 !== 0) { need(fs * 1.4); font('italic', fs * 0.75, GRAY); text(t('tabNote'), L, cx.y + fs); cx.y += fs * 1.4; }
+    }
   }
 
   // ---------- settings ----------

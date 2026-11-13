@@ -1,8 +1,8 @@
 /* Songgiggin service worker: the app works without a connection once it has been opened. */
-const VERSION = '3.2.0-mwf0rfy2';
+const VERSION = '3.3.0-mwf23tja';
 const SHELL = 'songgiggin-shell-' + VERSION;
 const FONTS = 'songgiggin-fonts-v1';
-const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './icon-maskable-512.png', './jspdf.umd.min.js'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(SHELL).then((c) => c.addAll(FILES)).then(() => self.skipWaiting()));
