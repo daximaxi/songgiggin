@@ -874,10 +874,58 @@ a.brand:hover { filter: brightness(1.08); }
     if (!meta.lyricist) { var tl = /(?:höfundur texta|texti|ljóð|lyrics(?:\s+by)?)\s*:\s*([^,)]+)/i.exec(L); if (tl) meta.lyricist = tl[1].trim(); }
   }
 
+  // Copied on a phone, Guitarparty (and similar pages) give every chord a line of its own between
+  // pieces of the lyric line: "Nú" / "Bb" / "held ég heim á ný" / "þó" / "Bb7" / ... A text line just
+  // before a chord and the text just after it belong to the same lyric line; two text lines in a row
+  // mean a new line. A chord with no words after it gets a line of spaces.
+  function singleChordLine(L) {
+    return L === L.trim() && isChordLine(L) && L.trim().split(/\s+/).length === 1 && !isTabLine(L);
+  }
+  function looksInterleaved(lines) {
+    var chords = 0, multi = 0, ws = 0, short = 0;
+    for (var i = 0; i < lines.length; i++) {
+      var L = lines[i];
+      if (isChordLine(L) && !isTabLine(L)) {
+        if (singleChordLine(L)) chords++; else multi++;
+        if (lines[i + 1] !== undefined && /^[ \t]+$/.test(lines[i + 1])) ws++;
+        var p = lines[i - 1], n = lines[i + 1];
+        if (p && n && p.trim() && n.trim() && !isChordLine(p) && !isChordLine(n) && p.trim().split(/\s+/).length <= 2) short++;
+      }
+    }
+    return chords >= 4 && multi === 0 && (ws >= 1 || short >= 3);
+  }
+  function unInterleave(text) {
+    var lines = text.split('\n');
+    if (!looksInterleaved(lines)) return text;
+    var first = 0;
+    while (first < lines.length && !singleChordLine(lines[first])) first++;
+    var out = lines.slice(0, first), cur = null, last = '';
+    function flush() { if (cur !== null) out.push(cur); cur = null; }
+    for (var i = first; i < lines.length; i++) {
+      var L = lines[i], x = L.trim();
+      if (singleChordLine(L)) {
+        cur = cur === null ? '[' + x + ']' : cur.replace(/\s+$/, '') + ' [' + x + ']';
+        last = 'chord';
+      } else if (!x) {
+        if (L.length && last === 'chord') { last = 'text'; continue; }   // a chord with no words
+        flush(); out.push(''); last = '';
+      } else if (isSectionOnly(L) || parseDirective(L) || isTabLine(L)) {
+        flush(); out.push(L); last = '';
+      } else if (last === 'chord') {
+        cur += x; last = 'text';
+      } else {
+        flush(); cur = x; last = 'text';
+      }
+    }
+    flush();
+    return out.join('\n');
+  }
+
   /** Pasted song text -> { title, artist, key, keyGuessed, bpm, body } with the body in ChordPro. */
   function importText(text) {
     var s = String(text || '').replace(/\r\n?/g, '\n').replace(/[\u00a0\u2007\u202f]/g, ' ');
     s = s.replace(/\[ch\]([^\[\]]*?)\[\/ch\]/gi, '$1').replace(/\[\/?tab\]/gi, '');
+    s = unInterleave(s);
     var lines = s.split('\n').map(function (l) { return l.replace(/\s+$/, ''); });
 
     var parsedMeta = parseSong(s).meta;

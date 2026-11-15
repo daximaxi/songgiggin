@@ -272,4 +272,20 @@ eq(C.parseBundle(JSON.stringify({ format: 'other', version: 1, songs: [] })), nu
   file.songs[0].updatedAt = 60;
   eq(C.planMerge(local, file, 100, { keepDeleted: true }).songs.add.length, 1);
 })();
+// copied from Guitarparty on a phone: every chord on a line of its own between pieces of the lyric line
+(function () {
+  var paste = 'Það snjóar\n\n    Höfundur lags: Iller Pattacini, Höfundur texta: Bragi Valdimar Skúlason, Flytjandi: Sigurður Guðmundsson, \n\n' +
+    'Bb\n    \nBb7\n    \nF7\n    \nNú\nBb\nheld ég heim á ný\nþó\nBb7\nheldur sé hann kaldur\nog\nCm7b5\nbíti frostið kinnar mér sem\nBb\ngaldur.\n\n' +
+    'Því það\nDm7\nsnjóar\ní\nGm7\nhjarta mér það\nC7\nsnjóar bara og\nEb/F\nsnjóar.\nF7\n    \n';
+  var r = C.importText(paste);
+  eq([r.title, r.artist], ['Það snjóar', 'Sigurður Guðmundsson']);
+  eq(r.body, '[Bb] [Bb7] [F7]\nNú [Bb]held ég heim á ný\nþó [Bb7]heldur sé hann kaldur\nog [Cm7b5]bíti frostið kinnar mér sem [Bb]galdur.\n\n' +
+    'Því það [Dm7]snjóar\ní [Gm7]hjarta mér það [C7]snjóar bara og [Eb/F]snjóar. [F7]\n');
+  // the lines of spaces lost on the way: the short words before chords still give it away
+  var r2 = C.importText(paste.replace(/^[ \t]+$/gm, ''));
+  eq(r2.body.indexOf('Nú [Bb]held ég heim á ný\nþó [Bb7]heldur sé hann kaldur') >= 0, true);
+  // ordinary chords over lyrics, one chord per line, is left alone
+  var r3 = C.importText('Lag\n\nG\nHello there my friend\nC\nGoodbye for now my love\nD\nSee you again tomorrow\nG\nAnd then we sing\n');
+  eq(r3.body, '[G]Hello there my friend\n[C]Goodbye for now my love\n[D]See you again tomorrow\n[G]And then we sing\n');
+})();
 console.log('core tests passed:', n);
