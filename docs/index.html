@@ -506,6 +506,17 @@ a.brand:hover { filter: brightness(1.08); }
 .ghset .row-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .ghset .ghstatus { color: var(--ink); }
 
+/* ---------- v4.0: account ---------- */
+.acset { gap: 8px; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+.acset .acrow { display: flex; gap: 8px; flex-wrap: wrap; }
+.acset .acrow .input { flex: 1 1 220px; min-width: 0; }
+.acset .accode { letter-spacing: .3em; font-family: var(--font-mono); font-size: 20px; }
+.acset .acwho { font-weight: 700; }
+.acset .row-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.acset .acmsg { color: var(--danger); }
+#sync { cursor: pointer; }
+.sync[data-s="error"] i { background: var(--danger); }
+
 </style>
 </head>
 <body>
@@ -1364,7 +1375,17 @@ a.brand:hover { filter: brightness(1.08); }
       prev: 'Previous song', next: 'Next song', nextUp: 'Next', endOfSet: 'End of setlist',
       text: 'Text', textSmaller: 'Smaller text', textLarger: 'Larger text', accidentals: 'Sharps or flats',
       transpose: 'Transpose', fullscreen: 'Full screen', tabNote: 'Tab is not transposed.',
-      sync_synced: 'Synced', sync_syncing: 'Syncing…', sync_local: 'This device only',
+      sync_synced: 'Synced', sync_syncing: 'Syncing…', sync_local: 'This device only', sync_error: 'Sync failed, will try again',
+      acTitle: 'Account', acIntro: 'Sign in to have your songs and setlists on all your devices.',
+      acEmail: 'Email', acSend: 'Send code', acSending: 'Sending…', acCodeSent: 'We sent a code to {e}. It can take a minute. Check spam too.',
+      acCode: 'Code from the email', acVerify: 'Sign in', acVerifying: 'Signing in…', acOther: 'Another email', acResend: 'Send again',
+      acSignedIn: 'Signed in as {e}', acSyncNow: 'Sync now', acSignOut: 'Sign out', acSignedOut: 'Signed out. The songs stay on this device.',
+      acLast: 'Last synced {d}', acNever: 'Not synced yet', acWelcome: 'Signed in. Your songs are being synced.',
+      acPrivacy: 'Your email is only used to sign in. Your songs are stored in your account (Supabase, Europe) and only you can see them.',
+      acClaude: 'In the Claude version your songs are synced through your Claude account.',
+      acBadEmail: 'Check the email address', acBadCode: 'The code is wrong or has expired. Ask for a new one.',
+      acRate: 'Too many emails right now. Wait a while and try again.', acNet: 'Could not reach the account service. Check the connection.',
+      acWait: 'You can ask for a new code in {n} s',
       sync_offline: 'Offline, may be out of date', sync_connecting: 'Connecting…',
       loading: 'Loading your songs…', exampleGig: 'Example gig',
       tags: 'Tags', newTag: 'New tag', addTag: 'Add tag', clearFilter: 'Clear', deleteTag: 'Delete tag', tagDeleted: 'Tag deleted',
@@ -1461,7 +1482,17 @@ a.brand:hover { filter: brightness(1.08); }
       prev: 'Fyrra lag', next: 'Næsta lag', nextUp: 'Næst', endOfSet: 'Lagalistinn er búinn',
       text: 'Letur', textSmaller: 'Minna letur', textLarger: 'Stærra letur', accidentals: 'Krossar eða bé',
       transpose: 'Tónflytja', fullscreen: 'Allur skjárinn', tabNote: 'Tab er ekki tónflutt.',
-      sync_synced: 'Samstillt', sync_syncing: 'Samstilli…', sync_local: 'Aðeins þetta tæki',
+      sync_synced: 'Samstillt', sync_syncing: 'Samstilli…', sync_local: 'Aðeins þetta tæki', sync_error: 'Samstilling mistókst, reyni aftur',
+      acTitle: 'Aðgangur', acIntro: 'Skráðu þig inn til að hafa lögin og lagalistana á öllum tækjunum þínum.',
+      acEmail: 'Netfang', acSend: 'Senda kóða', acSending: 'Sendi…', acCodeSent: 'Við sendum kóða á {e}. Það getur tekið mínútu. Skoðaðu líka ruslpóstinn.',
+      acCode: 'Kóðinn úr póstinum', acVerify: 'Skrá inn', acVerifying: 'Skrái inn…', acOther: 'Annað netfang', acResend: 'Senda aftur',
+      acSignedIn: 'Innskráð(ur) sem {e}', acSyncNow: 'Samstilla núna', acSignOut: 'Skrá út', acSignedOut: 'Skráð(ur) út. Lögin haldast á þessu tæki.',
+      acLast: 'Síðast samstillt {d}', acNever: 'Ekki samstillt enn', acWelcome: 'Innskráð(ur). Lögin eru að samstillast.',
+      acPrivacy: 'Netfangið er aðeins notað til innskráningar. Lögin eru geymd í aðganginum þínum (Supabase, Evrópu) og aðeins þú sérð þau.',
+      acClaude: 'Í Claude útgáfunni samstillast lögin í gegnum Claude aðganginn þinn.',
+      acBadEmail: 'Athugaðu netfangið', acBadCode: 'Kóðinn er rangur eða útrunninn. Biddu um nýjan.',
+      acRate: 'Of margir póstar í bili. Bíddu aðeins og reyndu aftur.', acNet: 'Náði ekki sambandi við aðganginn. Athugaðu netið.',
+      acWait: 'Þú getur beðið um nýjan kóða eftir {n} sek.',
       sync_offline: 'Ótengt, gæti verið úrelt', sync_connecting: 'Tengist…',
       loading: 'Sæki lögin þín…', exampleGig: 'Dæmi um gigg',
       tags: 'Tags', newTag: 'Nýtt tag', addTag: 'Bæta við tagi', clearFilter: 'Hreinsa', deleteTag: 'Eyða tagi', tagDeleted: 'Tagi eytt',
@@ -1728,6 +1759,7 @@ a.brand:hover { filter: brightness(1.08); }
     data[kind][rec.id] = rec;
     persistLocal();
     queueWrite(kind, rec.id);
+    sbDirty();
   }
 
   // Store a record exactly as it arrived (imports keep their own edit time).
@@ -1735,7 +1767,167 @@ a.brand:hover { filter: brightness(1.08); }
     data[kind][rec.id] = rec;
     persistLocal();
     queueWrite(kind, rec.id);
+    sbDirty();
   }
+
+  // ---------- account (Supabase): sign in with an email code, songs on all devices ----------
+  // Plain fetch, no SDK. The publishable key is meant to be public; Row Level Security on the
+  // server decides what each user may read and write (supabase/schema.sql).
+  var SB_URL = 'https://gqccejjjhayywtdkskxa.supabase.co', SB_KEY = 'sb_publishable_3MY0DlJN4jGw1lkXjOw3Gg_l6crrI3T';
+  var LS_AUTH = 'giggari.auth.v1', LS_SB = 'giggari.sbsync.v1';
+  var sb = { session: lsGet(LS_AUTH), state: lsGet(LS_SB) || { cursor: 0, pushed: {}, full: 0 },
+    running: null, again: false, timer: 0, status: '', lastAt: 0, refreshing: null };
+  // The sign-in form keeps its step here, so redrawing the settings does not lose it.
+  var acUi = { stage: 'email', email: '', msg: '', busy: false, waitUntil: 0 };
+  function isClaudeHost() { var api = window.claude; return !!(api && typeof api.use === 'function'); }
+  function sbSaveState() { lsSet(LS_SB, sb.state); }
+  function sbSetSession(s) {
+    sb.session = s;
+    if (s) lsSet(LS_AUTH, s); else { try { localStorage.removeItem(LS_AUTH); } catch (e) { /* ignore */ } }
+  }
+  function sbFetch(path, opts, auth) {
+    opts = opts || {};
+    var h = { apikey: SB_KEY, 'Content-Type': 'application/json' };
+    if (auth && sb.session) h.Authorization = 'Bearer ' + sb.session.access_token;
+    return fetch(SB_URL + path, { method: opts.method || 'GET', headers: h, body: opts.body ? JSON.stringify(opts.body) : undefined, cache: 'no-store' })
+      .then(function (res) {
+        return res.text().then(function (txt) {
+          var j = null; try { j = txt ? JSON.parse(txt) : null; } catch (e) { /* not json */ }
+          if (!res.ok) {
+            var err = new Error((j && (j.msg || j.message || j.error_description || j.error)) || ('http ' + res.status));
+            err.status = res.status; err.code = j && (j.error_code || j.code); throw err;
+          }
+          return j;
+        });
+      });
+  }
+  function sbSessionFrom(j) {
+    return { access_token: j.access_token, refresh_token: j.refresh_token,
+      expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600),
+      user: { id: j.user && j.user.id, email: j.user && j.user.email } };
+  }
+  function sbSendCode(email) { return sbFetch('/auth/v1/otp', { method: 'POST', body: { email: email, create_user: true } }); }
+  function sbVerify(email, code) {
+    return sbFetch('/auth/v1/verify', { method: 'POST', body: { type: 'email', email: email, token: code } }).then(function (j) {
+      sbSetSession(sbSessionFrom(j));
+      sb.state = { cursor: 0, pushed: {}, full: 0 }; sbSaveState();
+      sbSync();
+    });
+  }
+  // A fresh access token; the refresh token keeps the device signed in.
+  function sbToken() {
+    if (!sb.session) return Promise.reject(new Error('signed out'));
+    if ((sb.session.expires_at || 0) - 60 > Date.now() / 1000) return Promise.resolve();
+    if (sb.refreshing) return sb.refreshing;
+    sb.refreshing = sbFetch('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: { refresh_token: sb.session.refresh_token } })
+      .then(function (j) { sbSetSession(sbSessionFrom(j)); }, function (e) {
+        if (e.status === 400 || e.status === 401 || e.status === 403) { sbSetSession(null); sbShow(); }
+        throw e;
+      }).then(function (v) { sb.refreshing = null; return v; }, function (e) { sb.refreshing = null; throw e; });
+    return sb.refreshing;
+  }
+  function sbSignOut() {
+    var p = sb.session ? sbFetch('/auth/v1/logout', { method: 'POST' }, true).catch(function () { /* already gone */ }) : Promise.resolve();
+    clearTimeout(sb.timer);
+    sbSetSession(null); sb.state = { cursor: 0, pushed: {}, full: 0 }; sbSaveState(); sb.lastAt = 0; sbShow();
+    return p;
+  }
+  // Fetch what changed on the server since last time (change numbers); newer edits win.
+  function sbPull() {
+    var day = 24 * 3600 * 1000;
+    if (!sb.state.full || Date.now() - sb.state.full > day) sb.state.cursor = 0;   // a full pass once a day
+    var full = !sb.state.cursor, changed = 0;
+    function page() {
+      var q = '/rest/v1/records?select=kind,id,data,updated_at,deleted,seq&order=seq.asc&limit=500&seq=gt.' + (sb.state.cursor || 0);
+      return sbFetch(q, null, true).then(function (rows) {
+        rows = rows || [];
+        rows.forEach(function (r) {
+          sb.state.cursor = Math.max(sb.state.cursor || 0, +r.seq || 0);
+          if (KINDS.indexOf(r.kind) < 0 || !r.data) return;
+          var key = r.kind + '/' + r.id, loc = data[r.kind][r.id], at = +r.updated_at || 0;
+          if (!loc || at > (loc.updatedAt || 0)) {
+            var rec = r.data; rec.id = r.id; rec.updatedAt = at;
+            if (r.deleted) rec.deleted = true; else delete rec.deleted;
+            data[r.kind][r.id] = rec; changed++;
+          }
+          sb.state.pushed[key] = Math.max(sb.state.pushed[key] || 0, at);
+        });
+        sbSaveState();
+        if (rows.length === 500) return page();
+      });
+    }
+    return page().then(function () {
+      if (full) { sb.state.full = Date.now(); sbSaveState(); }
+      if (changed) { persistLocal(); if (!ready && hasRecords()) ready = true; refreshView(); }
+    });
+  }
+  // Send everything edited on this device since it was last sent, 100 at a time.
+  function sbPush() {
+    var items = [];
+    KINDS.forEach(function (kind) {
+      Object.keys(data[kind]).forEach(function (id) {
+        var r = data[kind][id], at = (r && r.updatedAt) || 0;
+        // Untouched examples stay on each device; they are not the user's songs. Editing one clears the mark.
+        if (!r || r.example || at <= (sb.state.pushed[kind + '/' + id] || 0)) return;
+        items.push({ kind: kind, id: id, data: r, updated_at: at, deleted: !!r.deleted });
+      });
+    });
+    var i = 0;
+    function next() {
+      if (i >= items.length) return Promise.resolve();
+      var batch = items.slice(i, i + 100); i += 100;
+      return sbFetch('/rest/v1/rpc/push_records', { method: 'POST', body: { items: batch } }, true).then(function () {
+        batch.forEach(function (it) { sb.state.pushed[it.kind + '/' + it.id] = it.updated_at; });
+        sbSaveState();
+        return next();
+      });
+    }
+    return next();
+  }
+  function sbStatus(s) {
+    sb.status = s;
+    if (!isClaudeHost()) setSync(s === 'error' ? 'error' : s);
+    var el = $('#ac-status'); if (el) el.textContent = sbStatusText();
+  }
+  function sbStatusText() {
+    if (sb.status === 'syncing') return t('sync_syncing');
+    if (sb.status === 'offline') return t('sync_offline');
+    if (sb.status === 'error') return t('sync_error');
+    return sb.lastAt ? t('acLast').replace('{d}', new Date(sb.lastAt).toTimeString().slice(0, 5)) : t('acNever');
+  }
+  // Pull first, then push, so an old device never overwrites newer work.
+  function sbSync() {
+    if (!sb.session || isClaudeHost()) return Promise.resolve();
+    if (sb.running) { sb.again = true; return sb.running; }
+    if (navigator.onLine === false) { sbStatus('offline'); return Promise.resolve(); }
+    clearTimeout(sb.timer);
+    sbStatus('syncing');
+    sb.running = sbToken().then(sbPull).then(sbPush).then(function () {
+      sb.lastAt = Date.now(); sbStatus('synced');
+    }, function () {
+      if (!sb.session) return;
+      sbStatus(navigator.onLine === false ? 'offline' : 'error');
+      clearTimeout(sb.timer); sb.timer = setTimeout(sbSync, 60000);   // try again in a minute
+    }).then(function () {
+      sb.running = null;
+      if (sb.again) { sb.again = false; return sbSync(); }
+    });
+    return sb.running;
+  }
+  // After a save: send soon, but let a burst of edits go as one.
+  function sbDirty() {
+    if (!sb.session || isClaudeHost()) return;
+    clearTimeout(sb.timer); sb.timer = setTimeout(sbSync, 3000);
+  }
+  function sbShow() {
+    if (isClaudeHost()) return;
+    if (!sb.session) setSync('local');
+    var box = $('#ac-box'); if (box && box._redraw) box._redraw();
+  }
+  window.addEventListener('online', function () { sbSync(); });
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible' && sb.session && Date.now() - sb.lastAt > 60000) sbSync();
+  });
 
   // Marked examples so the app does not open as an empty shell. All three are traditional songs.
   function seedExamples() {
@@ -3885,6 +4077,71 @@ a.brand:hover { filter: brightness(1.08); }
         prev,
         h('span', { class: 'hint', text: t('textSettingsHint') }));
     }
+    // Sign in with an email code: email, then code, then signed in.
+    function accountSection() {
+      var box = h('div', { class: 'field acset', id: 'ac-box' }), u = acUi, tick = 0;
+      if (!u.email) u.email = (sb.session && sb.session.user && sb.session.user.email) || prefs.acEmail || '';
+      function err(e, sending) {
+        if (e && e.status === 429) return t('acRate');
+        if (e && !e.status) return t('acNet');
+        if (e && e.status >= 400 && e.status < 500) return sending ? t('acBadEmail') : t('acBadCode');
+        return t('acNet');
+      }
+      function send(v) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { u.msg = t('acBadEmail'); draw(); return; }
+        u.email = v; prefs.acEmail = v; savePrefs(); u.busy = true; u.msg = ''; draw();
+        sbSendCode(v).then(function () { u.stage = 'code'; u.waitUntil = Date.now() + 60000; }, function (e) { u.msg = err(e, true); })
+          .then(function () { u.busy = false; draw(); });
+      }
+      function verify(v) {
+        v = v.replace(/\D/g, '');
+        if (v.length < 6) { u.msg = t('acBadCode'); draw(); return; }
+        u.busy = true; u.msg = ''; draw();
+        sbVerify(u.email, v).then(function () { toast(t('acWelcome')); u.stage = 'email'; }, function (e) { u.msg = err(e, false); })
+          .then(function () { u.busy = false; draw(); });
+      }
+      function draw() {
+        clearInterval(tick);
+        var kids = [h('span', { text: t('acTitle') })];
+        if (isClaudeHost()) { kids.push(h('span', { class: 'hint', text: t('acClaude') })); box.replaceChildren.apply(box, kids); return; }
+        if (sb.session) {
+          kids.push(h('b', { class: 'acwho', text: t('acSignedIn').replace('{e}', (sb.session.user && sb.session.user.email) || '') }),
+            h('span', { class: 'hint', id: 'ac-status', text: sbStatusText() }),
+            h('div', { class: 'row-btns' },
+              h('button', { class: 'btn', type: 'button', onclick: function () { sbSync(); } }, ico('cloud'), t('acSyncNow')),
+              h('button', { class: 'btn ghost', type: 'button', onclick: function () { sbSignOut(); toast(t('acSignedOut')); draw(); } }, t('acSignOut'))));
+        } else if (u.stage === 'email') {
+          var inp = h('input', { class: 'input', type: 'email', id: 'ac-email', autocomplete: 'email', inputmode: 'email', value: u.email, 'aria-label': t('acEmail'), placeholder: t('acEmail') });
+          inp.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') send(inp.value.trim()); });
+          kids.push(h('span', { class: 'hint', text: t('acIntro') }),
+            h('div', { class: 'acrow' }, inp, h('button', { class: 'btn primary', type: 'button', id: 'ac-send', disabled: u.busy,
+              onclick: function () { send(inp.value.trim()); } }, u.busy ? t('acSending') : t('acSend'))));
+        } else {
+          var code = h('input', { class: 'input accode', type: 'text', id: 'ac-code', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: 10, 'aria-label': t('acCode'), placeholder: t('acCode') });
+          code.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') verify(code.value); });
+          var left = Math.ceil((u.waitUntil - Date.now()) / 1000);
+          kids.push(h('span', { class: 'hint', text: t('acCodeSent').replace('{e}', u.email) }),
+            h('div', { class: 'acrow' }, code, h('button', { class: 'btn primary', type: 'button', id: 'ac-verify', disabled: u.busy,
+              onclick: function () { verify(code.value); } }, u.busy ? t('acVerifying') : t('acVerify'))),
+            h('div', { class: 'row-btns' },
+              h('button', { class: 'btn ghost', type: 'button', disabled: left > 0 || u.busy, onclick: function () { send(u.email); } }, t('acResend')),
+              h('button', { class: 'btn ghost', type: 'button', onclick: function () { u.stage = 'email'; u.msg = ''; draw(); } }, t('acOther'))),
+            left > 0 ? h('span', { class: 'hint acwait', text: t('acWait').replace('{n}', left) }) : null);
+          if (left > 0) tick = setInterval(function () {
+            var n = Math.ceil((u.waitUntil - Date.now()) / 1000), w = box.querySelector('.acwait');
+            if (n <= 0 || !box.isConnected) { clearInterval(tick); if (box.isConnected) draw(); return; }
+            if (w) w.textContent = t('acWait').replace('{n}', n);
+          }, 1000);
+          setTimeout(function () { if (code.isConnected && !u.busy) code.focus(); }, 0);
+        }
+        if (u.msg) kids.push(h('span', { class: 'hint acmsg', role: 'alert', text: u.msg }));
+        if (!sb.session) kids.push(h('span', { class: 'hint', text: t('acPrivacy') }));
+        box.replaceChildren.apply(box, kids.filter(Boolean));
+      }
+      box._redraw = draw;
+      draw();
+      return box;
+    }
     function ghSection() {
       var auto = h('input', { type: 'checkbox', checked: prefs.ghAuto !== false });
       auto.addEventListener('change', function () { prefs.ghAuto = auto.checked; savePrefs(); });
@@ -3947,6 +4204,7 @@ a.brand:hover { filter: brightness(1.08); }
 
       openDialog(h('div', { class: 'dlg' },
         h('h2', { text: t('settings') }),
+        accountSection(),
         h('div', { class: 'field' }, h('span', { text: t('language') }),
           seg([['en', 'English'], ['is', 'Íslenska']], prefs.lang, function (v) { prefs.lang = v; savePrefs(); applyPrefs(); if (ui.view !== 'edit') render(); draw(); })),
         h('div', { class: 'field' }, h('span', { text: t('theme') }),
@@ -3973,6 +4231,7 @@ a.brand:hover { filter: brightness(1.08); }
     draw();
   }
   $('#btn-settings').addEventListener('click', openSettings);
+  $('#sync').addEventListener('click', function () { if (!isClaudeHost()) openSettings(); });
 
   // ---------- songs on GitHub (read only): data/library.json in the repository ----------
   var ghBusy = false;
@@ -4036,6 +4295,7 @@ a.brand:hover { filter: brightness(1.08); }
     connect();
     // After the device's own data (and Claude sync) has loaded, merge in the songs from GitHub.
     if (prefs.ghAuto !== false) setTimeout(function () { ghPull(true); }, 1500);
+    if (sb.session && !isClaudeHost()) setTimeout(sbSync, 300);
   }
   var hot = window.claude && window.claude.hot;
   try { if (hot && hot.snapshot) hot.snapshot(function () { return { view: ui.view, setlistId: ui.setlistId }; }); } catch (e) { /* optional */ }
