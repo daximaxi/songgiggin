@@ -500,6 +500,12 @@ a.brand:hover { filter: brightness(1.08); }
 .row.archrow .acts { gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .tag.arch { margin-left: 8px; vertical-align: middle; font-weight: 400; }
 
+/* ---------- v3.6: GitHub songs ---------- */
+.ghset .sub { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.ghset .sub small { color: var(--muted); }
+.ghset .row-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.ghset .ghstatus { color: var(--ink); }
+
 </style>
 </head>
 <body>
@@ -1028,8 +1034,10 @@ a.brand:hover { filter: brightness(1.08); }
 
   /** Works out what importing a bundle would change. The newer copy of a record wins;
       tags are matched by name so nobody ends up with two "Hresst" tags. */
-  function planMerge(local, b, now) {
-    now = now || Date.now();
+  /** opts.keepDeleted: a song or setlist deleted on this device stays deleted unless the file has a newer edit
+      (used for the automatic GitHub sync, where the same file is read again and again). */
+  function planMerge(local, b, now, opts) {
+    now = now || Date.now(); opts = opts || {};
     var plan = { tags: [], tagMap: {}, songs: { add: [], update: [], same: 0, keep: 0 }, setlists: { add: [], update: [], same: 0, keep: 0 } };
     var byName = {}, maxOrder = -1;
     Object.keys(local.tags || {}).forEach(function (id) {
@@ -1047,7 +1055,8 @@ a.brand:hover { filter: brightness(1.08); }
     function decide(kind, rec) {
       var loc = (local[kind] || {})[rec.id], out = plan[kind];
       rec.updatedAt = rec.updatedAt || 0;
-      if (!loc || loc.deleted) {
+      if (loc && loc.deleted && opts.keepDeleted && rec.updatedAt <= (loc.updatedAt || 0)) out.keep++;
+      else if (!loc || loc.deleted) {
         if (loc) rec.updatedAt = Math.max(rec.updatedAt, (loc.updatedAt || 0) + 1);
         out.add.push(rec);
       } else if (rec.updatedAt > (loc.updatedAt || 0)) out.update.push(rec);
@@ -1277,6 +1286,7 @@ a.brand:hover { filter: brightness(1.08); }
     export: '<path d="M12 15V4M7 9l5-5 5 5M5 20h14"/>',
     file: '<path d="M6 3h8l4 4v14H6zM14 3v4h4"/>',
     copy: '<rect x="8" y="8" width="12" height="12" rx="1"/><path d="M16 8V4H4v12h4"/>',
+    cloud: '<path d="M7 18h10a4 4 0 0 0 .5-8 6 6 0 0 0-11.4 1.5A3.3 3.3 0 0 0 7 18zM12 10v6M9.5 13.5 12 16l2.5-2.5"/>',
     pen: '<path d="M3 21l3.5-1 12-12-2.5-2.5-12 12zM14.5 6.5l2.5 2.5"/><path d="M15 21h6"/>',
     marker: '<path d="M9 14l-4 4v3h6l2-2M8 13l7-9 5 4-7 9z"/>',
     textT: '<path d="M5 6V4h14v2M12 4v16M9 20h6"/>',
@@ -1369,6 +1379,14 @@ a.brand:hover { filter: brightness(1.08); }
       exportLibDesc: 'All your songs, setlists and tags in one file. Import it here on another device, or send it to someone who uses GIGGARI. The example songs are left out.',
       exportSetlistDesc: 'This setlist with its songs, the keys you set for it and the tags they use. Whoever imports it gets the whole setlist ready to play.',
       exportSongDesc: 'The song as a ChordPro text file. Other chord apps can open it, and GIGGARI can import it again.',
+      duplicate: 'Copy', duplicateHint: 'Make a copy of this setlist', copySuffix: ' (copy)', setlistCopied: 'Copy made. Change what you need.',
+      ghTitle: 'Songs on GitHub', ghAuto: 'Get songs from GitHub when the app opens', ghRepo: 'GitHub repository',
+      ghPullNow: 'Get songs now', ghFileBtn: 'Download library.json',
+      ghHint: 'The app reads data/library.json from the repository and merges it in: the newer version of each song wins, nothing newer on this device is overwritten. To send your songs up: download library.json here and upload it to the data folder in the repository (Add file, Upload files), or send it to Claude.',
+      ghPublicHint: 'The repository is public: anyone who finds it can read the songs and notes.',
+      ghNever: 'Not fetched yet', ghLast: 'Last fetched {d}', ghNone: 'No library.json in the repository yet', ghBad: 'The file on GitHub could not be read',
+      ghFailed: 'Could not reach GitHub', ghOffline: 'No connection', ghBusy: 'Fetching…',
+      ghPulled: function (n) { return n === 1 ? '1 change from GitHub' : n + ' changes from GitHub'; }, ghNothing: 'Nothing new on GitHub',
       download: 'Download', copy: 'Copy', copied: 'Copied. Paste it in a message or into Import on another device.',
       copyManual: 'Select all the text below and copy it.', fileSaved: 'File saved', fileBusy: 'A save is already waiting for your answer.',
       fileFailed: 'The file could not be saved here. Use Copy instead.', openFile: 'Open file',
@@ -1458,6 +1476,14 @@ a.brand:hover { filter: brightness(1.08); }
       exportLibDesc: 'Öll lögin þín, lagalistar og tags í einni skrá. Þú getur flutt hana inn hér á öðru tæki eða sent hana einhverjum sem notar Giggarann. Dæmalögin eru ekki með.',
       exportSetlistDesc: 'Lagalistinn ásamt lögunum, tóntegundunum sem þú valdir fyrir hann og tags-unum þeirra. Sá sem flytur hann inn fær allan lagalistann tilbúinn.',
       exportSongDesc: 'Lagið sem ChordPro textaskrá. Önnur hljómaöpp geta opnað hana og Giggarinn getur flutt hana inn aftur.',
+      duplicate: 'Afrita', duplicateHint: 'Búa til afrit af þessum lagalista', copySuffix: ' (afrit)', setlistCopied: 'Afrit búið til. Lagaðu það sem þarf.',
+      ghTitle: 'Lög á GitHub', ghAuto: 'Sækja lög af GitHub þegar appið opnast', ghRepo: 'GitHub geymsla',
+      ghPullNow: 'Sækja lög núna', ghFileBtn: 'Sækja library.json',
+      ghHint: 'Appið les data/library.json úr geymslunni og sameinar: nýrri útgáfa hvers lags vinnur, ekkert nýrra á tækinu skrifast yfir. Til að senda lögin upp: sæktu library.json hér og hladdu henni upp í möppuna data í geymslunni (Add file, Upload files), eða sendu hana til Claude.',
+      ghPublicHint: 'Geymslan er opinber: hver sem finnur hana getur lesið lögin og glósurnar.',
+      ghNever: 'Ekki sótt enn', ghLast: 'Síðast sótt {d}', ghNone: 'Engin library.json í geymslunni enn', ghBad: 'Ekki tókst að lesa skrána á GitHub',
+      ghFailed: 'Náði ekki sambandi við GitHub', ghOffline: 'Ekkert netsamband', ghBusy: 'Sæki…',
+      ghPulled: function (n) { return n === 1 ? '1 breyting af GitHub' : n + ' breytingar af GitHub'; }, ghNothing: 'Ekkert nýtt á GitHub',
       download: 'Hlaða niður', copy: 'Afrita', copied: 'Afritað. Límdu það í skilaboð eða í Flytja inn á öðru tæki.',
       copyManual: 'Veldu allan textann hér fyrir neðan og afritaðu hann.', fileSaved: 'Skrá vistuð', fileBusy: 'Vistun bíður nú þegar eftir svari frá þér.',
       fileFailed: 'Ekki var hægt að vista skrána hér. Notaðu Afrita í staðinn.', openFile: 'Opna skrá',
@@ -1503,7 +1529,8 @@ a.brand:hover { filter: brightness(1.08); }
   function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage may be unavailable */ } }
   var prefs = Object.assign(
     { lang: /^is/i.test(navigator.language || '') ? 'is' : 'en', theme: 'auto', fontSize: 20, defaultSpeed: 10, accent: 'orange', poolSort: 'title', setlistSort: 'created', penSize: 1, markerSize: 1, inkSmooth: 2,
-      sheetFont: 'body', boldLyrics: false, boldChords: true, chordColor: 'accent', chordHi: false, lockLine: false },
+      sheetFont: 'body', boldLyrics: false, boldChords: true, chordColor: 'accent', chordHi: false, lockLine: false,
+      ghAuto: true, ghRepo: 'daximaxi/songgiggin', ghLast: null },
     lsGet(LS_PREFS) || {}
   );
   function savePrefs() { lsSet(LS_PREFS, prefs); }
@@ -2300,6 +2327,16 @@ a.brand:hover { filter: brightness(1.08); }
   function newSetlistRec() {
     return { id: uid('l'), name: t('newSetlist'), date: '', items: [], createdAt: Date.now(), updatedAt: 0 };
   }
+  // A copy of a setlist: same songs, order, keys, capo and chords setting; no gig date; opens at once.
+  function duplicateSetlist(id) {
+    var src = data.setlists[id]; if (!src) return;
+    var c = clone(src);
+    c.id = uid('l'); c.name = (src.name || t('untitled')) + t('copySuffix'); c.date = '';
+    c.createdAt = Date.now(); c.updatedAt = 0; delete c.example; delete c.archived;
+    c.items = (src.items || []).map(function (it) { var x = clone(it); x.uid = uid('i'); return x; });
+    saveRec('setlists', c); go('setlist', { setlistId: c.id }); toast(t('setlistCopied'));
+    var n = $('#setlist-name'); if (n) { n.focus(); n.select(); }
+  }
   function setlistDates(sl) {
     return [sl.createdAt ? t('created') + ' ' + fmtDate(sl.createdAt) : '', sl.updatedAt ? t('edited') + ' ' + fmtDate(sl.updatedAt) : ''].filter(Boolean).join(' · ');
   }
@@ -2435,6 +2472,7 @@ a.brand:hover { filter: brightness(1.08); }
           h('button', { class: 'btn', type: 'button', onclick: function () { pickSongs(sl.id); } }, ico('plus'), t('addSongs')),
           h('button', { class: 'btn', type: 'button', onclick: function () { exportSetlist(sl.id); } }, ico('export'), t('exportBtn')),
           h('button', { class: 'btn', type: 'button', onclick: function () { openPrint({ setlistId: sl.id }); } }, ico('printer'), t('print')),
+          h('button', { class: 'btn', type: 'button', title: t('duplicateHint'), onclick: function () { duplicateSetlist(sl.id); } }, ico('copy'), t('duplicate')),
           h('span', { class: 'seg', role: 'group', 'aria-label': t('chordsInList') },
             h('button', { type: 'button', 'aria-pressed': String(!sl.hideChords), text: t('chordsOn'), onclick: function () { if (sl.hideChords) { mutate(function (c) { c.hideChords = false; }); render(); } } }),
             h('button', { type: 'button', 'aria-pressed': String(!!sl.hideChords), text: t('lyricsOnly'), onclick: function () { if (!sl.hideChords) { mutate(function (c) { c.hideChords = true; }); render(); } } })),
@@ -3847,6 +3885,27 @@ a.brand:hover { filter: brightness(1.08); }
         prev,
         h('span', { class: 'hint', text: t('textSettingsHint') }));
     }
+    function ghSection() {
+      var auto = h('input', { type: 'checkbox', checked: prefs.ghAuto !== false });
+      auto.addEventListener('change', function () { prefs.ghAuto = auto.checked; savePrefs(); });
+      var repo = h('input', { class: 'input', type: 'text', id: 'gh-repo', value: prefs.ghRepo || '', spellcheck: false, autocomplete: 'off', 'aria-label': t('ghRepo'), placeholder: 'notandi/geymsla' });
+      repo.addEventListener('change', function () { prefs.ghRepo = repo.value.trim(); savePrefs(); });
+      var status = h('span', { class: 'hint ghstatus', text: ghStatusText() });
+      return h('div', { class: 'field ghset' }, h('span', { text: t('ghTitle') }),
+        h('label', { class: 'check' }, auto, h('span', { text: t('ghAuto') })),
+        h('label', { class: 'sub' }, h('small', { text: t('ghRepo') }), repo),
+        h('div', { class: 'row-btns' },
+          h('button', { class: 'btn', type: 'button', onclick: function () {
+            prefs.ghRepo = repo.value.trim(); savePrefs(); status.textContent = t('ghBusy');
+            ghPull(false).then(function () { status.textContent = ghStatusText(); });
+          } }, ico('cloud'), t('ghPullNow')),
+          h('button', { class: 'btn', type: 'button', onclick: function () {
+            saveFile('library.json', JSON.stringify(C.exportBundle(data, 'library'), null, 1));
+          } }, ico('export'), t('ghFileBtn'))),
+        status,
+        h('span', { class: 'hint', text: t('ghHint') }),
+        h('span', { class: 'hint', text: t('ghPublicHint') }));
+    }
     function seg(options, current, onpick) {
       return h('div', { class: 'seg' }, options.map(function (o) {
         return h('button', { type: 'button', 'aria-pressed': String(o[0] === current), text: o[1], onclick: function () { onpick(o[0]); } });
@@ -3904,6 +3963,7 @@ a.brand:hover { filter: brightness(1.08); }
             speedB,
             h('button', { class: 'btn', type: 'button', 'aria-label': t('faster'), text: '+', onclick: function () { step(1); } })),
           h('span', { class: 'hint', text: t('defaultSpeedHint') })),
+        ghSection(),
         h('div', { class: 'field' }, h('span', { text: t('tags') }), tagList,
           h('div', { class: 'newtag' }, addInput, h('button', { class: 'btn', type: 'button', onclick: addTag }, ico('plus'), t('addTag')))),
         h('div', { class: 'foot' }, h('button', { class: 'btn primary', type: 'button', text: t('done'), onclick: closeDialog }))),
@@ -3913,6 +3973,47 @@ a.brand:hover { filter: brightness(1.08); }
     draw();
   }
   $('#btn-settings').addEventListener('click', openSettings);
+
+  // ---------- songs on GitHub (read only): data/library.json in the repository ----------
+  var ghBusy = false;
+  function ghUrl() {
+    var repo = String(prefs.ghRepo || '').trim().replace(/^https?:\/\/github\.com\//, '').replace(/\/+$/, '');
+    if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) return null;
+    return 'https://raw.githubusercontent.com/' + repo + '/main/data/library.json?t=' + Date.now();
+  }
+  function ghStatus(status, n) { prefs.ghLast = { at: Date.now(), status: status, n: n || 0 }; savePrefs(); }
+  // Fetch and merge. quiet: the automatic fetch at start only speaks up when something changed.
+  function ghPull(quiet) {
+    var url = ghUrl();
+    if (!url || ghBusy) return Promise.resolve();
+    if (navigator.onLine === false) { if (!quiet) toast(t('ghOffline')); return Promise.resolve(); }
+    ghBusy = true;
+    return fetch(url, { cache: 'no-store' }).then(function (res) {
+      if (res.status === 404) { ghStatus('none'); if (!quiet) toast(t('ghNone')); return; }
+      if (!res.ok) throw new Error('http ' + res.status);
+      return res.text().then(function (txt) {
+        var b = C.parseBundle(txt);
+        if (!b) { ghStatus('bad'); if (!quiet) toast(t('ghBad')); return; }
+        var plan = C.planMerge(data, b, Date.now(), { keepDeleted: true });
+        plan.tags.forEach(function (r) { putRec('tags', r); });
+        plan.songs.add.concat(plan.songs.update).forEach(function (r) { putRec('songs', r); });
+        plan.setlists.add.concat(plan.setlists.update).forEach(function (r) { putRec('setlists', r); });
+        var n = plan.songs.add.length + plan.songs.update.length + plan.setlists.add.length + plan.setlists.update.length;
+        ghStatus('ok', n);
+        if (n) { if (ui.view !== 'edit') render(); toast(t('ghPulled')(n)); } else if (!quiet) toast(t('ghNothing'));
+      });
+    }).catch(function () { ghStatus('failed'); if (!quiet) toast(t('ghFailed')); })
+      .then(function () { ghBusy = false; });
+  }
+  function ghStatusText() {
+    var g = prefs.ghLast;
+    if (!g) return t('ghNever');
+    var when = t('ghLast').replace('{d}', fmtDate(g.at) + ' ' + new Date(g.at).toTimeString().slice(0, 5));
+    if (g.status === 'none') return when + ' · ' + t('ghNone');
+    if (g.status === 'bad') return when + ' · ' + t('ghBad');
+    if (g.status === 'failed') return when + ' · ' + t('ghFailed');
+    return when + ' · ' + (g.n ? t('ghPulled')(g.n) : t('ghNothing'));
+  }
 
   // ---------- routing and start ----------
   function fromHash() {
@@ -3933,6 +4034,8 @@ a.brand:hover { filter: brightness(1.08); }
     ready = hasRecords();
     render();
     connect();
+    // After the device's own data (and Claude sync) has loaded, merge in the songs from GitHub.
+    if (prefs.ghAuto !== false) setTimeout(function () { ghPull(true); }, 1500);
   }
   var hot = window.claude && window.claude.hot;
   try { if (hot && hot.snapshot) hot.snapshot(function () { return { view: ui.view, setlistId: ui.setlistId }; }); } catch (e) { /* optional */ }

@@ -478,3 +478,9 @@ a.brand:hover { filter: brightness(1.08); }
 .row.archrow .open { cursor: default; }
 .row.archrow .acts { gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .tag.arch { margin-left: 8px; vertical-align: middle; font-weight: 400; }
+
+/* ---------- v3.6: GitHub songs ---------- */
+.ghset .sub { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.ghset .sub small { color: var(--muted); }
+.ghset .row-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.ghset .ghstatus { color: var(--ink); }

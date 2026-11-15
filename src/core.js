@@ -505,8 +505,10 @@
 
   /** Works out what importing a bundle would change. The newer copy of a record wins;
       tags are matched by name so nobody ends up with two "Hresst" tags. */
-  function planMerge(local, b, now) {
-    now = now || Date.now();
+  /** opts.keepDeleted: a song or setlist deleted on this device stays deleted unless the file has a newer edit
+      (used for the automatic GitHub sync, where the same file is read again and again). */
+  function planMerge(local, b, now, opts) {
+    now = now || Date.now(); opts = opts || {};
     var plan = { tags: [], tagMap: {}, songs: { add: [], update: [], same: 0, keep: 0 }, setlists: { add: [], update: [], same: 0, keep: 0 } };
     var byName = {}, maxOrder = -1;
     Object.keys(local.tags || {}).forEach(function (id) {
@@ -524,7 +526,8 @@
     function decide(kind, rec) {
       var loc = (local[kind] || {})[rec.id], out = plan[kind];
       rec.updatedAt = rec.updatedAt || 0;
-      if (!loc || loc.deleted) {
+      if (loc && loc.deleted && opts.keepDeleted && rec.updatedAt <= (loc.updatedAt || 0)) out.keep++;
+      else if (!loc || loc.deleted) {
         if (loc) rec.updatedAt = Math.max(rec.updatedAt, (loc.updatedAt || 0) + 1);
         out.add.push(rec);
       } else if (rec.updatedAt > (loc.updatedAt || 0)) out.update.push(rec);

@@ -263,4 +263,13 @@ eq([back.title, back.artist, back.key, back.bpm, back.body], ['Eitt', 'A', 'G', 
 // files from before the rename (Songgiggin) still import
 eq(!!C.parseBundle(JSON.stringify({ format: 'songgiggin', version: 1, songs: [], setlists: [], tags: [] })), true);
 eq(C.parseBundle(JSON.stringify({ format: 'other', version: 1, songs: [] })), null);
+// automatic sync keeps local deletions unless the file has a newer edit
+(function () {
+  var local = { songs: { a: { id: 'a', title: 'A', deleted: true, updatedAt: 50 } }, setlists: {}, tags: {} };
+  var file = { songs: [{ id: 'a', title: 'A', updatedAt: 40 }], setlists: [], tags: [] };
+  eq(C.planMerge(local, file, 100, { keepDeleted: true }).songs.add.length, 0);
+  eq(C.planMerge(local, file, 100).songs.add.length, 1);
+  file.songs[0].updatedAt = 60;
+  eq(C.planMerge(local, file, 100, { keepDeleted: true }).songs.add.length, 1);
+})();
 console.log('core tests passed:', n);
