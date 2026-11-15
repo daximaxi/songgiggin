@@ -1,4 +1,6 @@
 import asyncio, json, statistics
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fixture  # the three example songs the tests were written against
 from playwright.async_api import async_playwright
 URL = 'file:///home/claude/songgiggin/dist/index.html'
 PEN = """([x0, y0, x1, p0, p1]) => { const l = document.querySelector('#stage .notes-layer');

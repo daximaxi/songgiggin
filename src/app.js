@@ -178,13 +178,6 @@
       shareRefresh: 'Get newest', shareUpdated: 'Up to date.',
       sharedWithMe: 'Shared with me', sharedTag: 'Shared', sharedNote: 'You can change key, capo and chords and make notes; it stays on this device.',
       sharedFetched: 'Fetched {d}', sharedRemove: 'Remove from this device', sharedRemoved: 'Removed from this device. The link still works if you open it again.',
-      ghTitle: 'Songs on GitHub', ghAuto: 'Get songs from GitHub when the app opens', ghRepo: 'GitHub repository',
-      ghPullNow: 'Get songs now', ghFileBtn: 'Download library.json',
-      ghHint: 'The app reads data/library.json from the repository and merges it in: the newer version of each song wins, nothing newer on this device is overwritten. To send your songs up: download library.json here and upload it to the data folder in the repository (Add file, Upload files), or send it to Claude.',
-      ghPublicHint: 'The repository is public: anyone who finds it can read the songs and notes.',
-      ghNever: 'Not fetched yet', ghLast: 'Last fetched {d}', ghNone: 'No library.json in the repository yet', ghBad: 'The file on GitHub could not be read',
-      ghFailed: 'Could not reach GitHub', ghOffline: 'No connection', ghBusy: 'Fetching…',
-      ghPulled: function (n) { return n === 1 ? '1 change from GitHub' : n + ' changes from GitHub'; }, ghNothing: 'Nothing new on GitHub',
       download: 'Download', copy: 'Copy', copied: 'Copied. Paste it in a message or into Import on another device.',
       copyManual: 'Select all the text below and copy it.', fileSaved: 'File saved', fileBusy: 'A save is already waiting for your answer.',
       fileFailed: 'The file could not be saved here. Use Copy instead.', openFile: 'Open file',
@@ -305,13 +298,6 @@
       shareRefresh: 'Sækja nýjustu', shareUpdated: 'Allt uppfært.',
       sharedWithMe: 'Deilt með mér', sharedTag: 'Deilt', sharedNote: 'Þú getur breytt tóntegund, capo og hljómum og gert glósur; það geymist í þessu tæki.',
       sharedFetched: 'Sótt {d}', sharedRemove: 'Fjarlægja úr tækinu', sharedRemoved: 'Fjarlægt úr tækinu. Hlekkurinn virkar áfram ef þú opnar hann aftur.',
-      ghTitle: 'Lög á GitHub', ghAuto: 'Sækja lög af GitHub þegar appið opnast', ghRepo: 'GitHub geymsla',
-      ghPullNow: 'Sækja lög núna', ghFileBtn: 'Sækja library.json',
-      ghHint: 'Appið les data/library.json úr geymslunni og sameinar: nýrri útgáfa hvers lags vinnur, ekkert nýrra á tækinu skrifast yfir. Til að senda lögin upp: sæktu library.json hér og hladdu henni upp í möppuna data í geymslunni (Add file, Upload files), eða sendu hana til Claude.',
-      ghPublicHint: 'Geymslan er opinber: hver sem finnur hana getur lesið lögin og glósurnar.',
-      ghNever: 'Ekki sótt enn', ghLast: 'Síðast sótt {d}', ghNone: 'Engin library.json í geymslunni enn', ghBad: 'Ekki tókst að lesa skrána á GitHub',
-      ghFailed: 'Náði ekki sambandi við GitHub', ghOffline: 'Ekkert netsamband', ghBusy: 'Sæki…',
-      ghPulled: function (n) { return n === 1 ? '1 breyting af GitHub' : n + ' breytingar af GitHub'; }, ghNothing: 'Ekkert nýtt á GitHub',
       download: 'Hlaða niður', copy: 'Afrita', copied: 'Afritað. Límdu það í skilaboð eða í Flytja inn á öðru tæki.',
       copyManual: 'Veldu allan textann hér fyrir neðan og afritaðu hann.', fileSaved: 'Skrá vistuð', fileBusy: 'Vistun bíður nú þegar eftir svari frá þér.',
       fileFailed: 'Ekki var hægt að vista skrána hér. Notaðu Afrita í staðinn.', openFile: 'Opna skrá',
@@ -357,8 +343,7 @@
   function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage may be unavailable */ } }
   var prefs = Object.assign(
     { lang: /^is/i.test(navigator.language || '') ? 'is' : 'en', theme: 'auto', fontSize: 20, defaultSpeed: 10, accent: 'orange', poolSort: 'title', setlistSort: 'created', penSize: 1, markerSize: 1, inkSmooth: 2,
-      sheetFont: 'body', boldLyrics: false, boldChords: true, chordColor: 'accent', chordHi: false, lockLine: false,
-      ghAuto: true, ghRepo: 'daximaxi/songgiggin', ghLast: null },
+      sheetFont: 'body', boldLyrics: false, boldChords: true, chordColor: 'accent', chordHi: false, lockLine: false },
     lsGet(LS_PREFS) || {}
   );
   function savePrefs() { lsSet(LS_PREFS, prefs); }
@@ -978,20 +963,14 @@
   // Marked examples so the app does not open as an empty shell. All three are traditional songs.
   function seedExamples() {
     var songs = [
-      { id: 'ex-oh-susanna', title: 'Oh! Susanna', artist: 'Stephen Foster, 1848', key: 'G', bpm: 120, body:
-        '[Verse 1]\nI [G]come from Alabama with my banjo on my [D]knee\nI\'m [G]going to Louisiana, my true love [D]for to [G]see\nIt [G]rained all night the day I left, the weather it was [D]dry\nThe [G]sun so hot I froze to death, Susanna, [D]don\'t you [G]cry\n\n{start_of_chorus: Chorus}\n[C]Oh! Susanna, oh [G]don\'t you cry for [D]me\nI\'ve [G]come from Alabama with my banjo [D]on my [G]knee\n{end_of_chorus}\n' },
       { id: 'ex-rising-sun', title: 'House of the Rising Sun', artist: 'Traditional', key: 'Am', bpm: 78, body:
         '{comment: 6/8, arpeggio pattern as in the tab}\n\n[Intro]\n{start_of_tab}\ne|-------0-----|-------0-----|\nB|-----1---1---|-----1---1---|\nG|---2-------2-|---0-------0-|\nD|-2-----------|-------------|\nA|0------------|-3-----------|\nE|-------------|-------------|\n{end_of_tab}\n\n[Verse 1]\nThere [Am]is a [C]house in [D]New Or[F]leans\nThey [Am]call the [C]Rising [E]Sun\nIt\'s [Am]been the [C]ruin of [D]many a poor [F]girl\nAnd [Am]me, oh [E]God, for [Am]one\n\n[Outro]\n[Am] [C] [D] [F] [Am] [E] [Am]\n' },
-      { id: 'ex-amazing-grace', title: 'Amazing Grace', artist: 'John Newton, 1779', key: 'G', bpm: 80, body:
-        '{comment: 3/4}\n\n[Verse 1]\nA[G]mazing grace, how [C]sweet the [G]sound\nThat saved a wretch like [D]me\nI [G]once was lost, but [C]now am [G]found\nWas [Em]blind, but [D]now I [G]see\n\n[Verse 2]\n\'Twas [G]grace that taught my [C]heart to [G]fear\nAnd grace my fears re[D]lieved\nHow [G]precious did that [C]grace ap[G]pear\nThe [Em]hour I [D]first be[G]lieved\n\n[Verse 3]\nThrough [G]many dangers, [C]toils and [G]snares\nI have already [D]come\n\'Tis [G]grace hath brought me [C]safe thus [G]far\nAnd [Em]grace will [D]lead me [G]home\n' }
     ];
     songs.forEach(function (s) { s.example = true; s.updatedAt = 0; s.createdAt = 0; data.songs[s.id] = s; });
     data.setlists['ex-gig'] = {
       id: 'ex-gig', name: t('exampleGig'), date: '', example: true, updatedAt: 0, createdAt: 0,
       items: [
-        { uid: 'ex1', songId: 'ex-oh-susanna', tr: 0, acc: 'auto' },
-        { uid: 'ex2', songId: 'ex-rising-sun', tr: 0, acc: 'auto' },
-        { uid: 'ex3', songId: 'ex-amazing-grace', tr: 2, acc: 'auto' }
+        { uid: 'ex2', songId: 'ex-rising-sun', tr: 0, acc: 'auto' }
       ]
     };
     persistLocal();
@@ -3250,27 +3229,6 @@
       draw();
       return box;
     }
-    function ghSection() {
-      var auto = h('input', { type: 'checkbox', checked: prefs.ghAuto !== false });
-      auto.addEventListener('change', function () { prefs.ghAuto = auto.checked; savePrefs(); });
-      var repo = h('input', { class: 'input', type: 'text', id: 'gh-repo', value: prefs.ghRepo || '', spellcheck: false, autocomplete: 'off', 'aria-label': t('ghRepo'), placeholder: 'notandi/geymsla' });
-      repo.addEventListener('change', function () { prefs.ghRepo = repo.value.trim(); savePrefs(); });
-      var status = h('span', { class: 'hint ghstatus', text: ghStatusText() });
-      return h('div', { class: 'field ghset' }, h('span', { text: t('ghTitle') }),
-        h('label', { class: 'check' }, auto, h('span', { text: t('ghAuto') })),
-        h('label', { class: 'sub' }, h('small', { text: t('ghRepo') }), repo),
-        h('div', { class: 'row-btns' },
-          h('button', { class: 'btn', type: 'button', onclick: function () {
-            prefs.ghRepo = repo.value.trim(); savePrefs(); status.textContent = t('ghBusy');
-            ghPull(false).then(function () { status.textContent = ghStatusText(); });
-          } }, ico('cloud'), t('ghPullNow')),
-          h('button', { class: 'btn', type: 'button', onclick: function () {
-            saveFile('library.json', JSON.stringify(C.exportBundle(ownData(), 'library'), null, 1));
-          } }, ico('export'), t('ghFileBtn'))),
-        status,
-        h('span', { class: 'hint', text: t('ghHint') }),
-        h('span', { class: 'hint', text: t('ghPublicHint') }));
-    }
     function seg(options, current, onpick) {
       return h('div', { class: 'seg' }, options.map(function (o) {
         return h('button', { type: 'button', 'aria-pressed': String(o[0] === current), text: o[1], onclick: function () { onpick(o[0]); } });
@@ -3329,7 +3287,6 @@
             speedB,
             h('button', { class: 'btn', type: 'button', 'aria-label': t('faster'), text: '+', onclick: function () { step(1); } })),
           h('span', { class: 'hint', text: t('defaultSpeedHint') })),
-        ghSection(),
         h('div', { class: 'field' }, h('span', { text: t('tags') }), tagList,
           h('div', { class: 'newtag' }, addInput, h('button', { class: 'btn', type: 'button', onclick: addTag }, ico('plus'), t('addTag')))),
         h('div', { class: 'foot' }, h('button', { class: 'btn primary', type: 'button', text: t('done'), onclick: closeDialog }))),
@@ -3340,47 +3297,6 @@
   }
   $('#btn-settings').addEventListener('click', openSettings);
   $('#sync').addEventListener('click', function () { if (!isClaudeHost()) openSettings(); });
-
-  // ---------- songs on GitHub (read only): data/library.json in the repository ----------
-  var ghBusy = false;
-  function ghUrl() {
-    var repo = String(prefs.ghRepo || '').trim().replace(/^https?:\/\/github\.com\//, '').replace(/\/+$/, '');
-    if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) return null;
-    return 'https://raw.githubusercontent.com/' + repo + '/main/data/library.json?t=' + Date.now();
-  }
-  function ghStatus(status, n) { prefs.ghLast = { at: Date.now(), status: status, n: n || 0 }; savePrefs(); }
-  // Fetch and merge. quiet: the automatic fetch at start only speaks up when something changed.
-  function ghPull(quiet) {
-    var url = ghUrl();
-    if (!url || ghBusy) return Promise.resolve();
-    if (navigator.onLine === false) { if (!quiet) toast(t('ghOffline')); return Promise.resolve(); }
-    ghBusy = true;
-    return fetch(url, { cache: 'no-store' }).then(function (res) {
-      if (res.status === 404) { ghStatus('none'); if (!quiet) toast(t('ghNone')); return; }
-      if (!res.ok) throw new Error('http ' + res.status);
-      return res.text().then(function (txt) {
-        var b = C.parseBundle(txt);
-        if (!b) { ghStatus('bad'); if (!quiet) toast(t('ghBad')); return; }
-        var plan = C.planMerge(data, b, Date.now(), { keepDeleted: true });
-        plan.tags.forEach(function (r) { putRec('tags', r); });
-        plan.songs.add.concat(plan.songs.update).forEach(function (r) { putRec('songs', r); });
-        plan.setlists.add.concat(plan.setlists.update).forEach(function (r) { putRec('setlists', r); });
-        var n = plan.songs.add.length + plan.songs.update.length + plan.setlists.add.length + plan.setlists.update.length;
-        ghStatus('ok', n);
-        if (n) { if (ui.view !== 'edit') render(); toast(t('ghPulled')(n)); } else if (!quiet) toast(t('ghNothing'));
-      });
-    }).catch(function () { ghStatus('failed'); if (!quiet) toast(t('ghFailed')); })
-      .then(function () { ghBusy = false; });
-  }
-  function ghStatusText() {
-    var g = prefs.ghLast;
-    if (!g) return t('ghNever');
-    var when = t('ghLast').replace('{d}', fmtDate(g.at) + ' ' + new Date(g.at).toTimeString().slice(0, 5));
-    if (g.status === 'none') return when + ' · ' + t('ghNone');
-    if (g.status === 'bad') return when + ' · ' + t('ghBad');
-    if (g.status === 'failed') return when + ' · ' + t('ghFailed');
-    return when + ' · ' + (g.n ? t('ghPulled')(g.n) : t('ghNothing'));
-  }
 
   // ---------- routing and start ----------
   function fromHash() {
@@ -3406,8 +3322,6 @@
     ready = hasRecords();
     render();
     connect();
-    // After the device's own data (and Claude sync) has loaded, merge in the songs from GitHub.
-    if (prefs.ghAuto !== false) setTimeout(function () { ghPull(true); }, 1500);
     if (sb.session && !isClaudeHost()) setTimeout(sbSync, 300);
     if (shareTok && !isClaudeHost()) shareOpen(shareTok);
     else setTimeout(function () { shareRefreshAll(true); }, 800);

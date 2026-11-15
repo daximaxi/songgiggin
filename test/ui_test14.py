@@ -3,6 +3,8 @@ Mock Supabase follows schema.sql: records per owner (newer wins), shares per own
 get_share(t) returns the setlist and its songs without the owner's notes, or null."""
 import asyncio, json, uuid, subprocess, time, re
 from urllib.parse import urlparse, parse_qs
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fixture  # the three example songs the tests were written against
 from playwright.async_api import async_playwright
 
 PORT = 8766

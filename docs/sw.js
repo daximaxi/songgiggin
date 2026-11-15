@@ -1,5 +1,5 @@
 /* GIGGARI service worker: the app works without a connection once it has been opened. */
-const VERSION = '4.1.0-mwif694f';
+const VERSION = '4.1.1-mwig4tbp';
 const SHELL = 'giggari-shell-' + VERSION;
 const FONTS = 'giggari-fonts-v1';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './icon-maskable-512.png', './jspdf.umd.min.js'];
@@ -20,8 +20,6 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  // Songs from GitHub always come from the network.
-  if (url.hostname === 'raw.githubusercontent.com') return;
 
   // The page itself: try the network first so a new version arrives, fall back to the saved copy offline.
   if (req.mode === 'navigate') {

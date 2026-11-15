@@ -1,6 +1,8 @@
 """v3.3: capo, lyrics only, chord diagrams, chord tap, print and PDF. Runs against dist-pwa/ over http
 so the PDF library loads from the app's own files, as on GitHub Pages."""
 import asyncio, subprocess, time
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fixture  # the three example songs the tests were written against
 from playwright.async_api import async_playwright
 PORT = 8765
 URL = f'http://127.0.0.1:{PORT}/index.html'

@@ -482,10 +482,6 @@ a.brand:hover { filter: brightness(1.08); }
 .tag.arch { margin-left: 8px; vertical-align: middle; font-weight: 400; }
 
 /* ---------- v3.6: GitHub songs ---------- */
-.ghset .sub { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
-.ghset .sub small { color: var(--muted); }
-.ghset .row-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.ghset .ghstatus { color: var(--ink); }
 
 /* ---------- v4.0: account ---------- */
 .acset { gap: 8px; border-bottom: 1px solid var(--line); padding-bottom: 14px; }

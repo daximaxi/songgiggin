@@ -20,8 +20,6 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  // Songs from GitHub always come from the network.
-  if (url.hostname === 'raw.githubusercontent.com') return;
 
   // The page itself: try the network first so a new version arrives, fall back to the saved copy offline.
   if (req.mode === 'navigate') {

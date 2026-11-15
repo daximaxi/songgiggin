@@ -1,6 +1,8 @@
 """v3.4: save goes back, print on stage, chords button label, black theme, song text settings,
 text notes can be edited and moved, straight highlighter lines."""
 import asyncio, json
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fixture  # the three example songs the tests were written against
 from playwright.async_api import async_playwright
 URL = 'file:///home/claude/songgiggin/dist/index.html'
 NOTES = "JSON.parse(localStorage.getItem('songgiggin.data.v1')).songs['ex-amazing-grace'].notes || []"

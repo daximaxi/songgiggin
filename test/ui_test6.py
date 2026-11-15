@@ -1,4 +1,6 @@
 import asyncio
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fixture  # the three example songs the tests were written against
 from playwright.async_api import async_playwright
 URL = 'file:///home/claude/songgiggin/dist/index.html'
 LINE_AT = """(y) => { const els = [...document.querySelectorAll('#stage [data-bi]')];

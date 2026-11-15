@@ -4,6 +4,8 @@ app with the session after # ; pasting the link from the email; pasting the addr
 an expired link; another tab on the same device picks the session up."""
 import asyncio, json, uuid, subprocess, time
 from urllib.parse import urlparse, parse_qs
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fixture  # the three example songs the tests were written against
 from playwright.async_api import async_playwright
 
 PORT = 8765
