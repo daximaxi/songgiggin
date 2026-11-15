@@ -288,4 +288,14 @@ eq(C.parseBundle(JSON.stringify({ format: 'other', version: 1, songs: [] })), nu
   var r3 = C.importText('Lag\n\nG\nHello there my friend\nC\nGoodbye for now my love\nD\nSee you again tomorrow\nG\nAnd then we sing\n');
   eq(r3.body, '[G]Hello there my friend\n[C]Goodbye for now my love\n[D]See you again tomorrow\n[G]And then we sing\n');
 })();
+// phone copy, second song: words before the first chord, a whole line before a chord, repeated chord runs
+(function () {
+  var r = C.importText("Aumingi með bónuspoka\n\n    Höfundur lags: Gunnar Lárus Hjálmarsson, Höfundur texta: Gunnar Lárus Hjálmarsson, Flytjandi: Dr. Gunni, \n\nÉg er\nA\naumingi með Bónuspoka\nÉg er aumingi með Bónuspoka\nog\nD\nríkið er\nE\nbúið að\nA\nloka.\n\nÉg átti\nA\nkonu, hún fór með öðrum,\nÉg átti konu, hún fór með öðrum,\nD\nsvona er að\nE\nleggjast með\nA\nnöðrum.\n\nA5\n    \nC#5\n    \nE5\n    \nF#5\n    \nE5\n    \nD\n    \nDsus2\n    \nA5\n    \nC#5\n    \nE5\n    \nF#5\n    \nE5\n    \nD\n    \nDsus2\n    \nA\nAumingi, aumingi, aumingi, aumingi,\naumingja aumingi.\n\nÞví ég er\nA\naumingi með Bónuspoka\nog\nD\nríkið er\nE\nbúið að\nA\nloka.\n\nA5\n    \nC#5\n    \nE5\n    \nF#5\n    \nE5\n    \nD\n    \nDsus2\n    \nA5\n    \nC#5\n    \nE5\n    \nF#5\n    \nE5\n    \nD\n    \nDsus2\n");
+  eq([r.title, r.artist], ['Aumingi með bónuspoka', 'Dr. Gunni']);
+  eq(r.body, 'Ég er [A]aumingi með Bónuspoka\nÉg er aumingi með Bónuspoka\nog [D]ríkið er [E]búið að [A]loka.\n\n' +
+    'Ég átti [A]konu, hún fór með öðrum,\nÉg átti konu, hún fór með öðrum,\n[D]svona er að [E]leggjast með [A]nöðrum.\n\n' +
+    '[A5] [C#5] [E5] [F#5] [E5] [D] [Dsus2]\n[A5] [C#5] [E5] [F#5] [E5] [D] [Dsus2]\n[A]Aumingi, aumingi, aumingi, aumingi,\naumingja aumingi.\n\n' +
+    'Því ég er [A]aumingi með Bónuspoka\nog [D]ríkið er [E]búið að [A]loka.\n\n' +
+    '[A5] [C#5] [E5] [F#5] [E5] [D] [Dsus2]\n[A5] [C#5] [E5] [F#5] [E5] [D] [Dsus2]\n');
+})();
 console.log('core tests passed:', n);

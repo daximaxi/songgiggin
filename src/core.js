@@ -354,27 +354,51 @@
     }
     return chords >= 4 && multi === 0 && (ws >= 1 || short >= 3);
   }
+  // Text before a chord starts that chord's line only when it is a short piece ("Ég er", "og þó").
+  // A longer line, or one that ends with punctuation, is a whole line of its own.
+  function isLeadIn(x) { return x.split(/\s+/).length <= 4 && !/[.,!?;:]$/.test(x); }
+  // A run of chords with no words: start a new line each time the pattern repeats.
+  function splitChordRun(line) {
+    var t = line.match(/\[[^\]]+\]/g) || [];
+    for (var p = 2; p <= t.length / 2; p++) {
+      if (t.length % p) continue;
+      var ok = true;
+      for (var i = p; i < t.length && ok; i++) ok = t[i] === t[i % p];
+      if (ok) { var out = []; for (var j = 0; j < t.length; j += p) out.push(t.slice(j, j + p).join(' ')); return out; }
+    }
+    return [line];
+  }
   function unInterleave(text) {
     var lines = text.split('\n');
     if (!looksInterleaved(lines)) return text;
     var first = 0;
     while (first < lines.length && !singleChordLine(lines[first])) first++;
-    var out = lines.slice(0, first), cur = null, last = '';
-    function flush() { if (cur !== null) out.push(cur); cur = null; }
+    var before = first > 0 ? lines[first - 1].trim() : '';
+    if (before && isLeadIn(before) && !META_START.test(before) && !CREDIT_RE.test(before)) first--;
+    var out = lines.slice(0, first), cur = null, words = false, chords = false, last = '';
+    function flush() {
+      if (cur === null) return;
+      if (!words) out.push.apply(out, splitChordRun(cur)); else out.push(cur);
+      cur = null; words = false; chords = false;
+    }
     for (var i = first; i < lines.length; i++) {
       var L = lines[i], x = L.trim();
       if (singleChordLine(L)) {
+        if (cur !== null && last === 'text' && !chords && !isLeadIn(cur)) flush();
         cur = cur === null ? '[' + x + ']' : cur.replace(/\s+$/, '') + ' [' + x + ']';
-        last = 'chord';
+        chords = true; last = 'chord';
       } else if (!x) {
         if (L.length && last === 'chord') { last = 'text'; continue; }   // a chord with no words
         flush(); out.push(''); last = '';
       } else if (isSectionOnly(L) || parseDirective(L) || isTabLine(L)) {
         flush(); out.push(L); last = '';
       } else if (last === 'chord') {
-        cur += x; last = 'text';
+        // Words after a run of bare chords: the last chord starts the sung line.
+        var m = !words && /^(.*\])\s+(\[[^\]]+\])$/.exec(cur);
+        if (m) { cur = m[1]; flush(); cur = m[2]; chords = true; }
+        cur += x; words = true; last = 'text';
       } else {
-        flush(); cur = x; last = 'text';
+        flush(); cur = x; words = true; last = 'text';
       }
     }
     flush();
