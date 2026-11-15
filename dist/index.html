@@ -501,7 +501,7 @@ a.brand:hover { filter: brightness(1.08); }
 .acset { gap: 8px; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
 .acset .acrow { display: flex; gap: 8px; flex-wrap: wrap; }
 .acset .acrow .input { flex: 1 1 220px; min-width: 0; }
-.acset .accode { letter-spacing: .3em; font-family: var(--font-mono); font-size: 20px; }
+.acset .accode { font-size: 16px; }
 .acset .acwho { font-weight: 700; }
 .acset .row-btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .acset .acmsg { color: var(--danger); }
@@ -1368,15 +1368,16 @@ a.brand:hover { filter: brightness(1.08); }
       transpose: 'Transpose', fullscreen: 'Full screen', tabNote: 'Tab is not transposed.',
       sync_synced: 'Synced', sync_syncing: 'Syncing…', sync_local: 'This device only', sync_error: 'Sync failed, will try again',
       acTitle: 'Account', acIntro: 'Sign in to have your songs and setlists on all your devices.',
-      acEmail: 'Email', acSend: 'Send code', acSending: 'Sending…', acCodeSent: 'We sent a code to {e}. It can take a minute. Check spam too.',
-      acCode: 'Code from the email', acVerify: 'Sign in', acVerifying: 'Signing in…', acOther: 'Another email', acResend: 'Send again',
+      acEmail: 'Email', acSend: 'Send email', acSending: 'Sending…', acCodeSent: 'We sent an email to {e} (it can take a minute, check spam too). Tap the link in it. If the link opens in the browser and not in the app, copy the link and paste it here.',
+      acCode: 'Link or code from the email', acVerify: 'Sign in', acVerifying: 'Signing in…', acOther: 'Another email', acResend: 'Send again',
       acSignedIn: 'Signed in as {e}', acSyncNow: 'Sync now', acSignOut: 'Sign out', acSignedOut: 'Signed out. The songs stay on this device.',
       acLast: 'Last synced {d}', acNever: 'Not synced yet', acWelcome: 'Signed in. Your songs are being synced.',
       acPrivacy: 'Your email is only used to sign in. Your songs are stored in your account (Supabase, Europe) and only you can see them.',
       acClaude: 'In the Claude version your songs are synced through your Claude account.',
-      acBadEmail: 'Check the email address', acBadCode: 'The code is wrong or has expired. Ask for a new one.',
+      acBadEmail: 'Check the email address', acBadCode: 'The link or code is wrong, used or expired. Ask for a new email.',
+      acLinkBad: 'The sign-in link was used or has expired. Ask for a new email in Settings.',
       acRate: 'Too many emails right now. Wait a while and try again.', acNet: 'Could not reach the account service. Check the connection.',
-      acWait: 'You can ask for a new code in {n} s',
+      acWait: 'You can ask for a new email in {n} s',
       sync_offline: 'Offline, may be out of date', sync_connecting: 'Connecting…',
       loading: 'Loading your songs…', exampleGig: 'Example gig',
       tags: 'Tags', newTag: 'New tag', addTag: 'Add tag', clearFilter: 'Clear', deleteTag: 'Delete tag', tagDeleted: 'Tag deleted',
@@ -1475,15 +1476,16 @@ a.brand:hover { filter: brightness(1.08); }
       transpose: 'Tónflytja', fullscreen: 'Allur skjárinn', tabNote: 'Tab er ekki tónflutt.',
       sync_synced: 'Samstillt', sync_syncing: 'Samstilli…', sync_local: 'Aðeins þetta tæki', sync_error: 'Samstilling mistókst, reyni aftur',
       acTitle: 'Aðgangur', acIntro: 'Skráðu þig inn til að hafa lögin og lagalistana á öllum tækjunum þínum.',
-      acEmail: 'Netfang', acSend: 'Senda kóða', acSending: 'Sendi…', acCodeSent: 'Við sendum kóða á {e}. Það getur tekið mínútu. Skoðaðu líka ruslpóstinn.',
-      acCode: 'Kóðinn úr póstinum', acVerify: 'Skrá inn', acVerifying: 'Skrái inn…', acOther: 'Annað netfang', acResend: 'Senda aftur',
+      acEmail: 'Netfang', acSend: 'Senda póst', acSending: 'Sendi…', acCodeSent: 'Við sendum póst á {e} (það getur tekið mínútu, skoðaðu líka ruslpóstinn). Ýttu á hlekkinn í honum. Ef hlekkurinn opnast í vafranum en ekki í appinu skaltu afrita hann og líma hér.',
+      acCode: 'Hlekkur eða kóði úr póstinum', acVerify: 'Skrá inn', acVerifying: 'Skrái inn…', acOther: 'Annað netfang', acResend: 'Senda aftur',
       acSignedIn: 'Innskráð(ur) sem {e}', acSyncNow: 'Samstilla núna', acSignOut: 'Skrá út', acSignedOut: 'Skráð(ur) út. Lögin haldast á þessu tæki.',
       acLast: 'Síðast samstillt {d}', acNever: 'Ekki samstillt enn', acWelcome: 'Innskráð(ur). Lögin eru að samstillast.',
       acPrivacy: 'Netfangið er aðeins notað til innskráningar. Lögin eru geymd í aðganginum þínum (Supabase, Evrópu) og aðeins þú sérð þau.',
       acClaude: 'Í Claude útgáfunni samstillast lögin í gegnum Claude aðganginn þinn.',
-      acBadEmail: 'Athugaðu netfangið', acBadCode: 'Kóðinn er rangur eða útrunninn. Biddu um nýjan.',
+      acBadEmail: 'Athugaðu netfangið', acBadCode: 'Hlekkurinn eða kóðinn er rangur, notaður eða útrunninn. Biddu um nýjan póst.',
+      acLinkBad: 'Innskráningarhlekkurinn er notaður eða útrunninn. Biddu um nýjan póst í Stillingum.',
       acRate: 'Of margir póstar í bili. Bíddu aðeins og reyndu aftur.', acNet: 'Náði ekki sambandi við aðganginn. Athugaðu netið.',
-      acWait: 'Þú getur beðið um nýjan kóða eftir {n} sek.',
+      acWait: 'Þú getur beðið um nýjan póst eftir {n} sek.',
       sync_offline: 'Ótengt, gæti verið úrelt', sync_connecting: 'Tengist…',
       loading: 'Sæki lögin þín…', exampleGig: 'Dæmi um gigg',
       tags: 'Tags', newTag: 'Nýtt tag', addTag: 'Bæta við tagi', clearFilter: 'Hreinsa', deleteTag: 'Eyða tagi', tagDeleted: 'Tagi eytt',
@@ -1794,16 +1796,66 @@ a.brand:hover { filter: brightness(1.08); }
   }
   function sbSessionFrom(j) {
     return { access_token: j.access_token, refresh_token: j.refresh_token,
-      expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600),
+      expires_at: +j.expires_at || Math.floor(Date.now() / 1000) + (+j.expires_in || 3600),
       user: { id: j.user && j.user.id, email: j.user && j.user.email } };
   }
-  function sbSendCode(email) { return sbFetch('/auth/v1/otp', { method: 'POST', body: { email: email, create_user: true } }); }
-  function sbVerify(email, code) {
-    return sbFetch('/auth/v1/verify', { method: 'POST', body: { type: 'email', email: email, token: code } }).then(function (j) {
-      sbSetSession(sbSessionFrom(j));
-      sb.state = { cursor: 0, pushed: {}, full: 0 }; sbSaveState();
-      sbSync();
+  // The email holds a link (the free plan cannot change the email to show a code). The link
+  // comes back to this address, so the app asks Supabase to send people here.
+  function sbHere() { return /^https?:$/.test(location.protocol) ? location.origin + location.pathname.replace(/index\.html$/, '') : ''; }
+  function sbSendCode(email) {
+    var back = sbHere();
+    return sbFetch('/auth/v1/otp' + (back ? '?redirect_to=' + encodeURIComponent(back) : ''), { method: 'POST', body: { email: email, create_user: true } });
+  }
+  // Signed in: keep the session, fetch the email if the link did not carry it, then sync everything.
+  function sbAdopt(j) {
+    var s = sbSessionFrom(j);
+    sbSetSession(s); acUi.stage = 'email'; acUi.msg = '';
+    sb.state = { cursor: 0, pushed: {}, full: 0 }; sbSaveState();
+    var who = s.user.email ? Promise.resolve() : sbFetch('/auth/v1/user', null, true).then(function (u) {
+      if (sb.session !== s || !u) return;
+      s.user = { id: u.id, email: u.email }; sbSetSession(s);
     });
+    return who.catch(function () { /* the email is only shown in settings */ }).then(function () { sbShow(); sbSync(); });
+  }
+  // What the person pasted: the link from the email, the page address it led to, or a code.
+  function sbParseLogin(v) {
+    v = (v || '').trim();
+    var m = /[?&#]access_token=([^&#\s]+)/.exec(v);
+    if (m) {
+      var q = new URLSearchParams(v.slice(v.indexOf('#') + 1));
+      return { session: { access_token: q.get('access_token'), refresh_token: q.get('refresh_token'), expires_at: q.get('expires_at'), expires_in: q.get('expires_in') } };
+    }
+    m = /[?&]token=([^&#\s]+)/.exec(v);
+    if (m) { var ty = /[?&]type=([a-z_]+)/.exec(v); return { hash: decodeURIComponent(m[1]), type: ty ? ty[1] : 'magiclink' }; }
+    var d = v.replace(/\D/g, '');
+    return d.length >= 6 && d.length <= 10 && !/[a-z]/i.test(v) ? { code: d } : null;
+  }
+  function sbVerify(email, input) {
+    var l = sbParseLogin(input);
+    if (!l) return Promise.reject(Object.assign(new Error('bad'), { status: 400 }));
+    if (l.session) return l.session.access_token ? sbAdopt(l.session) : Promise.reject(Object.assign(new Error('bad'), { status: 400 }));
+    if (l.code) return sbFetch('/auth/v1/verify', { method: 'POST', body: { type: 'email', email: email, token: l.code } }).then(sbAdopt);
+    function as(type) { return sbFetch('/auth/v1/verify', { method: 'POST', body: { type: type, token_hash: l.hash } }); }
+    return as(l.type === 'signup' ? 'signup' : 'magiclink').catch(function (e) {
+      if (e.status >= 400 && e.status < 500 && e.status !== 429) return as('email');
+      throw e;
+    }).then(sbAdopt);
+  }
+  // Opened from the link in the email: Supabase sends the person here with the session (or an error)
+  // after the # in the address. Take it, then clean the address so it is not bookmarked or shared.
+  function sbFromUrl() {
+    var hsh = location.hash || '';
+    if (!/[#&](access_token|error_code|error)=/.test(hsh)) return false;
+    var q = new URLSearchParams(hsh.slice(1));
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { location.hash = ''; }
+    if (isClaudeHost()) return true;
+    if (q.get('access_token')) {
+      sbAdopt({ access_token: q.get('access_token'), refresh_token: q.get('refresh_token'), expires_at: q.get('expires_at'), expires_in: q.get('expires_in') })
+        .then(function () { toast(t('acWelcome')); });
+    } else {
+      setTimeout(function () { toast(t('acLinkBad')); }, 600);
+    }
+    return true;
   }
   // A fresh access token; the refresh token keeps the device signed in.
   function sbToken() {
@@ -1916,8 +1968,19 @@ a.brand:hover { filter: brightness(1.08); }
     var box = $('#ac-box'); if (box && box._redraw) box._redraw();
   }
   window.addEventListener('online', function () { sbSync(); });
+  // Signed in somewhere else on this device (e.g. the link opened in Chrome and not in the installed
+  // app): both share the browser storage, so pick the session up from there.
+  function sbReload() {
+    var s = lsGet(LS_AUTH);
+    if (JSON.stringify(s || null) === JSON.stringify(sb.session || null)) return;
+    sb.session = s; sb.state = lsGet(LS_SB) || { cursor: 0, pushed: {}, full: 0 }; acUi.stage = 'email'; acUi.msg = '';
+    sbShow(); if (s) sbSync();
+  }
+  window.addEventListener('storage', function (e) { if (e.key === LS_AUTH && !isClaudeHost()) sbReload(); });
   document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'visible' && sb.session && Date.now() - sb.lastAt > 60000) sbSync();
+    if (document.visibilityState !== 'visible' || isClaudeHost()) return;
+    if (!sb.session) { sbReload(); return; }
+    if (Date.now() - sb.lastAt > 60000) sbSync();
   });
 
   // Marked examples so the app does not open as an empty shell. All three are traditional songs.
@@ -4085,8 +4148,7 @@ a.brand:hover { filter: brightness(1.08); }
           .then(function () { u.busy = false; draw(); });
       }
       function verify(v) {
-        v = v.replace(/\D/g, '');
-        if (v.length < 6) { u.msg = t('acBadCode'); draw(); return; }
+        if (!sbParseLogin(v)) { u.msg = t('acBadCode'); draw(); return; }
         u.busy = true; u.msg = ''; draw();
         sbVerify(u.email, v).then(function () { toast(t('acWelcome')); u.stage = 'email'; }, function (e) { u.msg = err(e, false); })
           .then(function () { u.busy = false; draw(); });
@@ -4108,7 +4170,7 @@ a.brand:hover { filter: brightness(1.08); }
             h('div', { class: 'acrow' }, inp, h('button', { class: 'btn primary', type: 'button', id: 'ac-send', disabled: u.busy,
               onclick: function () { send(inp.value.trim()); } }, u.busy ? t('acSending') : t('acSend'))));
         } else {
-          var code = h('input', { class: 'input accode', type: 'text', id: 'ac-code', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: 10, 'aria-label': t('acCode'), placeholder: t('acCode') });
+          var code = h('input', { class: 'input accode', type: 'text', id: 'ac-code', autocomplete: 'one-time-code', spellcheck: false, autocapitalize: 'off', 'aria-label': t('acCode'), placeholder: t('acCode') });
           code.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') verify(code.value); });
           var left = Math.ceil((u.waitUntil - Date.now()) / 1000);
           kids.push(h('span', { class: 'hint', text: t('acCodeSent').replace('{e}', u.email) }),
@@ -4267,6 +4329,7 @@ a.brand:hover { filter: brightness(1.08); }
 
   // ---------- routing and start ----------
   function fromHash() {
+    if (sbFromUrl()) return;
     var want = location.hash === '#setlists' ? 'setlists' : location.hash === '#archive' ? 'archive' : 'songs';
     var cur = ui.view === 'archive' ? 'archive' : (ui.view === 'songs' || ui.view === 'edit') ? 'songs' : 'setlists';
     if (want !== cur) go(want);
@@ -4278,6 +4341,7 @@ a.brand:hover { filter: brightness(1.08); }
 
   function start(snap) {
     applyPrefs();
+    sbFromUrl();
     if (location.hash === '#setlists') ui.view = 'setlists';
     if (location.hash === '#archive') ui.view = 'archive';
     if (snap && snap.view === 'setlist' && snap.setlistId) { ui.view = 'setlist'; ui.setlistId = snap.setlistId; }

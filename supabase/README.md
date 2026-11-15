@@ -5,16 +5,14 @@ GIGGARI notar Supabase verkefnið „Giggari“ fyrir innskráningu og samstilli
 ## Uppsetning (einu sinni)
 
 1. **Gagnagrunnur:** Supabase → SQL Editor → New query → líma allt úr `schema.sql` → Run. Má keyra aftur án skaða.
-2. **Póstsniðmát:** Authentication → Emails (Templates) → **Magic Link**. Setja kóðann í póstinn, t.d.:
+2. **Slóð appsins:** Authentication → URL Configuration → **Site URL** `https://daximaxi.github.io/songgiggin/` og sama slóð undir **Redirect URLs**. Ef geymslan er endurnefnd þarf að breyta slóðinni hér líka.
 
-   ```html
-   <h2>Innskráningarkóði fyrir GIGGARA</h2>
-   <p>Sláðu þennan kóða inn í appinu:</p>
-   <p style="font-size:28px;letter-spacing:4px"><b>{{ .Token }}</b></p>
-   <p>Kóðinn gildir í klukkustund. Ef þú baðst ekki um hann máttu hunsa þennan póst.</p>
-   ```
+Póstsniðmátunum þarf ekki að breyta (og á fríu áskriftinni með innbyggða póstþjóninum er það ekki hægt). Pósturinn er með hlekk:
 
-   Gera eins í **Confirm signup** sniðmátinu, svo nýir notendur fái líka kóða.
+- Hlekkurinn opnar appið og skráir inn (Supabase sendir á slóðina sem appið gaf upp, með innskráningunni aftan við #; appið tekur hana og hreinsar slóðina).
+- Ef hlekkurinn opnast í vafranum en ekki í uppsetta appinu: afrita hlekkinn og líma hann í Stillingar → Aðgangur. Appið staðfestir hann sjálft.
+- Ef eigin póstþjónn kemur síðar má setja `{{ .Token }}` í sniðmátið; reiturinn tekur líka við kóða.
+- Innbyggði póstþjónninn sendir aðeins 2 pósta á klukkustund og aðeins til meðlima Supabase skipulagsins. Eigin póstþjónn þarf áður en aðrir skrá sig inn.
 
 ## Hvernig það virkar
 
