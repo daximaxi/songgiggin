@@ -448,6 +448,8 @@ a.brand:hover { filter: brightness(1.08); }
   #print .p-title { font-family: var(--font-display); font-weight: 800; font-size: 2em; text-transform: uppercase; line-height: 1; margin: 0; }
   #print .p-sub { color: #444; font-size: .9em; margin: .2em 0 .8em; }
   #print .ch { color: #000; }
+  #print .p-foot { position: fixed; left: 0; bottom: 0; }
+  #print .p-mark { display: inline-block; font-family: var(--font-display); font-weight: 900; font-size: 9pt; letter-spacing: .04em; padding: 1.5pt 5pt 1pt; border-radius: 2pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   #print .ch.an, #print .cmt, #print .sec, #print .tabnote { color: #444; }
   #print .chorus { border-left-color: #000; }
   #print .cd, #print .cd figcaption { color: #000; }
@@ -507,6 +509,14 @@ a.brand:hover { filter: brightness(1.08); }
 .acset .acmsg { color: var(--danger); }
 #sync { cursor: pointer; }
 .sync[data-s="error"] i { background: var(--danger); }
+
+/* 4.1: sharing */
+.tag.shared { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--ink); }
+.sharebox { display: grid; gap: 12px; }
+.sharebox .bar { display: flex; gap: 8px; flex-wrap: wrap; }
+.sharefacts { margin: 0; padding-left: 1.2em; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
+.sharednote { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+h1.name { margin: 0; }
 
 </style>
 </head>
@@ -1371,7 +1381,9 @@ a.brand:hover { filter: brightness(1.08); }
     eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
     eyeoff: '<path d="M2 12s3.6-7 10-7c2 0 3.7.7 5.1 1.6M22 12s-3.6 7-10 7c-2 0-3.7-.7-5.1-1.6M4 20L20 4"/>',
     grid: '<path d="M6 4h12M6 4v16M10 4v16M14 4v16M18 4v16M6 9h12M6 14h12"/><circle cx="10" cy="11.5" r="1.7" fill="currentColor"/><circle cx="14" cy="6.5" r="1.7" fill="currentColor"/>',
-    printer: '<path d="M7 9V3h10v6M7 17H4v-8h16v8h-3M7 14h10v7H7z"/>'
+    printer: '<path d="M7 9V3h10v6M7 17H4v-8h16v8h-3M7 14h10v7H7z"/>',
+    share: '<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.9l7.6-3.8M8.2 13.1l7.6 3.8"/>',
+    link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'
   };
   function ico(name) {
     var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -1465,6 +1477,25 @@ a.brand:hover { filter: brightness(1.08); }
       exportSetlistDesc: 'This setlist with its songs, the keys you set for it and the tags they use. Whoever imports it gets the whole setlist ready to play.',
       exportSongDesc: 'The song as a ChordPro text file. Other chord apps can open it, and GIGGARI can import it again.',
       duplicate: 'Copy', duplicateHint: 'Make a copy of this setlist', copySuffix: ' (copy)', setlistCopied: 'Copy made. Change what you need.',
+      share: 'Share', sharedByLink: 'Shared by link', shareTitle: 'Share with a link', shareLink: 'Link to the setlist',
+      shareIntro: 'Make a link to this setlist and send it to the band, e.g. in Messenger.',
+      shareFactLive: 'The link is live: when you change songs, order, keys or capo, they see it the next time they open it.',
+      shareFactNoLogin: 'No sign-in needed. They only see this setlist and its songs, not the rest of your songs.',
+      shareFactNotes: 'Your handwritten notes do not go along. Comments in the song text do.',
+      shareFactOwn: 'Each of them can change key, capo and make notes on their own device. It stays with them.',
+      shareMake: 'Make link', shareMaking: 'Syncing and making the link…', shareReady: 'Anyone with this link can open the setlist:',
+      shareSend: 'Send', shareCopied: 'Link copied. Paste it in a message to the band.', shareStop: 'Stop sharing',
+      shareStopAsk: 'The link stops working at once. The setlist disappears from the devices it was opened on the next time they go online. You can make a new link later.',
+      shareStoppedMine: 'Sharing stopped. The link no longer works.',
+      shareNoNet: 'Could not reach the account. Check the connection and try again.',
+      shareSignIn: 'To share a setlist, sign in first (Settings → Account), so the songs are on your account.',
+      shareClaude: 'Sharing works in the app at daximaxi.github.io/songgiggin, not in this Claude version.',
+      shareLoading: 'Fetching the setlist…', shareOpened: 'Setlist opened. It stays on this device and works offline.',
+      shareGone: 'This link no longer works. Ask for a new one.', shareFailed: 'Could not fetch the setlist. Check the connection and open the link again.',
+      shareOfflineCopy: 'Offline: showing the copy kept on this device.', shareStopped: 'Sharing of “{n}” was stopped by its owner.',
+      shareRefresh: 'Get newest', shareUpdated: 'Up to date.',
+      sharedWithMe: 'Shared with me', sharedTag: 'Shared', sharedNote: 'You can change key, capo and chords and make notes; it stays on this device.',
+      sharedFetched: 'Fetched {d}', sharedRemove: 'Remove from this device', sharedRemoved: 'Removed from this device. The link still works if you open it again.',
       ghTitle: 'Songs on GitHub', ghAuto: 'Get songs from GitHub when the app opens', ghRepo: 'GitHub repository',
       ghPullNow: 'Get songs now', ghFileBtn: 'Download library.json',
       ghHint: 'The app reads data/library.json from the repository and merges it in: the newer version of each song wins, nothing newer on this device is overwritten. To send your songs up: download library.json here and upload it to the data folder in the repository (Add file, Upload files), or send it to Claude.',
@@ -1573,6 +1604,25 @@ a.brand:hover { filter: brightness(1.08); }
       exportSetlistDesc: 'Lagalistinn ásamt lögunum, tóntegundunum sem þú valdir fyrir hann og tags-unum þeirra. Sá sem flytur hann inn fær allan lagalistann tilbúinn.',
       exportSongDesc: 'Lagið sem ChordPro textaskrá. Önnur hljómaöpp geta opnað hana og Giggarinn getur flutt hana inn aftur.',
       duplicate: 'Afrita', duplicateHint: 'Búa til afrit af þessum lagalista', copySuffix: ' (afrit)', setlistCopied: 'Afrit búið til. Lagaðu það sem þarf.',
+      share: 'Deila', sharedByLink: 'Deilt með hlekk', shareTitle: 'Deila með hlekk', shareLink: 'Hlekkur á lagalistann',
+      shareIntro: 'Búðu til hlekk á þennan lagalista og sendu hljómsveitinni, t.d. á Messenger.',
+      shareFactLive: 'Hlekkurinn er lifandi: þegar þú breytir lögum, röð, tóntegundum eða capo sjá þau það næst þegar þau opna hann.',
+      shareFactNoLogin: 'Engin innskráning. Þau sjá aðeins þennan lagalista og lögin á honum, ekki önnur lög þín.',
+      shareFactNotes: 'Glósurnar þínar fylgja ekki. Athugasemdir í texta lagsins fylgja.',
+      shareFactOwn: 'Hver og einn getur breytt tóntegund og capo og gert glósur í sínu tæki. Það geymist hjá honum.',
+      shareMake: 'Búa til hlekk', shareMaking: 'Samstilli og bý til hlekk…', shareReady: 'Allir með þennan hlekk geta opnað lagalistann:',
+      shareSend: 'Senda', shareCopied: 'Hlekkur afritaður. Límdu hann í skilaboð til hljómsveitarinnar.', shareStop: 'Hætta að deila',
+      shareStopAsk: 'Hlekkurinn hættir strax að virka. Lagalistinn hverfur úr tækjunum sem opnuðu hann næst þegar þau komast á net. Þú getur búið til nýjan hlekk síðar.',
+      shareStoppedMine: 'Hætt að deila. Hlekkurinn virkar ekki lengur.',
+      shareNoNet: 'Náði ekki sambandi við aðganginn. Athugaðu netið og reyndu aftur.',
+      shareSignIn: 'Til að deila lagalista þarftu fyrst að skrá þig inn (Stillingar → Aðgangur), svo lögin séu í aðganginum þínum.',
+      shareClaude: 'Deiling virkar í appinu á daximaxi.github.io/songgiggin, ekki í þessari Claude útgáfu.',
+      shareLoading: 'Sæki lagalistann…', shareOpened: 'Lagalistinn opnaður. Hann geymist í þessu tæki og virkar án nets.',
+      shareGone: 'Þessi hlekkur virkar ekki lengur. Biddu um nýjan.', shareFailed: 'Gat ekki sótt lagalistann. Athugaðu netið og opnaðu hlekkinn aftur.',
+      shareOfflineCopy: 'Án nets: sýni afritið sem er geymt í þessu tæki.', shareStopped: 'Eigandinn hætti að deila „{n}“.',
+      shareRefresh: 'Sækja nýjustu', shareUpdated: 'Allt uppfært.',
+      sharedWithMe: 'Deilt með mér', sharedTag: 'Deilt', sharedNote: 'Þú getur breytt tóntegund, capo og hljómum og gert glósur; það geymist í þessu tæki.',
+      sharedFetched: 'Sótt {d}', sharedRemove: 'Fjarlægja úr tækinu', sharedRemoved: 'Fjarlægt úr tækinu. Hlekkurinn virkar áfram ef þú opnar hann aftur.',
       ghTitle: 'Lög á GitHub', ghAuto: 'Sækja lög af GitHub þegar appið opnast', ghRepo: 'GitHub geymsla',
       ghPullNow: 'Sækja lög núna', ghFileBtn: 'Sækja library.json',
       ghHint: 'Appið les data/library.json úr geymslunni og sameinar: nýrri útgáfa hvers lags vinnur, ekkert nýrra á tækinu skrifast yfir. Til að senda lögin upp: sæktu library.json hér og hladdu henni upp í möppuna data í geymslunni (Add file, Upload files), eða sendu hana til Claude.',
@@ -1718,7 +1768,15 @@ a.brand:hover { filter: brightness(1.08); }
   var persistTimer = 0;
   function persistLocal() { clearTimeout(persistTimer); persistTimer = setTimeout(flushLocal, 250); }
   function flushLocal() { clearTimeout(persistTimer); lsSet(LS_DATA, data); }
-  function hasRecords() { return Object.keys(data.songs).length + Object.keys(data.setlists).length > 0; }
+  function hasRecords() {
+    function own(m) { return Object.keys(m).some(function (id) { return !m[id].shared; }); }
+    return own(data.songs) || own(data.setlists);
+  }
+  // Setlists shared with me (4.1) live on this device only: never synced, exported or listed with my own.
+  function ownData() {
+    function own(m) { var o = {}; Object.keys(m).forEach(function (id) { if (!m[id].shared) o[id] = m[id]; }); return o; }
+    return { songs: own(data.songs), setlists: own(data.setlists), tags: data.tags };
+  }
 
   function setSync(s) {
     sync.status = s;
@@ -1737,7 +1795,7 @@ a.brand:hover { filter: brightness(1.08); }
 
   function queueWrite(kind, id) {
     var ref = sync.refs[kind], rec = data[kind][id];
-    if (!ref || !rec) return;
+    if (!ref || !rec || rec.shared) return;
     var key = kind + '/' + id;
     if (sync.sent[key] === rec.updatedAt) return;
     var q = sync.queue[key] || (sync.queue[key] = { busy: false, dirty: false });
@@ -1983,7 +2041,7 @@ a.brand:hover { filter: brightness(1.08); }
       Object.keys(data[kind]).forEach(function (id) {
         var r = data[kind][id], at = (r && r.updatedAt) || 0;
         // Untouched examples stay on each device; they are not the user's songs. Editing one clears the mark.
-        if (!r || r.example || at <= (sb.state.pushed[kind + '/' + id] || 0)) return;
+        if (!r || r.example || r.shared || at <= (sb.state.pushed[kind + '/' + id] || 0)) return;
         items.push({ kind: kind, id: id, data: r, updated_at: at, deleted: !!r.deleted });
       });
     });
@@ -2039,7 +2097,186 @@ a.brand:hover { filter: brightness(1.08); }
     if (!sb.session) setSync('local');
     var box = $('#ac-box'); if (box && box._redraw) box._redraw();
   }
-  window.addEventListener('online', function () { sbSync(); });
+  window.addEventListener('online', function () { sbSync(); shareRefreshAll(); });
+
+  // ---------- 4.1: share a setlist with a link ----------
+  // The owner makes a long random token (table "shares"); anyone with the link reads that one setlist
+  // and its songs through get_share(), without signing in. The link is live: it shows what the owner
+  // last synced. The owner's handwritten notes never go along. On the receiving device the setlist is
+  // kept (works offline) under ids of its own, marked "shared", and never synced, exported or listed
+  // with that person's own songs. Their own key, capo and notes on it stay when it is updated.
+  var LS_MYSHARES = 'giggari.myshares.v1';
+  var myShares = lsGet(LS_MYSHARES) || {};       // my setlist id -> token, to mark my shared lists
+  var shareAt = 0;
+  function saveMyShares() { lsSet(LS_MYSHARES, myShares); }
+  function shareUrl(tok) { return (sbHere() || 'https://daximaxi.github.io/songgiggin/') + '#share/' + tok; }
+  function newShareToken() {
+    var a = new Uint8Array(24); crypto.getRandomValues(a);
+    return btoa(String.fromCharCode.apply(null, a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function sharePrefix(tok) { return 'x' + tok.slice(0, 12) + ':'; }
+  function sharedSetlists() {
+    return Object.keys(data.setlists).map(function (id) { return data.setlists[id]; })
+      .filter(function (sl) { return sl.shared && !sl.deleted; })
+      .sort(function (a, b) { return coll.compare(a.name || '', b.name || ''); });
+  }
+  function shareFetch(tok) { return sbFetch('/rest/v1/rpc/get_share', { method: 'POST', body: { t: tok } }, false); }
+  function shareStore(tok, res) {
+    var p = sharePrefix(tok), slId = p + res.setlist.id, old = data.setlists[slId], keep = {};
+    (res.songs || []).forEach(function (s0) {
+      var id = p + s0.id, prev = data.songs[id], s = clone(s0);
+      s.id = id; s.shared = tok; s.tags = [];
+      delete s.notes; delete s.archived; delete s.example; delete s.deleted;
+      if (prev && prev.notes) s.notes = prev.notes;       // my own notes on it stay
+      if (prev && prev.speed) s.speed = prev.speed;
+      s.updatedAt = (prev && prev.updatedAt) || Date.now();
+      data.songs[id] = s; keep[id] = true;
+    });
+    Object.keys(data.songs).forEach(function (id) { if (id.indexOf(p) === 0 && !keep[id]) delete data.songs[id]; });
+    var mine = {};
+    ((old && old.items) || []).forEach(function (it) { if (it.own) mine[it.uid] = it; });
+    var sl = clone(res.setlist);
+    sl.id = slId; sl.shared = tok; sl.fetchedAt = Date.now();
+    delete sl.archived; delete sl.example; delete sl.deleted;
+    sl.items = (sl.items || []).map(function (it) {
+      var c = clone(it), o = mine[it.uid];
+      c.songId = p + it.songId;
+      if (o) { c.tr = o.tr; c.acc = o.acc; c.capo = o.capo; c.own = true; }
+      return c;
+    }).filter(function (it) { return data.songs[it.songId]; });
+    if (old && old.ownHide) { sl.hideChords = old.hideChords; sl.ownHide = true; }
+    sl.updatedAt = (old && old.updatedAt) || Date.now();
+    data.setlists[slId] = sl;
+    persistLocal();
+    return slId;
+  }
+  function shareDrop(tok) {
+    var p = sharePrefix(tok);
+    ['songs', 'setlists'].forEach(function (kind) {
+      Object.keys(data[kind]).forEach(function (id) { if (id.indexOf(p) === 0) delete data[kind][id]; });
+    });
+    persistLocal();
+  }
+  // Opened from a link: fetch it, keep it on the device, show it. Offline, show the kept copy.
+  function shareOpen(tok) {
+    var p = sharePrefix(tok);
+    var kept = Object.keys(data.setlists).filter(function (id) { return id.indexOf(p) === 0; })[0];
+    toast(t('shareLoading'));
+    shareFetch(tok).then(function (res) {
+      if (!res || !res.setlist) {
+        if (kept) shareDrop(tok);
+        toast(t('shareGone')); go('setlists'); return;
+      }
+      var own = data.setlists[res.setlist.id];
+      if (own && !own.shared && !own.deleted && !own.example) { go('setlist', { setlistId: own.id }); return; }   // my own list (examples share ids on every device)
+      var id = shareStore(tok, res);
+      ready = true;
+      go('setlist', { setlistId: id });
+      toast(t('shareOpened'));
+    }, function () {
+      if (kept) { go('setlist', { setlistId: kept }); toast(t('shareOfflineCopy')); }
+      else { toast(t('shareFailed')); go('setlists'); }
+    });
+  }
+  // Fetch the newest version of every setlist shared with me (at most once a minute, unless asked).
+  function shareRefreshAll(force) {
+    if (isClaudeHost() || navigator.onLine === false) return Promise.resolve();
+    if (!force && Date.now() - shareAt < 60000) return Promise.resolve();
+    var lists = sharedSetlists();
+    if (!lists.length) return Promise.resolve();
+    shareAt = Date.now();
+    return Promise.all(lists.map(function (sl) {
+      var tok = sl.shared;
+      return shareFetch(tok).then(function (res) {
+        if (!res || !res.setlist) {
+          shareDrop(tok);
+          if (ui.setlistId === sl.id && ui.view === 'setlist') ui.view = 'setlists';
+          toast(t('shareStopped').replace('{n}', sl.name || t('untitled')));
+        } else shareStore(tok, res);
+      }, function () { /* offline or blocked: keep the copy */ });
+    })).then(function () { refreshView(); });
+  }
+  function shareFromUrl() {
+    var m = /^#share\/([A-Za-z0-9_-]{20,})$/.exec(location.hash || '');
+    if (!m) return null;
+    try { history.replaceState(null, '', location.pathname + location.search + '#setlists'); } catch (e) { location.hash = '#setlists'; }
+    return m[1];
+  }
+
+  // The owner's side: make, show and stop the link.
+  function openShare(slId) {
+    var body = h('div', { class: 'sharebox' });
+    var box = h('textarea', { class: 'input importta', readonly: true, hidden: true, 'aria-label': t('shareLink') });
+    function set() { body.replaceChildren.apply(body, Array.prototype.filter.call(arguments, Boolean)); }
+    openDialog(h('div', { class: 'dlg' },
+      h('h2', { text: t('shareTitle') }), body, box,
+      h('div', { class: 'foot' }, h('button', { class: 'btn primary', type: 'button', text: t('done'), onclick: closeDialog }))),
+      function () { render(); });
+    if (isClaudeHost()) { set(h('p', { class: 'hint', text: t('shareClaude') })); return; }
+    if (!sb.session) {
+      set(h('p', { text: t('shareSignIn') }),
+        h('button', { class: 'btn', type: 'button', onclick: function () { closeDialog(); openSettings(); } }, ico('sliders'), t('settings')));
+      return;
+    }
+    set(h('p', { class: 'hint', text: t('loading') }));
+    sbToken().then(function () {
+      return sbFetch('/rest/v1/shares?select=token&setlist_id=eq.' + encodeURIComponent(slId), null, true);
+    }).then(function (rows) { draw(rows && rows[0] && rows[0].token); }, function () { draw(null, true); });
+
+    function facts() {
+      return h('ul', { class: 'sharefacts' },
+        h('li', { text: t('shareFactLive') }), h('li', { text: t('shareFactNoLogin') }),
+        h('li', { text: t('shareFactNotes') }), h('li', { text: t('shareFactOwn') }));
+    }
+    function draw(tok, failed) {
+      if (!failed) { if (tok) myShares[slId] = tok; else delete myShares[slId]; saveMyShares(); }
+      if (failed) { set(h('p', { class: 'hint warn', text: t('shareNoNet') })); return; }
+      if (!tok) {
+        set(h('p', { text: t('shareIntro') }), facts(),
+          h('button', { class: 'btn primary', type: 'button', id: 'share-make', onclick: make }, ico('link'), t('shareMake')));
+        return;
+      }
+      var url = shareUrl(tok);
+      var input = h('input', { class: 'input', id: 'share-url', type: 'text', readonly: true, value: url, 'aria-label': t('shareLink'), onfocus: function () { input.select(); } });
+      set(h('p', { text: t('shareReady') }), input,
+        h('div', { class: 'bar' },
+          h('button', { class: 'btn primary', type: 'button', id: 'share-copy', onclick: function () {
+            try { navigator.clipboard.writeText(url).then(function () { toast(t('shareCopied')); }, function () { copyText(url, box); }); } catch (e) { copyText(url, box); }
+          } }, ico('copy'), t('copy')),
+          navigator.share ? h('button', { class: 'btn', type: 'button', onclick: function () {
+            var sl = data.setlists[slId];
+            navigator.share({ title: (sl && sl.name) || 'GIGGARI', url: url }).catch(function () { /* closed */ });
+          } }, ico('share'), t('shareSend')) : null),
+        facts(),
+        h('button', { class: 'btn ghost danger', type: 'button', id: 'share-stop', onclick: function () { askStop(tok); } }, ico('x'), t('shareStop')));
+    }
+    function askStop(tok) {
+      set(h('p', { text: t('shareStopAsk') }),
+        h('div', { class: 'bar' },
+          h('button', { class: 'btn ghost', type: 'button', text: t('cancel'), onclick: function () { draw(tok); } }),
+          h('button', { class: 'btn danger', type: 'button', id: 'share-stop-yes', onclick: function () {
+            set(h('p', { class: 'hint', text: t('loading') }));
+            sbToken().then(function () {
+              return sbFetch('/rest/v1/shares?token=eq.' + encodeURIComponent(tok), { method: 'DELETE' }, true);
+            }).then(function () { toast(t('shareStoppedMine')); draw(null); }, function () { draw(null, true); });
+          } }, ico('x'), t('shareStop'))));
+    }
+    function make() {
+      // Examples on the list become my own songs, so they go up with it.
+      var sl = data.setlists[slId];
+      if (sl && sl.example) { var c = clone(sl); delete c.example; saveRec('setlists', c); }
+      ((sl && sl.items) || []).forEach(function (it) {
+        var sg = data.songs[it.songId];
+        if (sg && sg.example) { var x = clone(sg); delete x.example; saveRec('songs', x); }
+      });
+      set(h('p', { class: 'hint', text: t('shareMaking') }));
+      var tok = newShareToken();
+      sbSync().then(function () {
+        if (sb.status === 'error' || sb.status === 'offline') throw new Error('sync');
+        return sbFetch('/rest/v1/shares', { method: 'POST', body: { token: tok, setlist_id: slId } }, true);
+      }).then(function () { draw(tok); }, function () { draw(null, true); });
+    }
+  }
   // Signed in somewhere else on this device (e.g. the link opened in Chrome and not in the installed
   // app): both share the browser storage, so pick the session up from there.
   function sbReload() {
@@ -2051,6 +2288,7 @@ a.brand:hover { filter: brightness(1.08); }
   window.addEventListener('storage', function (e) { if (e.key === LS_AUTH && !isClaudeHost()) sbReload(); });
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState !== 'visible' || isClaudeHost()) return;
+    shareRefreshAll();
     if (!sb.session) { sbReload(); return; }
     if (Date.now() - sb.lastAt > 60000) sbSync();
   });
@@ -2144,20 +2382,20 @@ a.brand:hover { filter: brightness(1.08); }
   function songTitle(s) { return (s && s.title && s.title.trim()) || t('untitled'); }
   function liveSongs() {
     return Object.keys(data.songs).map(function (id) { return data.songs[id]; })
-      .filter(function (sg) { return !sg.deleted && !sg.archived; })
+      .filter(function (sg) { return !sg.deleted && !sg.archived && !sg.shared; })
       .sort(function (a, b) { return coll.compare(songTitle(a), songTitle(b)); });
   }
   // Songs or setlists in the archive, newest first.
   function archivedOf(kind) {
     return Object.keys(data[kind]).map(function (id) { return data[kind][id]; })
-      .filter(function (r) { return r.archived && !r.deleted; })
+      .filter(function (r) { return r.archived && !r.deleted && !r.shared; })
       .sort(function (a, b) { return (b.archived || 0) - (a.archived || 0); });
   }
   function archiveCount() { return archivedOf('songs').length + archivedOf('setlists').length; }
   function liveSetlists() {
     var mode = prefs.setlistSort;
     return Object.keys(data.setlists).map(function (id) { return data.setlists[id]; })
-      .filter(function (sl) { return !sl.deleted && !sl.archived; })
+      .filter(function (sl) { return !sl.deleted && !sl.archived && !sl.shared; })
       .sort(function (a, b) {
         if (mode === 'name') return coll.compare(a.name || '', b.name || '');
         if (mode === 'edited') return (b.updatedAt || 0) - (a.updatedAt || 0);
@@ -2579,12 +2817,12 @@ a.brand:hover { filter: brightness(1.08); }
         h('button', { class: 'btn primary', type: 'button', onclick: function () { saveFile(filename, text); } }, ico('import'), t('download')))));
   }
   function exportLibrary() {
-    var b = C.exportBundle(data, 'library');
+    var b = C.exportBundle(ownData(), 'library');
     openExport(t('exportLib'), t('exportLibDesc') + ' ' + t('nSongs')(b.songs.length) + ', ' + t('nLists')(b.setlists.length) + '.',
       'GIGGARI ' + today() + '.json', JSON.stringify(b, null, 1));
   }
   function exportSetlist(id) {
-    var b = C.exportBundle(data, 'setlist', id), sl = data.setlists[id];
+    var b = C.exportBundle(ownData(), 'setlist', id), sl = data.setlists[id];
     openExport(t('exportSetlist'), t('exportSetlistDesc') + ' ' + t('nSongs')(b.songs.length) + '.',
       safeName('GIGGARI - ' + (sl.name || t('untitled'))) + '.json', JSON.stringify(b, null, 1));
   }
@@ -2681,8 +2919,23 @@ a.brand:hover { filter: brightness(1.08); }
           h('b', { text: sl.name || t('untitled') }),
           h('small', { text: t('nSongs')(visibleItems(sl).length) }),
           dates ? h('small', { class: 'dates', text: dates }) : null,
-          sl.example ? h('span', null, h('span', { class: 'tag', text: t('example') })) : null);
-      })) : h('div', { class: 'empty', text: t('noSetlists') })));
+          sl.example || myShares[sl.id] ? h('span', null,
+            sl.example ? h('span', { class: 'tag', text: t('example') }) : null,
+            myShares[sl.id] ? h('span', { class: 'tag shared', text: t('sharedByLink') }) : null) : null);
+      })) : h('div', { class: 'empty', text: t('noSetlists') }),
+      (function () {
+        var sh = sharedSetlists();
+        if (!sh.length) return null;
+        return h('section', { class: 'group' },
+          h('h2', { class: 'grouphead' }, h('span', { text: t('sharedWithMe') }), h('small', { text: String(sh.length) })),
+          h('div', { class: 'lists' }, sh.map(function (sl) {
+            return h('button', { class: 'listcard', type: 'button', onclick: function () { go('setlist', { setlistId: sl.id }); } },
+              sl.date ? h('span', { class: 'gigdate', text: fmtGig(sl.date) }) : null,
+              h('b', { text: sl.name || t('untitled') }),
+              h('small', { text: t('nSongs')(visibleItems(sl).length) }),
+              h('span', null, h('span', { class: 'tag shared', text: t('sharedTag') })));
+          })));
+      })()));
   }
 
   // ----- archive -----
@@ -2737,7 +2990,7 @@ a.brand:hover { filter: brightness(1.08); }
   function renderSetlist() {
     var sl = data.setlists[ui.setlistId];
     if (!sl || sl.deleted || sl.archived) { ui.view = 'setlists'; return renderSetlists(); }
-    var items = visibleItems(sl);
+    var items = visibleItems(sl), shared = !!sl.shared;
     function mutate(fn) { var c = clone(data.setlists[sl.id]); fn(c); if (c.example) delete c.example; saveRec('setlists', c); }
     function idxOf(c, itUid) { for (var i = 0; i < c.items.length; i++) if (c.items[i].uid === itUid) return i; return -1; }
 
@@ -2751,7 +3004,7 @@ a.brand:hover { filter: brightness(1.08); }
 
     var listEl = items.length ? h('ol', { class: 'setsongs' }, items.map(function (it, i) {
       var song = data.songs[it.songId], tr = it.tr || 0;
-      function shift(d) { mutate(function (c) { var k = idxOf(c, it.uid); if (k >= 0) c.items[k].tr = wrapTr((c.items[k].tr || 0) + d); }); render(); }
+      function shift(d) { mutate(function (c) { var k = idxOf(c, it.uid); if (k >= 0) { c.items[k].tr = wrapTr((c.items[k].tr || 0) + d); if (shared) c.items[k].own = true; } }); render(); }
       function move(d) {
         var other = items[i + d]; if (!other) return;
         mutate(function (c) { var a = idxOf(c, it.uid), b = idxOf(c, other.uid); var tmp = c.items[a]; c.items[a] = c.items[b]; c.items[b] = tmp; });
@@ -2771,16 +3024,45 @@ a.brand:hover { filter: brightness(1.08); }
           var cp = itemCapo(song, it);
           return h('button', { class: 'btn small capobtn' + (cp ? ' on' : ''), type: 'button', 'aria-label': cp ? t('capo') + ' ' + cp : t('capoNone'),
             onclick: function () {
-              openCapo(song, tr, cp, function (c) { mutate(function (x) { var k = idxOf(x, it.uid); if (k >= 0) x.items[k].capo = c; }); render(); });
+              openCapo(song, tr, cp, function (c) { mutate(function (x) { var k = idxOf(x, it.uid); if (k >= 0) { x.items[k].capo = c; if (shared) x.items[k].own = true; } }); render(); });
             } }, cp ? t('capo') + ' ' + cp + (song.key ? ' · ' + keyAfter(song, tr - cp) : '') : t('capo'));
         })(),
-        h('span', { class: 'acts' },
+        shared ? null : h('span', { class: 'acts' },
           iconBtn('up', t('moveUp'), function () { move(-1); }, i === 0 ? 'off' : ''),
           iconBtn('down', t('moveDown'), function () { move(1); }, i === items.length - 1 ? 'off' : ''),
           iconBtn('x', t('remove'), function () { mutate(function (c) { var k = idxOf(c, it.uid); if (k >= 0) c.items.splice(k, 1); }); render(); })));
     })) : h('div', { class: 'empty', text: t('emptySetlist') });
     Array.prototype.forEach.call(listEl.querySelectorAll('.iconbtn.off'), function (b) { b.disabled = true; });
 
+    if (shared) {
+      var when = sl.fetchedAt ? fmtDate(sl.fetchedAt) + ' ' + new Date(sl.fetchedAt).toTimeString().slice(0, 5) : '';
+      main.replaceChildren(h('div', { class: 'col' },
+        h('div', { class: 'sethead' },
+          h('div', null, h('button', { class: 'btn ghost', type: 'button', onclick: function () { go('setlists'); } }, ico('left'), t('setlists'))),
+          h('h1', { class: 'name', id: 'setlist-name', text: sl.name || t('untitled') }),
+          h('div', { class: 'sharednote' },
+            h('span', { class: 'tag shared', text: t('sharedTag') }),
+            h('span', { text: t('sharedNote') }),
+            when ? h('small', { class: 'hint', text: t('sharedFetched').replace('{d}', when) }) : null),
+          h('div', { class: 'bar' },
+            h('button', { class: 'btn primary', type: 'button', disabled: !items.length, onclick: function () { openStage({ setlistId: sl.id, index: 0 }); } }, ico('play'), t('start')),
+            h('button', { class: 'btn', type: 'button', onclick: function () { openPrint({ setlistId: sl.id }); } }, ico('printer'), t('print')),
+            h('button', { class: 'btn', type: 'button', id: 'share-refresh', onclick: function () {
+              toast(t('shareLoading'));
+              shareRefreshAll(true).then(function () { if (data.setlists[sl.id]) toast(t('shareUpdated')); });
+            } }, ico('restore'), t('shareRefresh')),
+            h('span', { class: 'seg', role: 'group', 'aria-label': t('chordsInList') },
+              h('button', { type: 'button', 'aria-pressed': String(!sl.hideChords), text: t('chordsOn'), onclick: function () { if (sl.hideChords) { mutate(function (c) { c.hideChords = false; c.ownHide = true; }); render(); } } }),
+              h('button', { type: 'button', 'aria-pressed': String(!!sl.hideChords), text: t('lyricsOnly'), onclick: function () { if (!sl.hideChords) { mutate(function (c) { c.hideChords = true; c.ownHide = true; }); render(); } } })),
+            sl.date ? h('span', { class: 'count hint', text: fmtGig(sl.date) }) : null,
+            h('span', { class: 'count hint', text: t('nSongs')(items.length) }),
+            h('span', { class: 'spacer' }),
+            h('button', { class: 'btn ghost danger', type: 'button', id: 'share-remove', onclick: function () {
+              shareDrop(sl.shared); go('setlists'); toast(t('sharedRemoved'));
+            } }, ico('trash'), t('sharedRemove')))),
+        listEl));
+      return;
+    }
     main.replaceChildren(h('div', { class: 'col' },
       h('div', { class: 'sethead' },
         h('div', null, h('button', { class: 'btn ghost', type: 'button', onclick: function () { go('setlists'); } }, ico('left'), t('setlists'))),
@@ -2791,9 +3073,10 @@ a.brand:hover { filter: brightness(1.08); }
           h('button', { class: 'btn', type: 'button', onclick: function () { exportSetlist(sl.id); } }, ico('export'), t('exportBtn')),
           h('button', { class: 'btn', type: 'button', onclick: function () { openPrint({ setlistId: sl.id }); } }, ico('printer'), t('print')),
           h('button', { class: 'btn', type: 'button', title: t('duplicateHint'), onclick: function () { duplicateSetlist(sl.id); } }, ico('copy'), t('duplicate')),
+          h('button', { class: 'btn', type: 'button', id: 'share-open', onclick: function () { openShare(sl.id); } }, ico('share'), myShares[sl.id] ? t('sharedByLink') : t('share')),
           h('span', { class: 'seg', role: 'group', 'aria-label': t('chordsInList') },
-            h('button', { type: 'button', 'aria-pressed': String(!sl.hideChords), text: t('chordsOn'), onclick: function () { if (sl.hideChords) { mutate(function (c) { c.hideChords = false; }); render(); } } }),
-            h('button', { type: 'button', 'aria-pressed': String(!!sl.hideChords), text: t('lyricsOnly'), onclick: function () { if (!sl.hideChords) { mutate(function (c) { c.hideChords = true; }); render(); } } })),
+            h('button', { type: 'button', 'aria-pressed': String(!sl.hideChords), text: t('chordsOn'), onclick: function () { if (sl.hideChords) { mutate(function (c) { c.hideChords = false; if (shared) c.ownHide = true; }); render(); } } }),
+            h('button', { type: 'button', 'aria-pressed': String(!!sl.hideChords), text: t('lyricsOnly'), onclick: function () { if (!sl.hideChords) { mutate(function (c) { c.hideChords = true; if (shared) c.ownHide = true; }); render(); } } })),
           h('label', { class: 'datebox' }, h('span', { text: t('gigDate') }), dateInput),
           h('span', { class: 'count hint', text: [t('nSongs')(items.length), setlistDates(sl)].filter(Boolean).join(' · ') }),
           h('span', { class: 'spacer' }),
@@ -3106,9 +3389,10 @@ a.brand:hover { filter: brightness(1.08); }
     delete ctx.scroll;
     wake(true);
   }
+  function stageSharedList() { var sl = st.ctx && st.ctx.setlistId && data.setlists[st.ctx.setlistId]; return !!(sl && sl.shared); }
   function stageToEditor() {
     var info = stageInfo();
-    if (!info) return;
+    if (!info || info.song.shared) return;
     var songId = info.song.id;
     if (ui.view === 'edit' && ed && ed.rec.id === songId) { closeStage(); return; }
     var ctx = clone(st.ctx);
@@ -3161,7 +3445,7 @@ a.brand:hover { filter: brightness(1.08); }
     stageEl.replaceChildren(
       h('div', { class: 'sttop' },
         iconBtn('x', t('close'), function () { notesGuard(closeStage); }),
-        iconBtn('docedit', t('editSong'), function () { notesGuard(stageToEditor); }, 'stedit'),
+        stageSharedList() ? null : iconBtn('docedit', t('editSong'), function () { notesGuard(stageToEditor); }, 'stedit'),
         h('div', { class: 'sttitle' }, e.title, e.sub),
         h('div', { class: 'stctl' }, textBtn('−', t('keyDown'), function () { shiftKey(-1); }), e.keys, textBtn('+', t('keyUp'), function () { shiftKey(1); }), e.acc,
           e.capo = h('button', { class: 'btn small capobtn', type: 'button', onclick: function () {
@@ -3304,7 +3588,7 @@ a.brand:hover { filter: brightness(1.08); }
     if (!info) return;
     if (info.item) {
       var c = clone(info.sl);
-      c.items.forEach(function (it) { if (it.uid === info.item.uid) it.capo = st.capo; });
+      c.items.forEach(function (it) { if (it.uid === info.item.uid) { it.capo = st.capo; if (c.shared) it.own = true; } });
       if (c.example) delete c.example;
       saveRec('setlists', c);
     } else if ((info.song.capo | 0) !== st.capo) {
@@ -3314,7 +3598,7 @@ a.brand:hover { filter: brightness(1.08); }
   function saveStageNoChords() {
     var info = stageInfo();
     if (info && info.sl) {
-      var c = clone(info.sl); c.hideChords = st.noChords; if (c.example) delete c.example; saveRec('setlists', c);
+      var c = clone(info.sl); c.hideChords = st.noChords; if (c.shared) c.ownHide = true; if (c.example) delete c.example; saveRec('setlists', c);
     } else { prefs.soloNoChords = st.noChords; savePrefs(); }
   }
   // Pick a capo fret. Shows what each fret turns the chords into, easy open shapes marked.
@@ -3338,7 +3622,7 @@ a.brand:hover { filter: brightness(1.08); }
     var info = stageInfo();
     if (info && info.item) {
       var c = clone(info.sl);
-      c.items.forEach(function (it) { if (it.uid === info.item.uid) { it.tr = st.tr; it.acc = st.acc; } });
+      c.items.forEach(function (it) { if (it.uid === info.item.uid) { it.tr = st.tr; it.acc = st.acc; if (c.shared) it.own = true; } });
       if (c.example) delete c.example;
       saveRec('setlists', c);
     } else { st.ctx.tr = st.tr; st.ctx.acc = st.acc; }
@@ -3921,6 +4205,13 @@ a.brand:hover { filter: brightness(1.08); }
     draw();
   }
   var PRINT_PT = { s: 10, m: 12, l: 15 };
+  // The accent colours the header wordmark uses right now, as [r, g, b].
+  function brandColors() {
+    function rgb(v, d) { var m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(v || ''); return m ? [+m[1], +m[2], +m[3]] : d; }
+    var el = $('#brand'), cs = null;
+    try { cs = el && getComputedStyle(el); } catch (e) { cs = null; }
+    return { bg: rgb(cs && cs.backgroundColor, [173, 78, 8]), ink: rgb(cs && cs.color, [255, 255, 255]) };
+  }
 
   // Print: the browser lays the songs out exactly as on screen, in black on white.
   function printHtml(target, po) {
@@ -3940,6 +4231,9 @@ a.brand:hover { filter: brightness(1.08); }
         h('p', { class: 'p-sub', text: [en.song.artist, meta].filter(Boolean).join(' · ') }),
         strip, renderSheet(en.song, en.tr, en.acc, { capo: en.capo, noChords: !po.chords })));
     });
+    var mark = brandColors();
+    parts.push(h('div', { class: 'p-foot' }, h('span', { class: 'p-mark', text: 'GIGGARI',
+      style: 'background:rgb(' + mark.bg.join(',') + ');color:rgb(' + mark.ink.join(',') + ')' })));
     setKids.apply(null, [box].concat(parts));
     var fired = false;
     function on() { fired = true; }
@@ -4058,9 +4352,16 @@ a.brand:hover { filter: brightness(1.08); }
 
     function finish() {
       var n = doc.getNumberOfPages(), label = sl ? (sl.name || t('untitled')) : songTitle(target.song);
+      var mark = brandColors();
       for (var p = 1; p <= n; p++) {
-        doc.setPage(p); font('normal', 8, 130);
-        text('GIGGARI · ' + label, L, PH - 24);
+        doc.setPage(p);
+        // The wordmark: GIGGARI on a band in the app's accent colour, as in the app's header.
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
+        var mw = doc.getTextWidth('GIGGARI'), bx = L, by = PH - 33, bw = mw + 10, bh = 12.5;
+        doc.setFillColor(mark.bg[0], mark.bg[1], mark.bg[2]); doc.roundedRect(bx, by, bw, bh, 1.5, 1.5, 'F');
+        doc.setTextColor(mark.ink[0], mark.ink[1], mark.ink[2]); doc.text('GIGGARI', bx + 5, by + 9);
+        font('normal', 8, 130);
+        text(label, bx + bw + 7, PH - 24);
         var pg = t('page') + ' ' + p + ' / ' + n; text(pg, R - width(pg), PH - 24);
       }
       return doc;
@@ -4282,7 +4583,7 @@ a.brand:hover { filter: brightness(1.08); }
             ghPull(false).then(function () { status.textContent = ghStatusText(); });
           } }, ico('cloud'), t('ghPullNow')),
           h('button', { class: 'btn', type: 'button', onclick: function () {
-            saveFile('library.json', JSON.stringify(C.exportBundle(data, 'library'), null, 1));
+            saveFile('library.json', JSON.stringify(C.exportBundle(ownData(), 'library'), null, 1));
           } }, ico('export'), t('ghFileBtn'))),
         status,
         h('span', { class: 'hint', text: t('ghHint') }),
@@ -4402,6 +4703,8 @@ a.brand:hover { filter: brightness(1.08); }
   // ---------- routing and start ----------
   function fromHash() {
     if (sbFromUrl()) return;
+    var tok = shareFromUrl();
+    if (tok) { if (!isClaudeHost()) shareOpen(tok); return; }
     var want = location.hash === '#setlists' ? 'setlists' : location.hash === '#archive' ? 'archive' : 'songs';
     var cur = ui.view === 'archive' ? 'archive' : (ui.view === 'songs' || ui.view === 'edit') ? 'songs' : 'setlists';
     if (want !== cur) go(want);
@@ -4414,6 +4717,7 @@ a.brand:hover { filter: brightness(1.08); }
   function start(snap) {
     applyPrefs();
     sbFromUrl();
+    var shareTok = shareFromUrl();
     if (location.hash === '#setlists') ui.view = 'setlists';
     if (location.hash === '#archive') ui.view = 'archive';
     if (snap && snap.view === 'setlist' && snap.setlistId) { ui.view = 'setlist'; ui.setlistId = snap.setlistId; }
@@ -4423,6 +4727,8 @@ a.brand:hover { filter: brightness(1.08); }
     // After the device's own data (and Claude sync) has loaded, merge in the songs from GitHub.
     if (prefs.ghAuto !== false) setTimeout(function () { ghPull(true); }, 1500);
     if (sb.session && !isClaudeHost()) setTimeout(sbSync, 300);
+    if (shareTok && !isClaudeHost()) shareOpen(shareTok);
+    else setTimeout(function () { shareRefreshAll(true); }, 800);
   }
   var hot = window.claude && window.claude.hot;
   try { if (hot && hot.snapshot) hot.snapshot(function () { return { view: ui.view, setlistId: ui.setlistId }; }); } catch (e) { /* optional */ }

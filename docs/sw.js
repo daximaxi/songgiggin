@@ -1,5 +1,5 @@
 /* GIGGARI service worker: the app works without a connection once it has been opened. */
-const VERSION = '4.0.3-mwie1g6g';
+const VERSION = '4.1.0-mwif694f';
 const SHELL = 'giggari-shell-' + VERSION;
 const FONTS = 'giggari-fonts-v1';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './icon-maskable-512.png', './jspdf.umd.min.js'];

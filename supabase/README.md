@@ -14,6 +14,13 @@ Póstsniðmátunum þarf ekki að breyta (og á fríu áskriftinni með innbygg�
 - Ef eigin póstþjónn kemur síðar má setja `{{ .Token }}` í sniðmátið; reiturinn tekur líka við kóða.
 - Innbyggði póstþjónninn sendir aðeins 2 pósta á klukkustund og aðeins til meðlima Supabase skipulagsins. Eigin póstþjónn þarf áður en aðrir skrá sig inn.
 
+## Viðbót í 4.1: deila lagalista með hlekk
+
+Keyra `schema.sql` aftur í SQL Editor (allt skjalið; það sem er þegar til breytist ekki). Það bætir við:
+
+- Töflu `shares`: ein lína á hvern virkan hlekk (löng tilviljanakennd runa, eigandi, lagalisti). Hver sér og eyðir aðeins sínum hlekkjum. „Hætta að deila“ eyðir línunni.
+- Fallinu `get_share(t)`: hver sem er (án innskráningar) fær lagalistann og lögin á honum gegn rununni, eins og eigandinn samstillti þau síðast. Glósur eigandans (`notes`) eru teknar af. Ekkert annað úr safninu sést.
+
 ## Hvernig það virkar
 
 - Appið talar beint við Supabase (fetch), með opinbera lyklinum (`sb_publishable_…`). Hann má vera í appinu; reglurnar (RLS) í `schema.sql` ráða því hver sér hvað.

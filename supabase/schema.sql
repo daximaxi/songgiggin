@@ -67,3 +67,52 @@ end $$;
 
 revoke all on function public.push_records(jsonb) from public, anon;
 grant execute on function public.push_records(jsonb) to authenticated;
+
+-- ---------------------------------------------------------------------------------------------
+-- GIGGARI 4.1: share a setlist with a link. Anyone with the link can read that one setlist and
+-- the songs on it, without signing in. The link is a long random token; deleting the row stops it.
+-- The owner's handwritten notes on the songs are never shared.
+
+create table if not exists public.shares (
+  token      text not null primary key check (length(token) >= 20),
+  owner      uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  setlist_id text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists shares_owner_setlist on public.shares (owner, setlist_id);
+
+alter table public.shares enable row level security;
+drop policy if exists "shares: read own"   on public.shares;
+drop policy if exists "shares: insert own" on public.shares;
+drop policy if exists "shares: delete own" on public.shares;
+create policy "shares: read own"   on public.shares for select to authenticated using (owner = (select auth.uid()));
+create policy "shares: insert own" on public.shares for insert to authenticated with check (owner = (select auth.uid()));
+create policy "shares: delete own" on public.shares for delete to authenticated using (owner = (select auth.uid()));
+
+revoke all on public.shares from anon;
+grant select, insert, delete on public.shares to authenticated;
+
+-- What a link shows: the setlist and its songs as the owner last synced them, or null when the
+-- link was stopped or the setlist deleted. Runs as the table owner so it can read past the rules
+-- above, but only ever returns the one setlist the token points to.
+create or replace function public.get_share(t text) returns jsonb
+language sql stable security definer set search_path = public as $$
+  with s as (
+    select owner, setlist_id from public.shares where token = t
+  ), l as (
+    select r.data from public.records r join s on r.owner = s.owner
+    where r.kind = 'setlists' and r.id = s.setlist_id and not r.deleted
+  ), ids as (
+    select distinct it->>'songId' as id from l, jsonb_array_elements(coalesce(l.data->'items', '[]'::jsonb)) it
+  )
+  select case when exists (select 1 from l) then jsonb_build_object(
+    'setlist', (select data from l),
+    'songs', coalesce((
+      select jsonb_agg(r.data - 'notes') from public.records r join s on r.owner = s.owner
+      where r.kind = 'songs' and r.id in (select id from ids) and not r.deleted), '[]'::jsonb),
+    'mine', coalesce((select owner from s) = auth.uid(), false)
+  ) end;
+$$;
+
+revoke all on function public.get_share(text) from public;
+grant execute on function public.get_share(text) to anon, authenticated;

@@ -436,6 +436,8 @@ a.brand:hover { filter: brightness(1.08); }
   #print .p-title { font-family: var(--font-display); font-weight: 800; font-size: 2em; text-transform: uppercase; line-height: 1; margin: 0; }
   #print .p-sub { color: #444; font-size: .9em; margin: .2em 0 .8em; }
   #print .ch { color: #000; }
+  #print .p-foot { position: fixed; left: 0; bottom: 0; }
+  #print .p-mark { display: inline-block; font-family: var(--font-display); font-weight: 900; font-size: 9pt; letter-spacing: .04em; padding: 1.5pt 5pt 1pt; border-radius: 2pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   #print .ch.an, #print .cmt, #print .sec, #print .tabnote { color: #444; }
   #print .chorus { border-left-color: #000; }
   #print .cd, #print .cd figcaption { color: #000; }
@@ -495,3 +497,11 @@ a.brand:hover { filter: brightness(1.08); }
 .acset .acmsg { color: var(--danger); }
 #sync { cursor: pointer; }
 .sync[data-s="error"] i { background: var(--danger); }
+
+/* 4.1: sharing */
+.tag.shared { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--ink); }
+.sharebox { display: grid; gap: 12px; }
+.sharebox .bar { display: flex; gap: 8px; flex-wrap: wrap; }
+.sharefacts { margin: 0; padding-left: 1.2em; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
+.sharednote { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+h1.name { margin: 0; }
