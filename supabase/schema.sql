@@ -116,3 +116,22 @@ $$;
 
 revoke all on function public.get_share(text) from public;
 grant execute on function public.get_share(text) to anon, authenticated;
+
+-- ---------------------------------------------------------------------------------------------
+-- GIGGARI 4.2: Follow. The owner's stage writes where it is ({on, uid, brk, at}) on the share row;
+-- everyone with the link open asks get_live() every couple of seconds and goes to the same song.
+
+alter table public.shares add column if not exists live jsonb;
+
+drop policy if exists "shares: update own" on public.shares;
+create policy "shares: update own" on public.shares for update to authenticated
+  using (owner = (select auth.uid())) with check (owner = (select auth.uid()));
+grant update (live) on public.shares to authenticated;
+
+create or replace function public.get_live(t text) returns jsonb
+language sql stable security definer set search_path = public as $$
+  select live from public.shares where token = t;
+$$;
+
+revoke all on function public.get_live(text) from public;
+grant execute on function public.get_live(text) to anon, authenticated;

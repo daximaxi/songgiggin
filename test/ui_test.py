@@ -36,9 +36,10 @@ async def main():
         print('after +1:', (await page.locator('.setsongs li .keys').nth(0).inner_text()).replace('\n', ' '))
         await page.locator('.setsongs li').nth(0).get_by_label('Lower the key by a semitone').click()
         # reorder: move song 1 down
-        await page.locator('.setsongs li').nth(0).get_by_label('Move down').click()
+        # move song 1 to number 2 (typed), then back (typed): the arrows are gone since 4.2
+        await page.locator('.setsongs li .num').nth(0).click(); await page.fill('.numin', '2'); await page.press('.numin', 'Enter')
         print('order:', await page.locator('.setsongs li .open b').all_inner_texts())
-        await page.locator('.setsongs li').nth(1).get_by_label('Move up').click()
+        await page.locator('.setsongs li .num').nth(1).click(); await page.fill('.numin', '1'); await page.press('.numin', 'Enter')
         await page.screenshot(path=OUT + '2-setlist-dark.png')
 
         # stage from setlist, song 3 (Amazing Grace, +2 -> A)

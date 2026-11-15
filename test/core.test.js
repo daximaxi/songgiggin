@@ -298,4 +298,21 @@ eq(C.parseBundle(JSON.stringify({ format: 'other', version: 1, songs: [] })), nu
     'Því ég er [A]aumingi með Bónuspoka\nog [D]ríkið er [E]búið að [A]loka.\n\n' +
     '[A5] [C#5] [E5] [F#5] [E5] [D] [Dsus2]\n[A5] [C#5] [E5] [F#5] [E5] [D] [Dsus2]\n');
 })();
+// song length and set times (4.2)
+eq([C.parseDuration('3:45'), C.parseDuration('3.05'), C.parseDuration('225'), C.parseDuration('4m 10s'), C.parseDuration('1:02:30'), C.parseDuration('3:75'), C.parseDuration(''), C.parseDuration('abc'), C.parseDuration('4')],
+  [225, 185, 225, 250, 3750, 0, 0, 0, 240]);
+eq([C.fmtDuration(225), C.fmtDuration(65), C.fmtDuration(3750), C.fmtDuration(0)], ['3:45', '1:05', '1:02:30', '0:00']);
+eq([C.parseClock('21:00'), C.parseClock('9.30'), C.parseClock('25:00'), C.fmtClock(1445), C.fmtClock(21 * 60 + 5)], [1260, 570, null, '00:05', '21:05']);
+(function () {
+  var songs = { a: { id: 'a', duration: '3:00' }, b: { id: 'b', duration: 240 }, c: { id: 'c' } };
+  var items = [{ uid: '1', songId: 'a' }, { uid: '2', songId: 'b' }, { uid: 'h', type: 'break', min: 20 }, { uid: '3', songId: 'c' }, { uid: '4', songId: 'a' }, { uid: '5', songId: 'gone' }];
+  var r = C.setlistTimes(items, songs, '21:00');
+  eq(r.sets.map(function (x) { return [x.n, x.songs, x.secs, x.missing, x.fromClock, x.toClock]; }), [[1, 2, 420, 0, '21:00', '21:07'], [2, 2, 180, 1, '21:27', '21:30']]);
+  eq([r.music, r.total, r.missing, r.endClock], [600, 1800, 1, '21:30']);
+  eq(r.rows.map(function (x) { return x.uid + '@' + x.clock; }), ['1@21:00', '2@21:03', 'h@21:07', '3@21:27', '4@21:27']);
+  eq(C.setlistTimes(items, songs, '').endClock, null);
+})();
+// {duration} in ChordPro both ways
+eq(C.songToChordPro({ title: 'X', duration: 225, body: '[G]a' }), '{title: X}\n{duration: 3:45}\n\n[G]a\n');
+eq([C.importText('{title: X}\n{duration: 3:45}\n[G]a\n').duration, C.importText('{title: X}\n{duration: 3:45}\n[G]a\n').body], [225, '[G]a\n']);
 console.log('core tests passed:', n);

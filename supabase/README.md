@@ -21,6 +21,13 @@ Keyra `schema.sql` aftur í SQL Editor (allt skjalið; það sem er þegar til b
 - Töflu `shares`: ein lína á hvern virkan hlekk (löng tilviljanakennd runa, eigandi, lagalisti). Hver sér og eyðir aðeins sínum hlekkjum. „Hætta að deila“ eyðir línunni.
 - Fallinu `get_share(t)`: hver sem er (án innskráningar) fær lagalistann og lögin á honum gegn rununni, eins og eigandinn samstillti þau síðast. Glósur eigandans (`notes`) eru teknar af. Ekkert annað úr safninu sést.
 
+## Viðbót í 4.2: Fylgja
+
+Keyra `schema.sql` aftur í SQL Editor (allt skjalið). Það bætir við:
+
+- Dálkinum `live` á `shares`: hvar stjórnandinn er staddur (`{on, uid, brk, at}`). Aðeins eigandinn getur breytt honum.
+- Fallinu `get_live(t)`: hver sem er með hlekkinn fær stöðuna, án innskráningar. Appið spyr á 2 sekúndna fresti á meðan sviðið er opið og fylgt er.
+
 ## Hvernig það virkar
 
 - Appið talar beint við Supabase (fetch), með opinbera lyklinum (`sb_publishable_…`). Hann má vera í appinu; reglurnar (RLS) í `schema.sql` ráða því hver sér hvað.

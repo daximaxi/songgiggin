@@ -160,6 +160,7 @@
         else if (n === 'artist' || n === 'subtitle' || n === 'st') { if (!meta.artist) meta.artist = v; }
         else if (n === 'key') meta.key = v;
         else if (n === 'tempo' || n === 'bpm') meta.bpm = v;
+        else if (n === 'duration') meta.duration = v;
         else if (n === 'capo') { meta.capo = v; blocks.push({ type: 'comment', text: 'Capo ' + v, chorus: chorus }); }
         else if (n === 'comment' || n === 'c' || n === 'ci' || n === 'cb' || n === 'comment_italic' || n === 'comment_box' || n === 'highlight') blocks.push({ type: 'comment', text: v, chorus: chorus });
         else if (n === 'soc' || n === 'start_of_chorus') { chorus = true; if (v) blocks.push({ type: 'section', text: v, chorus: true }); }
@@ -413,7 +414,7 @@
     var lines = s.split('\n').map(function (l) { return l.replace(/\s+$/, ''); });
 
     var parsedMeta = parseSong(s).meta;
-    var meta = { title: parsedMeta.title || '', artist: parsedMeta.artist || '', key: parsedMeta.key || '', bpm: parsedMeta.bpm || '', composer: '', lyricist: '' };
+    var meta = { title: parsedMeta.title || '', artist: parsedMeta.artist || '', key: parsedMeta.key || '', bpm: parsedMeta.bpm || '', duration: parsedMeta.duration || '', composer: '', lyricist: '' };
     var extra = [];
 
     // Leading lines before the first chord, tab or section line are the header.
@@ -491,14 +492,14 @@
     lines = lines.slice(0, i).concat(tail);
 
     var bodyLines = extra.concat(rest.length ? rest.concat(['']) : [], lines.slice(i))
-      .filter(function (L) { return !/^\s*\{\s*(title|t|artist|subtitle|st|key|tempo|bpm)\s*:/i.test(L); });
+      .filter(function (L) { return !/^\s*\{\s*(title|t|artist|subtitle|st|key|tempo|bpm|duration)\s*:/i.test(L); });
     var body = convertChordsOverLyrics(bodyLines.join('\n'))
       .replace(/\n{3,}/g, '\n\n').replace(/^\n+/, '').replace(/\s+$/, '') + '\n';
 
     var key = normalizeKey(meta.key), keyGuessed = false;
     if (!key) { key = guessKey(body); keyGuessed = !!key; }
     var bpm = parseInt(meta.bpm, 10);
-    return { title: meta.title.trim(), artist: meta.artist.trim(), key: key, keyGuessed: keyGuessed, bpm: bpm > 0 ? bpm : '', body: body };
+    return { title: meta.title.trim(), artist: meta.artist.trim(), key: key, keyGuessed: keyGuessed, bpm: bpm > 0 ? bpm : '', duration: parseDuration(meta.duration) || '', body: body };
   }
 
   /** Formatted copy (HTML) where chords are elements with data-chord, as on Guitarparty.
@@ -550,7 +551,7 @@
       var sl = data.setlists[setlistId];
       setlists = sl && !sl.deleted ? [sl] : [];
       var ids = {};
-      setlists.forEach(function (x) { (x.items || []).forEach(function (it) { ids[it.songId] = 1; }); });
+      setlists.forEach(function (x) { (x.items || []).forEach(function (it) { if (it.songId) ids[it.songId] = 1; }); });
       songs = live(data.songs).filter(function (sg) { return ids[sg.id]; });
     } else {
       songs = live(data.songs).filter(function (sg) { return !sg.example; });
@@ -622,6 +623,7 @@
     if (song.artist) head.push('{artist: ' + song.artist + '}');
     if (song.key) head.push('{key: ' + song.key + '}');
     if (song.bpm) head.push('{tempo: ' + song.bpm + '}');
+    if (song.duration) head.push('{duration: ' + fmtDuration(song.duration) + '}');
     return head.join('\n') + (head.length ? '\n\n' : '') + String(song.body || '').replace(/\s+$/, '') + '\n';
   }
 
@@ -757,7 +759,75 @@
     return out;
   }
 
+  // ---------- song length and set times ----------
+
+  /** "3:45", "3.45", "4" (minutes), "225" (seconds), "3m 45s" or "1:02:30" -> seconds (0 when it can not be read). */
+  function parseDuration(v) {
+    if (typeof v === 'number') return v > 0 ? Math.round(v) : 0;
+    var s = String(v || '').trim().toLowerCase();
+    if (!s) return 0;
+    var m = /^(\d{1,2})[:.](\d{1,2})[:.](\d{2})$/.exec(s);
+    if (m) return (+m[1]) * 3600 + (+m[2]) * 60 + (+m[3]);
+    m = /^(\d{1,3})[:.](\d{1,2})$/.exec(s);
+    if (m) return +m[2] < 60 ? (+m[1]) * 60 + (+m[2]) : 0;
+    m = /^(?:(\d+)\s*(?:m|min|mín)\s*)?(?:(\d+)\s*(?:s|sek|sec))?$/.exec(s);
+    if (m && (m[1] || m[2])) return (+(m[1] || 0)) * 60 + (+(m[2] || 0));
+    m = /^\d+$/.exec(s);
+    if (!m) return 0;
+    return +s <= 30 ? +s * 60 : +s;     // a small plain number means minutes ("4"), a large one seconds ("225")
+  }
+  /** seconds -> "3:45" (or "1:02:30"). */
+  function fmtDuration(sec) {
+    sec = Math.max(0, Math.round(sec || 0));
+    var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), x = sec % 60;
+    return (h ? h + ':' + (m < 10 ? '0' : '') : '') + m + ':' + (x < 10 ? '0' : '') + x;
+  }
+  /** "21:00" -> minutes after midnight, or null. */
+  function parseClock(v) {
+    var m = /^(\d{1,2})[:.](\d{2})$/.exec(String(v || '').trim());
+    if (!m || +m[1] > 23 || +m[2] > 59) return null;
+    return (+m[1]) * 60 + (+m[2]);
+  }
+  /** minutes after midnight (may pass midnight) -> "21:05". */
+  function fmtClock(min) {
+    min = ((Math.round(min) % 1440) + 1440) % 1440;
+    var h = Math.floor(min / 60), m = min % 60;
+    return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+  /** Times for a setlist: items are songs ({songId}) and breaks ({type: 'break', min}).
+      Returns per item its start (seconds from the start) and per set (split by breaks) the
+      songs, the time they take and how many have no length. With a start time, clock times too. */
+  function setlistTimes(items, songs, start) {
+    var t0 = parseClock(start), at = 0, sets = [], cur = null, rows = [], missing = 0, music = 0;
+    function newSet() { cur = { songs: 0, secs: 0, missing: 0, from: at }; sets.push(cur); }
+    (items || []).forEach(function (it) {
+      if (it.type === 'break') {
+        var len = Math.max(0, (+it.min || 0) * 60);
+        if (cur) cur.to = at;
+        rows.push({ uid: it.uid, brk: true, at: at, secs: len, clock: t0 == null ? null : fmtClock(t0 + at / 60) });
+        at += len; cur = null;
+        return;
+      }
+      var sg = songs && songs[it.songId];
+      if (!sg) return;
+      if (!cur) newSet();
+      var d = parseDuration(sg.duration);
+      rows.push({ uid: it.uid, at: at, secs: d, clock: t0 == null ? null : fmtClock(t0 + at / 60) });
+      cur.songs++; cur.secs += d; music += d;
+      if (!d) { cur.missing++; missing++; }
+      at += d;
+    });
+    if (cur) cur.to = at;
+    sets.forEach(function (x, i) {
+      x.n = i + 1;
+      if (t0 != null) { x.fromClock = fmtClock(t0 + x.from / 60); x.toClock = fmtClock(t0 + x.to / 60); }
+    });
+    return { rows: rows, sets: sets, music: music, total: at, missing: missing,
+      endClock: t0 == null ? null : fmtClock(t0 + at / 60) };
+  }
+
   var Core = {
+    parseDuration: parseDuration, fmtDuration: fmtDuration, parseClock: parseClock, fmtClock: fmtClock, setlistTimes: setlistTimes,
     chordShape: chordShape, shapeNotes: shapeNotes, songChords: songChords, chordFamily: chordFamily, INTERVALS: INTERVALS,
     capoOptions: capoOptions, noteIndex: noteIndex,
     parseChord: parseChord, transposeChord: transposeChord, transposeBracket: transposeBracket,

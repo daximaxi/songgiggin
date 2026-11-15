@@ -63,7 +63,7 @@ async def handle(route):
         if not s: return await ok(None)
         sl = db['records'].get((s['owner'], 'setlists', s['setlist_id']))
         if not sl or sl['deleted']: return await ok(None)
-        ids = {it['songId'] for it in sl['data'].get('items', [])}
+        ids = {it.get('songId') for it in sl['data'].get('items', [])}
         songs = []
         for (o, k, i), r in db['records'].items():
             if o == s['owner'] and k == 'songs' and i in ids and not r['deleted']:
