@@ -91,7 +91,7 @@ async def main():
         print('two finger scroll moved page:', top1 > top0, '| strokes unchanged:', cnt3 == cnt2)
         await page.get_by_role('button', name='Lokið').click()
         await page.screenshot(path='/home/claude/shots/v3-after.png')
-        await page.set_viewport_size({'width': 390, 'height': 800}); await page.get_by_role('button', name='Glósur', exact=True).click()
+        await page.set_viewport_size({'width': 390, 'height': 800}); await page.click('#stage-tools-btn'); await page.get_by_role('button', name='Glósur', exact=True).click()
         await page.screenshot(path='/home/claude/shots/v3-phone.png')
         print('ERRORS:', errors)
         await b.close()

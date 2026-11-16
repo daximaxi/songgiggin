@@ -64,6 +64,7 @@
     eyeoff: '<path d="M2 12s3.6-7 10-7c2 0 3.7.7 5.1 1.6M22 12s-3.6 7-10 7c-2 0-3.7-.7-5.1-1.6M4 20L20 4"/>',
     grid: '<path d="M6 4h12M6 4v16M10 4v16M14 4v16M18 4v16M6 9h12M6 14h12"/><circle cx="10" cy="11.5" r="1.7" fill="currentColor"/><circle cx="14" cy="6.5" r="1.7" fill="currentColor"/>',
     printer: '<path d="M7 9V3h10v6M7 17H4v-8h16v8h-3M7 14h10v7H7z"/>',
+    dots: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
     share: '<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.9l7.6-3.8M8.2 13.1l7.6 3.8"/>',
     link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'
   };
@@ -159,7 +160,7 @@
       exportSetlistDesc: 'This setlist with its songs, the keys you set for it and the tags they use. Whoever imports it gets the whole setlist ready to play.',
       exportSongDesc: 'The song as a ChordPro text file. Other chord apps can open it, and GIGGARI can import it again.',
       duplicate: 'Copy', duplicateHint: 'Make a copy of this setlist', copySuffix: ' (copy)', setlistCopied: 'Copy made. Change what you need.',
-      length: 'Length', mins: '{m} min', hrsMin: '{h} h {m} min', setN: 'Set {n}', noLengthN: function (n) { return n === 1 ? '1 without length' : n + ' without length'; },
+      tools: 'Tools', length: 'Length', mins: '{m} min', hrsMin: '{h} h {m} min', setN: 'Set {n}', noLengthN: function (n) { return n === 1 ? '1 without length' : n + ' without length'; },
       withBreaks: '{t} with breaks', endsAt: 'ends about {c}', startsAt: 'starts {c}', startTime: 'Starts', place: 'Venue', placeHint: 'e.g. Rosenberg, Reykjavík',
       addBreak: 'Add break', breakAdded: 'Break added at the end. Drag it into place.', breakName: 'Break', breakMinutes: 'Break length in minutes', minShort: 'min',
       moveToNumber: 'Move to number', dragToMove: 'Drag to move',
@@ -288,7 +289,7 @@
       exportSetlistDesc: 'Lagalistinn ásamt lögunum, tóntegundunum sem þú valdir fyrir hann og tags-unum þeirra. Sá sem flytur hann inn fær allan lagalistann tilbúinn.',
       exportSongDesc: 'Lagið sem ChordPro textaskrá. Önnur hljómaöpp geta opnað hana og Giggarinn getur flutt hana inn aftur.',
       duplicate: 'Afrita', duplicateHint: 'Búa til afrit af þessum lagalista', copySuffix: ' (afrit)', setlistCopied: 'Afrit búið til. Lagaðu það sem þarf.',
-      length: 'Lengd', mins: '{m} mín', hrsMin: '{h} klst {m} mín', setN: 'Set {n}', noLengthN: function (n) { return n === 1 ? '1 án lengdar' : n + ' án lengdar'; },
+      tools: 'Tól', length: 'Lengd', mins: '{m} mín', hrsMin: '{h} klst {m} mín', setN: 'Set {n}', noLengthN: function (n) { return n === 1 ? '1 án lengdar' : n + ' án lengdar'; },
       withBreaks: '{t} með hléum', endsAt: 'lok um {c}', startsAt: 'byrjar {c}', startTime: 'Byrjar', place: 'Staður', placeHint: 't.d. Rosenberg, Reykjavík',
       addBreak: 'Bæta við hléi', breakAdded: 'Hlé bætt við aftast. Dragðu það á sinn stað.', breakName: 'Hlé', breakMinutes: 'Lengd hlés í mínútum', minShort: 'mín',
       moveToNumber: 'Færa á númer', dragToMove: 'Draga til að færa',
@@ -1091,7 +1092,10 @@
   function stageItems(sl) {
     return (sl.items || []).filter(function (it) { if (isBreak(it)) return true; var s = data.songs[it.songId]; return s && !s.deleted; });
   }
-  function itemLabel(it) { return isBreak(it) ? (it.name || t('breakName')) : songTitle(data.songs[it.songId]); }
+  // A break without its own name is called "Break" / "Hlé" in the app's language. Older breaks were
+  // saved with that word as their name, so the word in either language counts as no name.
+  function brkName(it) { var n = (it && it.name || '').trim(); return !n || /^(hlé|break)$/i.test(n) ? t('breakName') : n; }
+  function itemLabel(it) { return isBreak(it) ? brkName(it) : songTitle(data.songs[it.songId]); }
   function slTimes(sl) { return C.setlistTimes(stageItems(sl), data.songs, sl.start); }
   // "48 mín" / "1 klst 8 mín"
   function fmtLong(secs) {
@@ -1752,8 +1756,8 @@
           handle(),
           h('span', { class: 'num brk' }, h('span', { text: '‖' }), tm && tm.clock ? h('small', { text: tm.clock }) : null),
           h('span', { class: 'open brkname' },
-            shared ? h('b', { text: it.name || t('breakName') }) : h('input', { class: 'input', type: 'text', value: it.name || t('breakName'), 'aria-label': t('breakName'),
-              onchange: function (e) { var v = e.target.value.trim() || t('breakName'); mutate(function (c) { var k = idxOf(c, it.uid); if (k >= 0) c.items[k].name = v; }); render(); } })),
+            shared ? h('b', { text: brkName(it) }) : h('input', { class: 'input', type: 'text', value: brkName(it) === t('breakName') ? '' : brkName(it), placeholder: t('breakName'), 'aria-label': t('breakName'),
+              onchange: function (e) { var v = e.target.value.trim(); if (/^(hlé|break)$/i.test(v)) v = ''; mutate(function (c) { var k = idxOf(c, it.uid); if (k >= 0) c.items[k].name = v; }); render(); } })),
           h('label', { class: 'brkmin' },
             shared ? h('b', { text: String(it.min || 0) }) : h('input', { class: 'input', type: 'number', inputmode: 'numeric', min: '0', max: '600', value: String(it.min || 0), 'aria-label': t('breakMinutes'),
               onchange: function (e) { var v = clamp(parseInt(e.target.value, 10) || 0, 0, 600); mutate(function (c) { var k = idxOf(c, it.uid); if (k >= 0) c.items[k].min = v; }); render(); } }),
@@ -1837,7 +1841,7 @@
             h('button', { type: 'button', 'aria-pressed': String(!sl.hideChords), text: t('chordsOn'), onclick: function () { if (sl.hideChords) { mutate(function (c) { c.hideChords = false; if (shared) c.ownHide = true; }); render(); } } }),
             h('button', { type: 'button', 'aria-pressed': String(!!sl.hideChords), text: t('lyricsOnly'), onclick: function () { if (!sl.hideChords) { mutate(function (c) { c.hideChords = true; if (shared) c.ownHide = true; }); render(); } } })),
           h('button', { class: 'btn', type: 'button', id: 'add-break', onclick: function () {
-            mutate(function (c) { (c.items || (c.items = [])).push({ uid: uid('i'), type: 'break', name: t('breakName'), min: 15 }); });
+            mutate(function (c) { (c.items || (c.items = [])).push({ uid: uid('i'), type: 'break', name: '', min: 15 }); });
             render(); toast(t('breakAdded'));
           } }, ico('pause'), t('addBreak')),
           h('span', { class: 'spacer' }),
@@ -2316,6 +2320,7 @@
   }
   function closeStage() {
     clearInterval(st.brkTimer); clearInterval(st.clockTimer); st.brk = null;
+    clearTimeout(st.barsTimer); clearTimeout(st.speedTimer); stageEl.classList.remove('immersive', 'toolsopen', 'speedopen');
     leadStop(); followStop();
     notesReset();
     setPlaying(false);
@@ -2352,6 +2357,13 @@
       e.playIcon, h('span', { class: 'sp' }, h('small', { text: t('speed') }), e.speed));
     e.prevLabel = h('span'); e.nextLabel = h('span');
     e.prev = h('button', { class: 'nav prev', type: 'button', 'aria-label': t('prev'), onclick: function () { stageStep(-1); } }, ico('left'), e.prevLabel);
+    // Phone: the speed number is its own button; it shows − / + for a few seconds.
+    e.spd = h('button', { class: 'spdbtn', type: 'button', id: 'stage-speed', 'aria-label': t('speed'), onclick: function () { speedOpen(); } });
+    e.mini = h('div', { class: 'minictl', id: 'stage-mini' },
+      e.miniPlay = h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('pause'), onclick: function () { setPlaying(!st.playing); } }, ico('pause')),
+      e.miniSpd = h('b'),
+      h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('slower'), text: '−', onclick: function () { setSpeed(st.speed - 1); } }),
+      h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('faster'), text: '+', onclick: function () { setSpeed(st.speed + 1); } }));
     e.next = h('button', { class: 'nav next', type: 'button', 'aria-label': t('next'), onclick: function () { stageStep(1); } }, e.nextLabel, ico('right'));
     st.el = e;
     stageEl.replaceChildren(
@@ -2361,9 +2373,16 @@
         h('div', { class: 'sttitle' }, e.title, e.sub),
         e.lead = h('button', { class: 'btn small leadbtn', type: 'button', id: 'stage-lead', hidden: true, onclick: leadToggle }),
         e.clock = h('span', { class: 'stclock', id: 'stage-clock', hidden: true, 'aria-label': t('clock') }),
+        h('button', { class: 'iconbtn toolsbtn', type: 'button', id: 'stage-tools-btn', 'aria-label': t('tools'), title: t('tools'), 'aria-expanded': 'false', onclick: function () { toolsOpen(!stageEl.classList.contains('toolsopen')); } }, ico('dots')),
+        h('div', { class: 'stscrim', onclick: function () { toolsOpen(false); } }),
+        h('div', { class: 'sttools', id: 'stage-tools' },
+        h('div', { class: 'toolshead' }, h('b', { text: t('tools') }),
+          stageSharedList() ? null : h('button', { class: 'btn small', type: 'button', onclick: function () { toolsOpen(false); notesGuard(stageToEditor); } }, ico('docedit'), t('editSong')),
+          iconBtn('x', t('close'), function () { toolsOpen(false); })),
         h('div', { class: 'stctl' }, textBtn('−', t('keyDown'), function () { shiftKey(-1); }), e.keys, textBtn('+', t('keyUp'), function () { shiftKey(1); }), e.acc,
           e.capo = h('button', { class: 'btn small capobtn', type: 'button', onclick: function () {
             var info = stageInfo(); if (!info) return;
+            toolsOpen(false);
             openCapo(info.song, st.tr, st.capo, function (c) { st.capo = c; saveStageCapo(); var top = st.el.sheet.scrollTop; drawStage(true); st.el.sheet.scrollTop = top; });
           } })),
         h('div', { class: 'stctl' },
@@ -2375,7 +2394,7 @@
           e.eyeBtn = iconBtn('eye', t('notesHide'), function () { prefs.hideNotes = !prefs.hideNotes; savePrefs(); drawNotes(); }),
           e.printBtn = iconBtn('printer', t('print'), function () {
             var info = stageInfo(); if (!info) return;
-            setPlaying(false);
+            setPlaying(false); toolsOpen(false);
             openPrint({ song: info.song, tr: st.tr, acc: st.acc, capo: st.capo, noChords: st.noChords });
           }),
           h('button', { class: 'iconbtn', type: 'button', 'aria-label': t('textSmaller'), title: t('textSmaller'), text: 'A−', onclick: function () { setFont(-2); } }),
@@ -2385,15 +2404,22 @@
               if (document.fullscreenElement) document.exitFullscreen();
               else document.documentElement.requestFullscreen().catch(function () {});
             } catch (err) { /* not allowed here */ }
-          }))),
+          })))),
       e.notesBar = buildNotesBar(),
       e.sheet,
+      e.mini,
       h('div', { class: 'transport' },
         e.prev,
-        h('button', { class: 'step', type: 'button', 'aria-label': t('slower'), title: t('slower'), text: '−', onclick: function () { setSpeed(st.speed - 1); } }),
+        h('button', { class: 'step', type: 'button', 'aria-label': t('slower'), title: t('slower'), text: '−', onclick: function () { setSpeed(st.speed - 1); speedOpen(); } }),
         e.play,
-        h('button', { class: 'step', type: 'button', 'aria-label': t('faster'), title: t('faster'), text: '+', onclick: function () { setSpeed(st.speed + 1); } }),
+        e.spd,
+        h('button', { class: 'step', type: 'button', 'aria-label': t('faster'), title: t('faster'), text: '+', onclick: function () { setSpeed(st.speed + 1); speedOpen(); } }),
         e.next));
+    // Phone, while scrolling by itself: bars hide; one tap on the text brings them back for a while.
+    e.sheet.addEventListener('click', function (ev) {
+      if (ev.target.closest && ev.target.closest('.ch[data-c], button, a, input, .note-text')) return;
+      if (st.playing && isCompact()) barsShow();
+    });
     // swipe left or right to change song inside a setlist
     var sx = 0, sy = 0, stime = 0;
     e.sheet.addEventListener('touchstart', function (ev) { var p = ev.changedTouches[0]; sx = p.clientX; sy = p.clientY; stime = Date.now(); }, { passive: true });
@@ -2430,7 +2456,7 @@
   // The break screen: its name and planned length, a timer once started, and what comes next.
   function drawBreak(info) {
     var e = st.el, it = info.brk, b = st.brk || (st.brk = { uid: it.uid, start: 0 });
-    e.title.textContent = it.name || t('breakName');
+    e.title.textContent = brkName(it);
     e.sub.textContent = [(st.ctx.index + 1) + ' / ' + info.items.length, it.min ? t('mins').replace('{m}', it.min) : null].filter(Boolean).join(' · ');
     var nx = info.items[st.ctx.index + 1];
     var timer = h('div', { class: 'brktimer', id: 'brk-timer' });
@@ -2444,7 +2470,7 @@
     st.brkTimer = setInterval(function () { if (!st.el || !stageInfo() || !stageInfo().brk) { clearInterval(st.brkTimer); return; } tickBreak(); }, 1000);
     tickBreak();
     e.sheet.replaceChildren(h('div', { class: 'brkscreen' },
-      h('div', { class: 'brkword', text: it.name || t('breakName') }),
+      h('div', { class: 'brkword', text: brkName(it) }),
       timer,
       b.start ? h('small', { class: 'hint', text: t('breakSince').replace('{c}', new Date(b.start).toTimeString().slice(0, 5)) + (it.min ? ' · ' + t('breakPlanned').replace('{m}', it.min) : '') }) : null,
       h('div', { class: 'bar' },
@@ -2516,6 +2542,33 @@
     var e = st.el; if (!e) return;
     e.playIcon.replaceChildren(ico(st.playing ? 'pause' : 'play'));
     e.play.setAttribute('aria-label', (st.playing ? t('pause') : t('play')) + ', ' + t('speed') + ' ' + st.speed);
+    e.spd.textContent = String(st.speed); e.miniSpd.textContent = String(st.speed);
+    e.miniPlay.replaceChildren(ico(st.playing ? 'pause' : 'play'));
+    immersive();
+  }
+  // ----- compact stage (phones, 4.2.1) -----
+  var COMPACT = window.matchMedia ? window.matchMedia('(max-width: 640px), (max-height: 500px)') : { matches: false };
+  function isCompact() { return !!COMPACT.matches; }
+  function toolsOpen(on) {
+    stageEl.classList.toggle('toolsopen', !!on);
+    var b = $('#stage-tools-btn'); if (b) b.setAttribute('aria-expanded', String(!!on));
+    if (on) setPlaying(false);
+  }
+  function speedOpen() {
+    stageEl.classList.add('speedopen');
+    clearTimeout(st.speedTimer);
+    st.speedTimer = setTimeout(function () { stageEl.classList.remove('speedopen'); }, 3500);
+  }
+  // While scrolling by itself on a phone only the small speed control shows.
+  function immersive() {
+    var on = !!(st.playing && isCompact() && !(st.barsUntil > Date.now()));
+    stageEl.classList.toggle('immersive', on);
+  }
+  function barsShow() {
+    st.barsUntil = Date.now() + 4000;
+    immersive();
+    clearTimeout(st.barsTimer);
+    st.barsTimer = setTimeout(function () { st.barsUntil = 0; immersive(); }, 4100);
   }
   // Synced data arrived while on stage: redraw only if this song's text really changed.
   function stageRefresh() {
@@ -2701,7 +2754,7 @@
     else if (e.key === '-' || e.key === '_') { e.preventDefault(); setSpeed(st.speed - 1); }
     else if (e.key === 'ArrowRight') { e.preventDefault(); stageStep(1); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); stageStep(-1); }
-    else if (e.key === 'Escape') { e.preventDefault(); notesGuard(closeStage); }
+    else if (e.key === 'Escape') { e.preventDefault(); if (stageEl.classList.contains('toolsopen')) toolsOpen(false); else notesGuard(closeStage); }
   });
   // A focused button would also fire on space keyup and undo the toggle above.
   document.addEventListener('keyup', function (e) {
@@ -2830,6 +2883,7 @@
   function notesStart() {
     var sg = stageSong();
     if (!sg) return;
+    toolsOpen(false);
     setPlaying(false);
     an.on = true; an.dirty = false; an.undo = [];
     an.notes = clone(sg.notes || []);
@@ -3140,7 +3194,7 @@
       times.endClock && times.total ? t('endsAt').replace('{c}', times.endClock) : null].filter(Boolean).join(' · ');
     return { rows: rows, info: info };
   }
-  function brkText(it) { return (it.name || t('breakName')) + (it.min ? ' · ' + t('mins').replace('{m}', it.min) : ''); }
+  function brkText(it) { return brkName(it) + (it.min ? ' · ' + t('mins').replace('{m}', it.min) : ''); }
   function entryMeta(en, noChords) {
     var s = en.song, bits = [];
     if (s.key) bits.push(t('key') + ' ' + keyAfter(s, en.tr));

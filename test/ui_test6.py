@@ -48,6 +48,7 @@ async def main():
         await cdp.send('Input.dispatchTouchEvent', {'type': 'touchEnd', 'touchPoints': []})
         print('two-finger drag leaves size alone:', await fs() == f0)
         # notes mode: pinch still works, nothing gets drawn
+        await page.click('#stage-tools-btn')  # phone: the tools are in a sheet since 4.2.1
         await page.get_by_role('button', name='Glósur', exact=True).click()
         await pinch(cdp, 206, 520, 100, 180)
         print('pinch in notes mode: font', await fs(), '| strokes drawn:', await page.evaluate("document.querySelectorAll('#stage .notes-svg g').length"))
@@ -57,7 +58,7 @@ async def main():
         await page.mouse.move(200, 500); await page.keyboard.down('Control'); await page.mouse.wheel(0, -200); await page.keyboard.up('Control')
         await asyncio.sleep(0.2)
         print('ctrl+wheel: font', f1, '->', await fs())
-        print('A+ still works:', end=' '); f2 = await fs(); await page.get_by_label('Stærra letur').click(); print(f2, '->', await fs())
+        print('A+ still works:', end=' '); f2 = await fs(); await page.click('#stage-tools-btn'); await page.get_by_label('Stærra letur').click(); print(f2, '->', await fs())
         print('ERRORS:', errs)
         await b.close()
 asyncio.run(main())

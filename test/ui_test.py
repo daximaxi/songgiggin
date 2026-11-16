@@ -49,7 +49,7 @@ async def main():
         chords = await page.locator('#stage .ch').all_inner_texts()
         print('stage chords:', [c for c in chords if c.strip()][:8])
         # speed + twice, play, check scroll moves
-        await page.get_by_label('Faster').click(); await page.get_by_label('Faster').click()
+        await page.locator('.transport').get_by_label('Faster').click(); await page.locator('.transport').get_by_label('Faster').click()
         print('speed:', await page.locator('.transport .play b').inner_text())
         await page.set_viewport_size({'width': 900, 'height': 420})
         await page.locator('.transport .play').click()
